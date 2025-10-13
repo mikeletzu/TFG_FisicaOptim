@@ -1,0 +1,2 @@
+	PruebaCloth
+walk01 = https://www.mixamo.com/#/?page=2&query=walk
