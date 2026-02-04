@@ -1,0 +1,9 @@
+The Python Tutorial
+https://docs.python.org/3/tutorial/index.html
+
+Otro tutorial para programadores:
+https://www.geeksforgeeks.org/python-programming-language-tutorial/
+
+Algunas librerías:
+Numpy (implementación eficiente de arrays)
+Tutorial en: http://cs231n.github.io/python-numpy-tutorial/#numpy
