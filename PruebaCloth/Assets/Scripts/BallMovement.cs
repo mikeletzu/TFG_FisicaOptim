@@ -57,8 +57,8 @@ public class BallMovement : MonoBehaviour
 
     void AutoUpdate()
     {
-        if (transform.position.x > 4) dir = -1;
-        else if (transform.position.x < -4) dir = 1;
+        if (transform.position.x > 1) dir = -1;
+        else if (transform.position.x < -1) dir = 1;
         transform.position += dir * Vector3.right * Time.deltaTime * movementSpeed;
     }
 }
