@@ -265,6 +265,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   movementSpeed: 1
+  isAuto: 1
 --- !u!135 &339546646
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -352,7 +353,7 @@ Transform:
   m_GameObject: {fileID: 339546644}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.67, y: 0.72, z: -0}
+  m_LocalPosition: {x: 3, y: 0.72, z: -0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -944,7 +945,7 @@ Transform:
   m_GameObject: {fileID: 1454476647}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: -2.39933, y: 4.71, z: 1.60593}
+  m_LocalPosition: {x: 0, y: 4.71, z: 1.60593}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
