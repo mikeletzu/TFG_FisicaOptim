@@ -519,6 +519,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 521ede0c7280746458b2098a97f34277, type: 3}
       insertIndex: -1
       addedObject: {fileID: 825766817}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 521ede0c7280746458b2098a97f34277, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 825766819}
   m_SourcePrefab: {fileID: 100100000, guid: 521ede0c7280746458b2098a97f34277, type: 3}
 --- !u!1 &825766816 stripped
 GameObject:
@@ -602,7 +605,7 @@ Cloth:
   m_CapsuleColliders: []
   m_SphereColliders:
   - first: {fileID: 339546646}
-    second: {fileID: 0}
+    second: {fileID: 339546646}
   m_SelfCollisionDistance: 0
   m_SelfCollisionStiffness: 0.2
   m_SelfAndInterCollisionIndices: 
@@ -671,6 +674,26 @@ SkinnedMeshRenderer:
     m_Center: {x: 0, y: 0, z: 0}
     m_Extent: {x: 0.005, y: 0.005, z: 0}
   m_DirtyAABB: 0
+--- !u!114 &825766819
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825766816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa883dacb49e3474487078a70b9f7426, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClothDatasetRecorder
+  autoRecord: 0
+  record: 0
+  recordTime: 3.5
+  timeLeft: 0
+  totalFramesRecorded: 0
+  fileName: cloth_dataset.csv
+  filePrefix: clothDataset
+  fileExtension: .csv
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -3420,9 +3443,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa883dacb49e3474487078a70b9f7426, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  autoRecord: 1
   record: 1
-  vertexIndices: 
+  recordTime: 3.5
+  timeLeft: 0
+  totalFramesRecorded: 0
   fileName: cloth_dataset.csv
+  filePrefix: clothDataset
+  fileExtension: .csv
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
