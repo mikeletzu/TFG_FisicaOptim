@@ -7,6 +7,7 @@ using Unity.Mathematics;
 using UnityEngine;
 using System.Globalization;
 using NUnit.Framework.Constraints;
+using System.Collections.Generic;
 
 [RequireComponent(typeof(Cloth))]
 public class ClothDatasetRecorder : MonoBehaviour
@@ -18,7 +19,7 @@ public class ClothDatasetRecorder : MonoBehaviour
 	private bool record = false;
 	[SerializeField, Tooltip("Automatic record time")]
 	private float recordTime = 3.5f;
-	public float timeLeft = 0.0f;
+	public float recordTimeLeft = 0.0f;
 	private int[] vertexIndices;
 	[SerializeField, Tooltip("Frames Recorded")]
 	private int totalFramesRecorded = 0;
@@ -28,11 +29,16 @@ public class ClothDatasetRecorder : MonoBehaviour
     private string fileDirectory;
     public string filePrefix = "clothDataset";
     public string fileExtension = ".csv";
+    [SerializeField, Tooltip("Time between record frames")]
+    private float snapShotTime = 0.3f;
+    private float snapTimeLeft = 0.0f;
 
+    // Cloth 
     private Cloth cloth;
+    private Vector3[] particles;
 
-    // Estado en t
-    private Vector3[] pos_t;
+	// Estado en t
+	private Vector3[] pos_t;
     private Vector3[] vel_t;
     private Vector3[] normal_t;
     private float [] sdf_t;
@@ -45,7 +51,20 @@ public class ClothDatasetRecorder : MonoBehaviour
     private string filePath;
 
     NumberFormatInfo nfi; // Para cambiar de formato de escritura al estadounidense (usar puntos)
-    
+
+    /// <summary>
+    /// Informacion de un snapshot.
+    /// </summary>
+    public struct SnapInfo
+    {
+		public Vector3[] pos;
+		public Vector3[] vel;
+		public Vector3[] normal;
+        public float[] sdf;
+	}
+
+    List<SnapInfo> snapshots;
+     
 
     void Start()
     {
@@ -61,32 +80,44 @@ public class ClothDatasetRecorder : MonoBehaviour
             return;
         }
 
+        // Record automático
+		if (autoRecord)
+		{
+			record = true;
+			recordTimeLeft = recordTime;
+            snapTimeLeft  = snapShotTime;
+		}
+
+		// Formato estadounidense (puntos en vez de comas)
+		nfi = new CultureInfo("en-US", false).NumberFormat;
+        nfi.NumberDecimalSeparator = ".";
+
+        // Lista de snapshots
+        snapshots = new List<SnapInfo> {};
+
+        // Auxiliares para guardar datos del frame
+		pos_t = new Vector3[vertexIndices.Length]; 
+		vel_t = new Vector3[vertexIndices.Length];
+		sdf_t = new float[vertexIndices.Length];
+		normal_t = new Vector3[vertexIndices.Length];
+        pos_t_minus_1 = new Vector3[vertexIndices.Length];
+
+        // Info del cloth
+		particles = cloth.vertices;
+
+        // File guardado
         fileDirectory = Application.dataPath + "/Datasets/";
-        generateFileName();
+        GenerateFileName();
         filePath = fileDirectory + fileName;
         sb = new StringBuilder();
-
         Debug.Log(filePath);
 
         // CSV Header
         sb.Append("frame");
         foreach (int i in vertexIndices)  // Input
             sb.Append($",x{i},y{i},z{i},vx{i},vy{i},vz{i}, sdf{i}, nx{i}, ny{i}, nz{i}");
-        foreach (int i in vertexIndices) // Output
-            sb.Append($",dx{i},dy{i},dz{i}");
         sb.AppendLine();
-
-        // Record automático
-		if (autoRecord)
-		{
-			record = true;
-			timeLeft = recordTime;
-		}
-
-		// Formato estadounidense (puntos en vez de comas)
-		nfi = new CultureInfo("en-US", false).NumberFormat;
-        nfi.NumberDecimalSeparator = ".";
-    }
+	}
 
     /// <summary>
     /// Selecciona vértices random de la cloth.
@@ -113,25 +144,27 @@ public class ClothDatasetRecorder : MonoBehaviour
     {
         record = false;
     }
+    private void OnDestroy()
+    {
+        if (autoRecord)
+        {
+            SaveSnapsToCSV(snapshots);
+        }
+    }
 
-    void FixedUpdate() // Puede estar eestar justamanete antes? Va por frames? 
-    { //Se actualiza a la vez que la física. Puedes estar guardando antes de que acabe
+	void FixedUpdate() 
+    { 
+        //Se actualiza a la vez que la física. 
         if (!record) return;
 
-        timeLeft -= Time.deltaTime;
-        if (timeLeft < 0)
+        recordTimeLeft -= Time.deltaTime;
+        if (recordTimeLeft < 0)
         {
             stopRecording();
             return;
         }
 
-        Vector3[] particles = cloth.vertices;
-
-        pos_t = new Vector3[vertexIndices.Length]; // No hay que hacer un new por frame
-        vel_t = new Vector3[vertexIndices.Length];
-        sdf_t = new float[vertexIndices.Length];
-        normal_t = new Vector3[vertexIndices.Length];
-
+        particles = cloth.vertices;
         // Sphere collider of cloth
         Vector3 spherePos = cloth.sphereColliders[0].first.transform.position; // cventer para que es
         float sphereRad = cloth.sphereColliders[0].first.radius;
@@ -162,41 +195,58 @@ public class ClothDatasetRecorder : MonoBehaviour
             pos_t_minus_1[j] = pos_t[j];
         }
         
-
-		totalFramesRecorded++;
         hasPrevious = true;
-		SaveSample(pos_t, vel_t, null); // Guardar en memoria cada cierto tiempo, escribir en archivo al final
+
+        // Guardamos snapshot
+		snapTimeLeft -= Time.deltaTime;
+		if (snapTimeLeft < 0)
+		{
+            RecordSnapshot(pos_t, vel_t, sdf_t, normal_t);
+            snapTimeLeft = snapShotTime;
+            totalFramesRecorded++;
+		}
+		
 	}
 
-    void SaveSample(Vector3[] pos, Vector3[] vel, Vector3[] delta)
+    void RecordSnapshot(Vector3[] pos, Vector3[] vel, float[] sdf, Vector3[] normals) // Si vemos que no queremos acceder a snapshot anterior guardamos en vector concatenando directamente
     {
-        sb.Append(Time.frameCount.ToString(nfi));
+        SnapInfo snapInfo = new SnapInfo();
+		snapInfo.pos = new Vector3[vertexIndices.Length]; // Esto se puede optimizar?
+		snapInfo.vel = new Vector3[vertexIndices.Length];
+		snapInfo.sdf = new float[vertexIndices.Length];
+		snapInfo.normal = new Vector3[vertexIndices.Length];
 
-        for (int j = 0; j < pos.Length; j++)
+		pos.CopyTo(snapInfo.pos, 0);
+        vel.CopyTo(snapInfo.vel , 0);
+        sdf.CopyTo(snapInfo.sdf, 0);
+        normals.CopyTo(snapInfo.normal, 0);
+        snapshots.Add(snapInfo);
+        
+        // sb.Append(Time.frameCount.ToString(nfi)); // Queremos numero de frames totales? O tiempos?
+    }
+
+    void SaveSnapsToCSV(List<SnapInfo> snaps)
+    {
+        int i = 0;
+        foreach (SnapInfo snap in snaps)
         {
-            sb.Append($",{pos[j].x.ToString(nfi)},{pos[j].y.ToString(nfi)},{pos[j].z.ToString(nfi)}");
-            sb.Append($",{vel[j].x.ToString(nfi)},{vel[j].y.ToString(nfi)},{vel[j].z.ToString(nfi)}");
-        }
+			sb.Append(i.ToString(nfi));
+            i++;
 
-        for (int j = 0; j < delta.Length; j++)
-        {
-            sb.Append($",{delta[j].x.ToString(nfi)},{delta[j].y.ToString(nfi)},{delta[j].z.ToString(nfi)}");
-        }
-
-		for (int j = 0; j < sdf_t.Length; j++)
-		{
-			sb.Append($",{sdf_t[j].ToString(nfi)}");
+			for (int j = 0; j < snap.pos.Length; j++)
+            {
+                sb.Append($",{snap.pos[j].x.ToString(nfi)},{snap.pos[j].y.ToString(nfi)},{snap.pos[j].z.ToString(nfi)}");
+                sb.Append($",{snap.vel[j].x.ToString(nfi)},{snap.vel[j].y.ToString(nfi)},{snap.vel[j].z.ToString(nfi)}");
+				sb.Append($",{snap.sdf[j].ToString(nfi)}");
+				sb.Append($",{snap.normal[j].x.ToString(nfi)},{snap.normal[j].y.ToString(nfi)},{snap.normal[j].z.ToString(nfi)}");
+			}
+            sb.AppendLine();
 		}
-
-		for (int j = 0; j < normal_t.Length; j++)
-		{
-            sb.Append($",{normal_t[j].x.ToString(nfi)},{normal_t[j].y.ToString(nfi)},{normal_t[j].z.ToString(nfi)}");
-		}
-
-		sb.AppendLine();
 
         File.AppendAllText(filePath, sb.ToString());
         sb.Length = 0;
+
+        snapshots.Clear();
     }
 
     /// <summary>
@@ -226,7 +276,7 @@ public class ClothDatasetRecorder : MonoBehaviour
 	/// <summary>
     /// Generamos un nombre para el dataset segun lo ya guardado.
     /// </summary>
-	private void generateFileName()
+	private void GenerateFileName()
 	{
         // Directorio donde guardamos de momento los datasets.
 		DirectoryInfo directoryInfo = new DirectoryInfo(fileDirectory);

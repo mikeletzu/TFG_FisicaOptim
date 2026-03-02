@@ -686,14 +686,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa883dacb49e3474487078a70b9f7426, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClothDatasetRecorder
-  autoRecord: 0
+  autoRecord: 1
   record: 0
-  recordTime: 3.5
-  timeLeft: 0
+  recordTime: 13.5
+  recordTimeLeft: 0
   totalFramesRecorded: 0
   fileName: cloth_dataset.csv
   filePrefix: clothDataset
   fileExtension: .csv
+  snapShotTime: 0.3
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0
@@ -3446,11 +3447,12 @@ MonoBehaviour:
   autoRecord: 1
   record: 1
   recordTime: 3.5
-  timeLeft: 0
+  recordTimeLeft: 0
   totalFramesRecorded: 0
   fileName: cloth_dataset.csv
   filePrefix: clothDataset
   fileExtension: .csv
+  snapShotTime: 0.3
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
