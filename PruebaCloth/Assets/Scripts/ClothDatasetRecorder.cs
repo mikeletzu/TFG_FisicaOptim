@@ -70,8 +70,8 @@ public class ClothDatasetRecorder : MonoBehaviour
     {
         cloth = GetComponent<Cloth>();
 
-        // SelectAllVertices(); // Para seleccionar todos los vertices
-        AutoSelectVertices(10); // Para seleccinar un conjunto random limitado
+        SelectAllVertices(); // Para seleccionar todos los vertices
+        //AutoSelectVertices(10); // Para seleccinar un conjunto random limitado
 
         if (vertexIndices == null || vertexIndices.Length == 0)
         {
@@ -115,7 +115,7 @@ public class ClothDatasetRecorder : MonoBehaviour
         // CSV Header
         sb.Append("frame");
         foreach (int i in vertexIndices)  // Input
-            sb.Append($",x{i},y{i},z{i},vx{i},vy{i},vz{i}, sdf{i}, nx{i}, ny{i}, nz{i}");
+            sb.Append($",x{i},y{i},z{i},vx{i},vy{i},vz{i},sdf{i},nx{i},ny{i},nz{i}");
         sb.AppendLine();
 	}
 
@@ -193,6 +193,9 @@ public class ClothDatasetRecorder : MonoBehaviour
              **/
 
             pos_t_minus_1[j] = pos_t[j];
+
+            // TODO recolectar UVs de cada vertice
+            Debug.Log(idx + " " + GetComponent<MeshFilter>().mesh.uv[idx]);
         }
         
         hasPrevious = true;
