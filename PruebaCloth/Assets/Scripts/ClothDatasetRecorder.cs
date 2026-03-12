@@ -42,6 +42,7 @@ public class ClothDatasetRecorder : MonoBehaviour
     private Vector3[] vel_t;
     private Vector3[] normal_t;
     private float [] sdf_t;
+    private float[] maxDist_t;
 
     // Para calcular velocidades
     private Vector3[] pos_t_minus_1;
@@ -61,6 +62,7 @@ public class ClothDatasetRecorder : MonoBehaviour
 		public Vector3[] vel;
 		public Vector3[] normal;
         public float[] sdf;
+        public float[] maxDist;
 	}
 
     List<SnapInfo> snapshots;
@@ -70,6 +72,7 @@ public class ClothDatasetRecorder : MonoBehaviour
     {
         cloth = GetComponent<Cloth>();
 
+        
         SelectAllVertices(); // Para seleccionar todos los vertices
         //AutoSelectVertices(10); // Para seleccinar un conjunto random limitado
 
@@ -101,9 +104,10 @@ public class ClothDatasetRecorder : MonoBehaviour
 		sdf_t = new float[vertexIndices.Length];
 		normal_t = new Vector3[vertexIndices.Length];
         pos_t_minus_1 = new Vector3[vertexIndices.Length];
+        maxDist_t = new float[vertexIndices.Length];
 
         // Info del cloth
-		particles = cloth.vertices;
+        particles = cloth.vertices;
 
         // File guardado
         fileDirectory = Application.dataPath + "/Datasets/";
@@ -115,7 +119,7 @@ public class ClothDatasetRecorder : MonoBehaviour
         // CSV Header
         sb.Append("frame");
         foreach (int i in vertexIndices)  // Input
-            sb.Append($",x{i},y{i},z{i},vx{i},vy{i},vz{i},sdf{i},nx{i},ny{i},nz{i}");
+            sb.Append($",x{i},y{i},z{i},vx{i},vy{i},vz{i},sdf{i},nx{i},ny{i},nz{i}, md{i}");
         sb.AppendLine();
 	}
 
@@ -138,7 +142,10 @@ public class ClothDatasetRecorder : MonoBehaviour
 		vertexIndices = new int[cloth.vertices.Length]; // Esto si desde luego
 		for (int i = 0; i < vertexIndices.Length; i++) // Creo que esto es prescindible
 			vertexIndices[i] = i;
-	}
+
+        
+
+    }
 
     void stopRecording()
     {
@@ -165,6 +172,10 @@ public class ClothDatasetRecorder : MonoBehaviour
         }
 
         particles = cloth.vertices;
+
+        //cloth.coefficients[].maxDistance
+        ClothSkinningCoefficient[] coeffs = cloth.coefficients;
+
         // Sphere collider of cloth
         Vector3 spherePos = cloth.sphereColliders[0].first.transform.position; // cventer para que es
         float sphereRad = cloth.sphereColliders[0].first.radius;
@@ -183,9 +194,10 @@ public class ClothDatasetRecorder : MonoBehaviour
                 vel_t[j] = Vector3.zero;
             }
 
-            sdf_t[idx] = SDFSphere(pos_t[j], spherePos, sphereRad);
-            normal_t[idx] = NormalToSphere(pos_t[j], spherePos);
-            
+            sdf_t[j] = SDFSphere(pos_t[j], spherePos, sphereRad);
+            normal_t[j] = NormalToSphere(pos_t[j], spherePos);
+            maxDist_t[j] = coeffs[idx].maxDistance;
+
             /**
              * Constraints
              * cloth.GetVirtualParticleWeights();
@@ -204,27 +216,30 @@ public class ClothDatasetRecorder : MonoBehaviour
 		snapTimeLeft -= Time.deltaTime;
 		if (snapTimeLeft < 0)
 		{
-            RecordSnapshot(pos_t, vel_t, sdf_t, normal_t);
+            RecordSnapshot(pos_t, vel_t, sdf_t, normal_t, maxDist_t);
             snapTimeLeft = snapShotTime;
             totalFramesRecorded++;
 		}
 		
 	}
 
-    void RecordSnapshot(Vector3[] pos, Vector3[] vel, float[] sdf, Vector3[] normals) // Si vemos que no queremos acceder a snapshot anterior guardamos en vector concatenando directamente
+    void RecordSnapshot(Vector3[] pos, Vector3[] vel, float[] sdf, Vector3[] normals, float[] maxDist) // Si vemos que no queremos acceder a snapshot anterior guardamos en vector concatenando directamente
     {
         SnapInfo snapInfo = new SnapInfo();
 		snapInfo.pos = new Vector3[vertexIndices.Length]; // Esto se puede optimizar?
 		snapInfo.vel = new Vector3[vertexIndices.Length];
 		snapInfo.sdf = new float[vertexIndices.Length];
 		snapInfo.normal = new Vector3[vertexIndices.Length];
+        snapInfo.maxDist = new float[vertexIndices.Length];
 
 		pos.CopyTo(snapInfo.pos, 0);
         vel.CopyTo(snapInfo.vel , 0);
         sdf.CopyTo(snapInfo.sdf, 0);
         normals.CopyTo(snapInfo.normal, 0);
+        maxDist.CopyTo(snapInfo.maxDist, 0);
         snapshots.Add(snapInfo);
-        
+
+
         // sb.Append(Time.frameCount.ToString(nfi)); // Queremos numero de frames totales? O tiempos?
     }
 
@@ -242,7 +257,9 @@ public class ClothDatasetRecorder : MonoBehaviour
                 sb.Append($",{snap.vel[j].x.ToString(nfi)},{snap.vel[j].y.ToString(nfi)},{snap.vel[j].z.ToString(nfi)}");
 				sb.Append($",{snap.sdf[j].ToString(nfi)}");
 				sb.Append($",{snap.normal[j].x.ToString(nfi)},{snap.normal[j].y.ToString(nfi)},{snap.normal[j].z.ToString(nfi)}");
-			}
+                sb.Append($",{snap.maxDist[j].ToString(nfi)}");
+
+            }
             sb.AppendLine();
 		}
 
