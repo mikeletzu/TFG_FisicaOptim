@@ -1,0 +1,29 @@
+% Fichero con acr�nimos para su uso con GlossTeX
+%
+% El listado de acr�nimos funciona de manera similar a las referencias
+% bibliogr�ficas. Este  fichero es equivalente por tanto  al .bib, con
+% el listado de  los acr�nimos disponibles. A lo  largo del documento,
+% cuando se  utilice alguno  de ellos, se  referencia para  indicar al
+% sistema que queremos que dicho  acr�nimo aparezca en el glosario. En
+% contra de  lo que ocurre con  la bibliograf�a, el  texto original no
+% sufre ninguna modificaci�n.
+%
+% Las entradas son:
+% @entry{<etiqueta>[,<item>[,<forma larga>]]} [<texto>]
+%
+% La etiqueta es el  nombre del acr�nimo (equivalente a la etiqueta en
+% BibTeX) que luego se utiliza para "referenciarlo" en el texto.
+
+% Para  que  la  generaci�n   en  Release  con  el  Makefile  funcione
+% correctamente, necesitar�s  al menos tener  referenciado un acr�nimo
+% dentro del  texto.  Si  no quieres usar  acr�nimos, o de  momento no
+% tienes ninguno  referenciado, basta con que no  definas la constante
+% \acronimosEnRelease en config.tex
+
+@entry{CVS, , \emph{Control Version System}, Sistema de Control de Versiones}
+
+@entry{IA, , \emph{Artificial Inteligence}, Inteligencia Artificial}
+
+@entry{GPL, , \emph{General Public License}, Licencia P�blica General de GNU}
+
+@entry{PC2, PC$^2$, \emph{Programming Contest Control}}

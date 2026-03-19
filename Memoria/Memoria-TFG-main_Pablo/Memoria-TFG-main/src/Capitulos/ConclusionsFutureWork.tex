@@ -1,0 +1,76 @@
+\chapter*{Conclusions and Future Work}
+\label{cap:conclusions}
+\addcontentsline{toc}{chapter}{Conclusions and Future Work}
+\section{Conclusions}
+
+The objective of this study was to create an \gls{ai} model capable of detecting a series of gestures from users wearing a motion capture suit. To achieve this, datasets of gestures that matched the study's constraints were sought. Since no easily adaptable datasets with the required gestures were found, an animation dataset was created, consisting of both computer-generated data and data collected from real users.
+The computer-generated animations were converted to \gls{csv} format using a tool created by the authors of the study, while the animations collected from real users were processed with another tool developed by the same authors.
+After training various \gls{ai} models, it was concluded that the \gls{randomforest} model is the best choice for several reasons. Following this, a demonstration application was created to showcase the final results.
+
+The conclusions of each part of the work are presented in the following sections in more detail.
+
+\subsection{Dataset Search Conclusions}
+
+After the search for animation datasets, it was concluded that there are not enough public datasets available for the objective of this study.
+
+These conclusions led us to the need to create our own dataset by collecting animations from animation banks and through user trials.
+
+\subsection{Conclusions of the Animation Extraction Tool}
+
+The gesture conversion tool fully meets its objective, as it only requires specifying the name of the folder containing the downloaded gestures. It automatically processes the gestures in Unity and uploads them to Kaggle.
+Additionally, the tool is independent of the number of gestures to be converted and the number of animations available for those gestures, achieving great scalability. This allows for the introduction of new gestures without requiring any changes to the tool.
+
+
+
+\subsection{Conclusions of the User Data Collection}
+
+As can be seen in the figures in Appendix \ref{appendix:formularioDemografia}, the participant group—except for the non-binary gender category—is heterogeneous in terms of gender, with only a small percentage difference between men and women.
+The most notable difference can be seen in users' dominant hand, with left-handed individuals making up only 6.15\% of the group’s total population.
+
+Thanks to the test, a total of 975 animations were obtained (195 animations each for waving, pointing, sitting, fighting, and running).
+
+\subsection{Conclusions of the \gls{ia} Models Comparison}
+
+In terms of the \gls{ai} models, it has been observed that neural network models did not achieve the expected results, likely due to a combination of insufficient data and simplification of the neural networks to ensure shorter training times and faster inference computations.
+
+However, the \gls{randomforest} model has yielded the best results, being the fastest model (both in inference and training), the lightest model, and the most adaptable. This model can be used in systems with limited resources, such as standalone \gls{vr} glasses like Meta Quest or more powerful computers, and even in \gls{ai} ecosystems due to its possible translation to TensorFlow already implemented.
+
+In the analysis of the \gls{randomforest} results, it has been observed that the model places significant importance on the y-coordinate of the left leg and the y-coordinate of the left foot in the second time interval. This may indicate that gestures heavily depend on leg positions to distinguish between running, dancing, waving, or pointing.
+
+Also, there is a slight confusion between the gestures of fighting and waving. This may be due to the rapid hand movements in both types of gestures, which, due to the lack of fingers in the suit, can lead to confusion between a punch and a wave.
+
+\subsection{Final Application Conclusions}
+
+The final application is a demo that connects to a server to display the results.
+
+The negative aspect of this application is the way it connects to the server where the model is hosted, as it makes direct web requests to the Tensor Serving server, making it dependent on that server.
+
+Finally, the final application fulfills its purpose of showing the user the predicted animation with minimal latency.
+
+
+\subsection{Limitations}
+
+
+This study has faced a series of limitations, including the scarcity of public datasets, imbalance in types of animations, lack of more data from real users, training issues with neural network models, and data shortages for those same models.
+
+The limitation of dataset scarcity is not only due to the lack of datasets in number but also to the lack of gestures related to non-verbal communication. Most available datasets focus on sports or very specific themes, with few general-purpose datasets. Another limitation of these datasets has been the ease of adaptation or conversion to a format compatible with the motion capture suit used in the study.
+
+Regarding the imbalance of animation types, the issue arises from the duration of Mixamo's dance animations. Following the standardization process, the various dance animations are multiplied by a significantly larger number than those of other types. This was not resolved with the data collected from real users, as even though a large number of new animations were obtained, after standardization, dance animations still predominated significantly. This can be seen in Figures \ref{fig:datos-bruto} and \ref{fig:datos-estandar}.
+
+The neural network models did not yield the expected results, which may be due to the lack of data. Although there appears to be a sufficient number of samples at first glance, it is not enough for training neural networks. Additionally, hardware limitations for training more complex models and the time constraints of this study did not allow for longer training sessions or more extensive hyperparameter searches.
+
+All this limitations have led to the following future work plan.
+
+
+\section{Future Work}
+
+The future work of this study can focus on several efforts:
+
+\begin{itemize}
+    \item Improve the dataset by including people with functional diversity, increasing the number of samples per gesture, considering finger movements, and adding new categories. This could not only enhance the performance of neural network models but also provide greater differentiation for better generalization.
+    \item Investigate other \gls{ai} models that could improve classification accuracy and enable classification not only of gestures but also of emotions. This could help \glspl{npc} react more naturally to user gestures, making interactions more immersive.
+    \item Standardize the server to be compatible with other \gls{ai} technologies beyond TensorFlow. This would allow for the integration of emerging technologies into existing applications.
+    \item Implement another model that considers not only the current predicted gesture but also the entire context to advance the use of non-verbal communication with \glspl{npc}.
+    \item Evaluation of the final result with users.
+\end{itemize}
+

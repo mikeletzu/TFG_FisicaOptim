@@ -1,0 +1,178 @@
+\chapter{Código de la herramienta MixamoDumper}
+\label{appendix:MixamoDumperCode}
+
+\begin{lstlisting}[style=customcsharp, caption={Código de la herramienta MixamoDumper}, label={lst:MixamoDumperCode}]
+public class AnimImport : MonoBehaviour{
+    private Animator anim;
+    private string path;
+    private string header;
+    private string csv_path;
+    private StreamWriter csv_file;
+
+    private Dictionary<string, List<AnimationClip>> animacionMap;
+    protected AnimatorOverrideController animatorOverrideController;
+
+    private int indexAnim;
+    private int index;
+    private float timer;
+
+    private const string resourcePath = "Assets/Resources/";
+
+    [SerializeField]
+    private List<Transform> _bones;
+    private NumberFormatInfo nfi;
+
+    // Start is called before the first frame update
+    void Start()
+    {
+        nfi = new NumberFormatInfo();
+        nfi.NumberDecimalSeparator = ".";
+        animacionMap = 
+         new Dictionary<string, List<AnimationClip>>();
+        anim = GetComponent<Animator>();
+        animatorOverrideController =
+         new AnimatorOverrideController(
+            anim.runtimeAnimatorController);
+        anim.runtimeAnimatorController = 
+         animatorOverrideController;
+        index = 0;
+        indexAnim = -1;
+        timer = 0.0f;
+        path = Application.dataPath + "/Resources";
+        Directory.CreateDirectory(Path.Combine(
+            Application.dataPath, "CSV"));
+        header = createHeader();
+        loadClips();
+        setClip();
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        timer += Time.deltaTime;
+        string data = "";
+        foreach (Transform t in _bones)
+        {
+            data += t.position.x.ToString(nfi) + ","
+             + t.position.y.ToString(nfi) + "," 
+             + t.position.z.ToString(nfi) + "," + 
+             t.rotation.eulerAngles.x.ToString(nfi) + "," + 
+             t.rotation.eulerAngles.y.ToString(nfi) + "," + 
+             t.rotation.eulerAngles.z.ToString(nfi) + ",";
+        }
+        data = data.Remove(data.Length - 1);
+        csv_file.Write(data + "\n");
+
+
+        if (timer >= 
+         anim.GetCurrentAnimatorClipInfo(0)[0].clip.length)
+        {
+            timer = 0.0f;
+            csv_file.Close();
+            setClip(); //nextAnimation
+        }
+    }
+
+    /// <summary>
+    /// Sets the animation clip that will be executed.
+    /// </summary>
+    private void setClip()
+    {
+        KeyValuePair<string, List<AnimationClip>> val = 
+         animacionMap.ElementAt(index);
+        indexAnim++;
+        if (indexAnim == val.Value.Count)
+        {
+            index++;
+            if (index == animacionMap.Count)
+                EditorApplication.Exit(0);
+            val = animacionMap.ElementAt(index);
+            indexAnim = 0;
+        }
+        csv_path = Path.Combine(Application.dataPath, 
+        "CSV", 
+        val.Key.ToLower() + "_" + indexAnim.ToString() + ".csv");
+        csv_file = new StreamWriter(csv_path, false);
+        csv_file.WriteLine(header);
+        animatorOverrideController[val.Value[indexAnim].name] = 
+         val.Value[indexAnim];
+        anim.runtimeAnimatorController = 
+         animatorOverrideController;
+        anim.Play("Default", 0, 0f);
+    }
+
+    /// <summary>
+    /// Loads all the animation clips from the "Resources" directory.
+    /// Each animation must be in a directory with the same name 
+    /// as the type of gesture.
+    /// </summary>
+    private void loadClips()
+    {
+        try
+        {
+            string[] dir = Directory.GetDirectories(path);
+            foreach (string dirName in dir)
+            {
+                string[] animsPath = Directory.GetFiles(dirName);
+                string[] tmp = dirName.Split('\\');
+                animacionMap.Add(tmp[tmp.Length - 1], 
+                 new List<AnimationClip>());
+                foreach (string animPath in animsPath)
+                {
+
+                    string[] tmp2 = animPath.Split('\\');
+                    string a = Path.Combine(resourcePath, 
+                     tmp2[tmp2.Length - 2], 
+                     tmp2[tmp2.Length - 1]);
+                    var allAsset = 
+                     AssetDatabase.LoadAllAssetsAtPath(
+                        Path.Combine(resourcePath, 
+                         tmp2[tmp2.Length - 2], 
+                         tmp2[tmp2.Length - 1]));
+                    foreach (var asset in allAsset)
+                    {
+                        if (asset is AnimationClip && 
+                         asset.name != "__preview__mixamo.com")
+                        {
+                            string tag = tmp[tmp.Length - 1];
+                            animacionMap[tag].Add(
+                                asset as AnimationClip);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.Log($"Error: {e.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Creates the CSV header.
+    /// </summary>
+    /// <returns>CSV header.</returns>
+    private string createHeader()
+    {
+        string s = "";
+        string[] coordinates = { "x", "y", "z" };
+
+        foreach (Transform bone in _bones)
+        {
+            foreach (string coordinate in coordinates)
+            {
+                s += bone.name + "_pos" + coordinate + ",";
+            }
+            foreach (string coordinate in coordinates)
+            {
+                s += bone.name + "_rot" + coordinate + ",";
+            }
+        }
+
+        s = s.Remove(s.Length - 1);
+
+        return s;
+    }
+}
+\end{lstlisting}

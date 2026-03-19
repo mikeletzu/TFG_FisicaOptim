@@ -1,0 +1,21 @@
+\chapter*{Resumen}
+
+\section*{\tituloPortadaVal}
+
+Este estudio se centra en la comparativa de distintos modelos de \gls{ia} para la detección de gestos específicos mediante el traje de captura de movimiento Perception Neuron 3 con el fin de crear interacciones con \glspl{npc} a través de la comunicación no verbal y la creación de herramientas derivadas de los modelos que ayuden a la comunicación no verbal en entornos virtuales.
+
+Para ello primero se buscaron datasets públicos de gestos, no encontrándose ninguno que se adaptara a las necesidades del estudio. Por ello se creó una herramienta para traducir animaciones de Mixamo a \glspl{csv} para que pudieran ser entendidas por los modelos a entrenar. Esta herramienta generó un gran número de animaciones pero muy desbalanceadas en el número de animaciones de cada tipo.
+
+Para solucionar el problema del desbalance, se realizó una serie de pruebas con usuarios (N=65) en las cuales se les pidió que realizaran 3 tomas de cada gesto mientras llevaban el traje de captura de movimiento puesto. Esta recolección de datos resultó en un total de 975 animaciones, habiendo un total de 195 gestos humanos de correr, saludar, señalar, pegar y sentarse. Se omitió el gesto de baile en las pruebas por el desbalanceo en el dataset generado por ordenador. Esta omisión sirvió para equilibrar más el número de animaciones, pero no para terminar del todo con el desbalanceo en los datos estandarizados.
+
+Una vez se tuvo el dataset, se implementaron distintos modelos de \gls{ia} para la detección de gestos bajo una interfaz web para su facilidad de uso. Estos modelos fueron: \gls{lstm}, \gls{cnn}, \gls{rnn} y \gls{randomforest}. Tras realizar los entrenamientos de todos los modelos, se observó que el modelo \gls{randomforest} era con diferencia el que mejores datos obtenía, con un 95\% de precisión en entrenamiento y un 86\% en test. Los resultados de los modelos basados en redes neuronales fueron bastante menores, pudiendo ser esto así por la falta de datos, de tiempo de entrenamiento y de hardware suficiente para explotar mejor los modelos.
+
+Finalmente, se exportó el modelo \gls{randomforest} a TensorFlow Serving para posteriormente ser utilizado en una aplicación de demostración con un \gls{npc} reactivo. Esta aplicación permite al usuario ver como el \gls{npc} interpreta distintos gestos y responde de manera simple ante ellos.
+
+\section*{Palabras clave}
+
+\noindent Captura de movimiento, Unity, Inteligencia Artificial, Comunicación no verbal, Perception Neuron, TensorFlow, YDF, Keras, Realidad Virtual
+
+
+
+

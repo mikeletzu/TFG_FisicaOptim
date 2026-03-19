@@ -1,0 +1,77 @@
+\chapter{Conclusiones y Trabajo Futuro}
+\label{cap:conclusiones}
+
+\section{Conclusiones}
+
+El objetivo de este estudio era la creación de un modelo de \gls{ia} que pudiera detectar una serie de gestos de usuarios con un traje de captura de movimiento. Para ello, se buscaron datasets de gestos que concordaran con las restricciones del trabajo. Al no encontrar nada fácilmente adaptable o con los gestos necesitados, se creó un dataset de animaciones, con datos tanto generados por ordenador como recopilados de usuarios reales.
+
+Las animaciones generadas por ordenador se convirtieron a \gls{csv} por una herramienta creada por los autores del trabajo, al igual que las recolectadas por usuarios reales se hicieron con otra herramienta de los mismos creadores.
+
+Tras los entrenamientos de los distintos modelos de \gls{ia}, se llegó a la conclusión de que el \gls{randomforest} es el mejor modelo por diferentes razones. Tras esto, se creó una aplicación a modo de demostración para mostrar el resultado final.
+
+Las conclusiones de cada una de las partes del trabajo se presentan en las siguientes secciones de manera más detalladas.
+
+\subsection{Conclusiones de la búsqueda de datasets}
+Tras la búsqueda de datasets de animaciones se ha llegado a la conclusión de que no existen datasets públicos suficientes para el objetivo de este estudio.
+
+Estas conclusiones nos llevaron a la necesidad de crear un dataset propio recabando animaciones de bancos de animaciones y mediante pruebas con usuarios.
+
+\subsection{Conclusiones de la extracción de animaciones de bancos de animaciones}
+Para la conversión de animaciones de Mixamo se ha creado una herramienta para hacerlo de forma automática y se ha modificado otra herramienta para hacer una descarga en masa de estas animaciones.
+
+La herramienta de conversión de gestos cumple su objetivo completamente, ya que tan solo indicando el nombre de la carpeta que contiene los gestos descargados coge los gestos, se procesan en Unity y se suben a Kaggle de forma automática.
+Además la herramienta es independiente al número de gestos que se quieren convertir y a su vez del número de animaciones que hay de esos gestos, consiguiendo una gran escabilidad de esta forma haciendo posible la introducción de nuevos gestos sin tener que cambiar nada de la herramienta.
+
+\subsection{Conclusiones de la recolección de animaciones con usuarios}
+Para la recolección de datos con usuarios se anunció de forma insistente en las redes sociales de los autores del estudio así como por las distintas facultades de la Universidad Complutense de Madrid.
+Los anuncios cumplieron su objetivo, consiguiendo 75 respuestas de los cuales se presentaron 65 participantes, consiguiendo un 86,67\% de asistencia.
+
+Como se puede ver en las figuras del apéndice \ref{appendix:formularioDemografia} el grupo de participantes, con excepción del género no binario, es heterogéneo en cuanto al género con una pequeña diferencia de porcentaje entre hombres y mujeres.
+Donde se puede ver mayor diferencia es entre la mano dominante de los usuarios, siendo los zurdos tan solo un 6.15\% de la población total del grupo.
+
+Gracias a la prueba se obtuvieron 975 animaciones (195 animaciones de saludar, señalar, sentarse, pelear y correr).
+
+\subsection{Conclusiones de la comparativa entre los modelos de \gls{ia}}
+
+En cuanto a los modelos de \gls{ia}, se ha visto que los modelos de redes neuronales no han obtenido los resultados esperados, siendo esto seguramente por una mezcla de falta de datos y simplificación de las redes neuronales para asegurar un tiempo de entrenamiento menor y un computo más rápido a la hora de realizar inferencias.
+
+Sin embargo, el \gls{randomforest} ha sido el que ha obtenido mejores resultados, siendo el modelo más rápido (tanto en inferencia como en entrenamiento), el modelo más ligero y el modelo más adaptable. Este modelo se podría usar en sistemas con recursos limitados como pueden ser gafas de \gls{vr} independientes como las Meta Quest o en ordenadores más potentes, e incluso en ecosistemas de \gls{ia} por su posible traducción a TensorFlow ya implementada.
+
+En el análisis de los resultados del \gls{randomforest} se ha visto que el modelo le da una gran importancia a la coordenada y de la pierna izquierda, a la coordenada y del pie izquierdo en el segundo intervalo de tiempo. Esto puede indicar que los gestos dependen mucho de la posición de las piernas para discriminar si se está corriendo, bailando, saludando o señalando.
+
+También se puede ver una ligera confusión entre los gestos de pelea y saludar. Esto puede ser debido a los movimientos rápidos de las manos en ambos tipos de gesto, que al no tener dedos por limitación del traje, puede dar lugar a confusión entre un puñetazo y un saludo.
+
+\subsection{Conclusiones de la aplicación final}
+La aplicación final es una demo que se conecta a un servidor para mostrar los resultados.
+
+La parte negativa de esta aplicación es la forma de conectarse con el servidor en el que está el modelo, ya que hace peticiones web al servidor de Tensor Serving directamente, lo que lo hace dependiente de éste.
+
+Finalmente la aplicación final cumple su propósito de enseñar al usuario la animación predicha con una latencia mínima.
+
+
+\subsection{Limitaciones}
+
+Este estudio ha tenido una serie de limitaciones, desde escasez de datasets públicos, desbalanceo de tipos de animaciones, falta de más datos de usuarios reales, problemas de entrenamiento con los modelos de redes neuronales y problemas de falta de datos para estos mismos modelos.
+
+La limitación de escasez de datasets se debe no solo a la falta en número de datasets, sino también a la falta de gestos referentes a comunicación no verbal, habiendo algunos sobre deportes o temáticas muy concretas y pocos de carácter general.  Otra limitación de estos datasets ha sido la facilidad de adecuación o conversión a un formato compatible con el traje de captura de movimiento usado en el estudio.
+
+En cuanto al desbalanceo de los tipos de animaciones, la problemática viene dada por la duración de las animaciones de baile de Mixamo. Al seguir el proceso de estandarizado, las distintas animaciones de baile se multiplican en un número bastante mayor que los del resto de tipos. Esto no se solucionó con los datos recopilados de usuarios reales, ya que aún que se obtuvo un gran número de animaciones nuevas, tras la estandarización las de baile seguían prevaleciendo por bastante. Esto se puede ver en las figuras \ref{fig:datos-bruto} y \ref{fig:datos-estandar}.
+
+Los modelos de redes neuronales no han dado los resultados esperados, esto puede ser por la falta de datos, que aunque haya un número que a simple vista parece suficiente no lo es para entrenar redes neuronales, por las limitaciones de hardware para entrenar modelos más complejos y por los tiempos requeridos para la realización de este estudio no ser lo suficientemente largos como para llevar a cabo entrenamientos más extensos y con mayor búsqueda de hiperparámetros.
+
+Todas estas limitaciones, han llevado al siguiente plan de trabajo a futuro.
+
+
+\section{Trabajo Futuro}
+
+El trabajo a futuro de este estudio se puede centrar en varios esfuerzos:
+\begin{itemize}
+    \item Mejorar el dataset, incluyendo gente con diversidad funcional, aumentando el número de muestras por gesto, teniendo en cuenta los dedos de las manos y añadiendo nuevas categorías. Esto no solo puede llegar a mejorar el rendimiento de modelos de redes neuronales, sino que puede dotar de mayores diferencias a los modelos para poder generalizar mejor.
+    \item Investigar otros modelos de \gls{ia} que puedan mejorar la precisión de la clasificación y hacer clasificación no solo de gestos, sino también de emociones. Esto podría ayudar a que los \glspl{npc} puedan reaccionar de una manera más natural a los gestos del usuario, haciendo la interacción más inmersiva.
+    \item Estandarizar el servidor para que pueda ser usado con otras tecnologías de \gls{ia} y no solo con TensorFlow. Esto permitiría integrar tecnologías que vayan surgiendo en el futuro a aplicaciones ya existentes.
+    \item Implementar otro modelo que no solo tenga en cuenta el gesto predicho actual sino también todo el contexto para poder avanzar en el uso de la comunicación no verbal con \glspl{npc}.
+    \item Evaluación del resultado final con usuarios.
+\end{itemize}
+
+
+

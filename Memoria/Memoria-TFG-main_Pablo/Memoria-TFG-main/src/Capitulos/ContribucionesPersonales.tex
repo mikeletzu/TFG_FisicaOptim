@@ -1,0 +1,79 @@
+\chapter*{Contribuciones Personales}
+\label{cap:contribucionesPersonales}
+\addcontentsline{toc}{chapter}{Contribuciones Personales}
+
+\section*{Alejandro Barrachina Argudo}
+Alejandro Barrachina, estudiante del Grado de Ingeniería Informática, se ha involucrado en el desarrollo del estudio desde el momento en que se le propuso la idea. Desde el principio, ha estado en comunicación constante con su compañero y sus tutores para comunicar los avances y dudas del proyecto. A lo largo del proyecto, estas son las tareas que ha desempeñado:
+
+En un primer momento, se dedicó a estudiar el funcionamiento de Unity en gafas de \gls{vr} y su posible integración con el traje de captura de movimiento y los modelos de \gls{ia} pensados. Esto implicó aprender sobre Unity, C\#, y servidores en Unity.
+
+Una vez tuvo claro el comportamiento y funcionamiento de Unity, junto a su compañero, se dedicó a buscar posibles datasets para entrenar los modelos de \gls{ia}. Tras varias búsquedas, cuando se optó por crear un dataset a mano, se dedicó a buscar herramientas para automatizar el proceso.
+
+Al encontrar la herramienta Mixamo Downloader, la analizó hasta encontrar los errores de funcionamiento de la misma. Tras arreglarlos y añadir nuevas funcionalidades, se dedicó a crear la primera versión del dataset con los datos descargados, decidiendo la estructura de carpetas y su método de guardado.
+
+Para este método de guardado, se decidió usar Kaggle para evitar problemas con Github y su límite de tamaño por archivo. Alejandro se ha encargado también de la estructura de repositorios y herramientas en la organización creada para este TFG, \textit{FratosVR}, para así facilitar el desarrollo e interoperabilidad de las distintas herramientas con un desarrollo paralelo.
+
+Tras investigar distintos estudios de \gls{ia} para la detección de gestos, Alejandro decide hacer una comparativa entre los cuatro modelos expuestos en el estudio, reservandose otros por si hubiera más tiempo o recursos.
+
+Mientras Pablo Sánchez desarrollaba la herramienta de conversión de datos, Alejandro investigó como hacer un \textit{pipeline} de descarga del dataset, conversión al formato deseado usando Unity y su posterior actualización en el nuevo conjunto de datos de Kaggle. Para ello tuvo que investigar las funcionalidades de línea de comando de Unity, así como el funcionamiento del editor de Unity y sus funcionalidades expuestas en su \gls{api} de C\#.
+
+Una vez creados estos datos, Alejandro discutió con sus tutores cual sería la mejor manera de estandarizar los datos para su uso en los entrenamientos de los modelos. Cuando se llegó a un formato concreto, Alejandro se dedicó a programar la clase DataLoader para procesar todos los datos, estandarizarlos y actualizarlos en la nube para su posterior uso.
+
+Tras esto, Alejandro modeló los cuatro modelos a probar y comparar. Esto implicó el uso de Gradio y TensorBoard para facilitar el entrenamiento para usuarios ajenos al proyecto. Esta idea se desarrolló por la ayuda cedida por la asociación LAG, que consistió en dejarnos equipos con gráficas más potentes que las que teníamos disponibles para así acelerar el entrenamiento de los modelos.
+
+Mientras que Pablo se dedicaba a la adaptación de la herramienta para su uso con personas reales, Alejandro hizo dos formularios para las pruebas con usuarios. Uno de ellos para que las personas interesadas dejaran su correo y las fechas que tenían disponibles, y otro para la posterior recogida de datos demográficos. Estos formularios se pasaron a María del Carmen Fernández Villalba, Responsable de Protección de datos en Vicepresidencia Primera, perteneciente a Presidencia de La Junta de Comunidades de Castilla La Mancha, para su revisión y aprobación.
+Esto se hizo para asegurar que ninguno de los formularios incumplía la ley de protección de datos y así asegurar el anonimato de los datos recogidos y de los usuarios participantes. Tras sus sugerencias, se realizaron los cambios pertinentes y se abrieron para respuesta.
+
+De manera adicional, empezó a plantear los diferentes modelos a entrenar y su representación gráfica en la web de entrenamiento. Para ello, investigó YDF, ya que era una herramienta nueva que no había usado, y desarrolló los modelos con TensorFlow de manera que fueran todos iguales de cara a la interfaz. Para ello, tuvo que investigar también keras-tuner para hacer que los entrenamientos fueran lo más eficientes posibles teniendo en cuenta las restricciones de hardware.
+
+Una vez Pablo adaptó la herramienta para las pruebas con usuarios, Alejandro creo parte de los carteles para la difusión de las pruebas. Junto a Pablo hicieron una ruta por todas las facultades de la UCM de Ciudad Universitaria para colgarlos. También inició una campaña por sus redes sociales junto a las asociaciones de estudiantes de la facultad de informática para atraer a más gente.
+
+Previo a las pruebas con usuarios, Alejandro junto a su compañero habló con los tutores y con distinto personal de la facultad para conseguir un espacio reservado el mayor tiempo posible para realizar dichas pruebas.
+
+Durante las pruebas, tanto Alejandro como Pablo estuvieron presentes en todas para ayudar a los usuarios a ponerse el traje, realizar el calibrado del mismo y recoger las preguntas del cuestionario. Durante este proceso de pruebas, tanto Alejandro como Pablo se encargaron de atraer usuarios de prueba nuevos en caso de que fallaran los que tenían prueba asignada, resultando en que solo 5 plazas no fueran completadas.
+También se encargaron de gestionar horarios para maximizar el número de pruebas realizadas y gestionar la espera de los usuarios que se solaparan.
+
+Tras esto, Alejandro se encargó de los entrenamientos de los modelos y los problemas que surgieron durante el proceso (Falta de VRAM, problemas de ingesta de datos, etc). También se encargó de desplegar los mecanismos de entrenamiento en distintos sistemas para no ocasionar inconvenientes a los usuario de la asociación. Esto consistió en montar \gls{wsl} en los ordenadores de la asociación para compatibilizarlos con las últimas versiones de TensorFlow.
+
+Una vez se acabaron los entrenamientos y se decidió el mejor modelo, Alejandro investigó una manera de hacer que estos modelos fueran multiplataforma y pudieran ser usados en cualquier dispositivo. Esto resulto en el descubrimiento e investigación de TensorFlow Serving. Alejandro posteriormente hizo scripts para Windows y Linux para facilitar el desplegado del modelo en docker usando las \textit{releases} de Github.
+
+Tras finalizar todo esto, Alejandro se dedicó a la redacción de este documento junto a su compañero, garantizando así cohesión durante todo el texto y ayuda con \LaTeX en los momentos necesarios. También se dedicó a hacer las gráficas explicativas de los modelos y los datos demográficos para asegurar un entendimiento más sencillo de todos los resultados.
+
+\section*{Pablo Sánchez Martín}
+Pablo Sánchez Martín, estudiante del Grado de Desarrollo de Videojuegos, se ha involucrado en el proyecto desde el momento en el que salió la idea manteniendo una comunicación constante con su compañero y tutores.
+
+Desde el año 2023 mantuvo contacto con uno de los tutores, Alejandro Romero, para hacer un proyecto con un traje de captura de movimiento.
+Tras varias reuniones debatiendo lo que podría ser un trabajo interesante los dos decidieron el estudio actual.
+Para ello Pablo contactó al otro tutor del proyecto, Ismael Sagredo, e involucró a su compañero Alejandro Barrachina.
+
+Durante el desarrollo estas son las tareas que ha realizado:
+
+La primera tarea que tuvo que realizar junto a su compañero Alejandro era establecer qué gestos se querían detectar, qué modelos de \gls{ia} se iban a utilizar y si se iba a detectar el movimiento de los dedos mediante las gafas de \gls{vr} (handtracking).
+Finalmente los dos acordaron los cinco gestos en los que se basa el proyecto, los cuatro modelos con los que se hace la comparación y la decisión de no tener el handtracking por posibles problemas a la hora de no estar viendo las manos en todo momento.
+
+Lo siguiente que hizo fue investigar el funcionamiento del traje de captura de movimiento junto al software necesario, tanto Axis Studio como el plugin de Unity.
+Para ello estuvo investigando las distintas funcionalidades dentro de un proyecto de Axis Studio que podría interesar para el estudio y se descargó un proyecto cedido por el tutor Alejandro Romero en el que se usaba el plugin para poder analizarlo y saber cómo usarlo.
+
+Una vez entendió el funcionamiento del software necesario para el funcionamiento del traje empezó a buscar distintos datasets de animaciones para entrenar los modelos junto a su compañero.
+Al ver la escasez de estos datasets se optó por sacaralos de un banco de animaciones, por lo que empezó el desarrollo de la herramienta Mixamo Dumper.
+
+En un primer momento investigó sobre el uso de los Assets Bundles de Unity para la carga automática de recursos externos a la aplicación, pero al final decidió no usar ese método.
+Finalmente para esa aplicación decidió usar el Asset Database de Unity, por lo que se dedicó a la investigación de esta \gls{api} y finalmente a la implementación de la herramienta.
+Una vez funcionaba la implementación de la carga de animaciones en tiempo de ejecución investigó como poder ejecutar todas estas animaciones seguidas en tiempo de ejecución, hasta que finalmente encontró el componente ``Animator Override Controller'', lo que le permitió cumplir el objetivo de la herramienta.
+
+Debido a los pocos datos encontrados en Mixamo se decidió grabar a usuarios con el traje de captura de movimiento, por lo que hizo en Unity una herramienta sencilla para crear \glspl{csv} en tiempo real con el traje de captura de movimiento.
+
+Para las pruebas con usuarios se encargó de la comunicación con sus tutores y personal de la Facultad de Informática para conseguir un lugar en el que poder grabar.
+Con el fin de capar usuarios junto a su compañero hizo carteles y ayudó en la campaña en redes sociales y difusión por el resto de facultades de Ciudad Universitaria.
+
+En la prueba explicó junto a su compañero a todos los usuarios el propósito de las pruebas, les ayudó a ponerse el traje y a explicarles el proceso de calibración.
+También le fue dando indicaciones a los usuarios sobre los gestos a realizar, grabó las animaciones y verificó que no hubiese ningún problema con estas.
+Adicionalmente se encargó junto a su compañero de buscar nuevos usuarios para cubrir huecos que habían quedado libres con el fin de maximizar el número de datos recogidos y gestionar a las personas que solapaban con otros usuarios.
+
+Una vez recogidos los datos investigó diferentes formas de conectarse con el servidor que hostee el modelo elegido.
+Investigó el uso de ``Unity NetCode'', un paquete propio de Unity para la comunicación en red en videojuegos y también investigó la posibilidad de realizar la comunicación mediante las llamadas nativas de C\#.
+Finalmente se decidió usar la arquitectura \gls{API REST}, por lo que investigó su funcionamiento mediante el paquete nativo ``UnityWebRequest'' y empezó la aplicación final con la implementación de ésta en Unity.
+
+Una vez estaba hecha la comunicación con el servidor diseñó e implementó una aplicación final con soporte para las gafas de \gls{vr} y el traje de captura de movimiento en el que se conectase con el servidor y se pueda ver el resultado del modelo elegido en tiempo real y como un \gls{npc} reacciona a los gestos predichos por éste.
+
+Finalmente ha contribuído a la redacción de este documento junto a su compañero, así como la constante comunicación con los tutores para comprobar que el formato de éste era adecuado y a la realización de distintos diagramas para que las herramientas creadas durante el proceso del proyecto sean más sencillas de entender.
