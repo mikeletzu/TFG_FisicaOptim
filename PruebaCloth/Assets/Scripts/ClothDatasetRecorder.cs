@@ -203,8 +203,8 @@ public class ClothDatasetRecorder : MonoBehaviour
 
             sdf_t[j] = SDFSphere(pos_t[j], spherePos, sphereRad);
             normal_t[j] = NormalToSphere(pos_t[j], spherePos);
-            maxDist_t[j] = coeffs[idx].maxDistance;
 
+            maxDist_t[j] = Mathf.Clamp(coeffs[idx].maxDistance, 0f, 1f);
             /**
              * Constraints
              * cloth.GetVirtualParticleWeights();
