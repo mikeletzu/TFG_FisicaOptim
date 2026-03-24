@@ -1,7 +1,13 @@
+using Unity.Mathematics;
 using UnityEngine;
+using UnityEngine.Splines;
 
 public class BallMovement : MonoBehaviour
 {
+    [SerializeField]
+    private bool isLineal = false;
+    SplineAnimate splineAnimate = null;
+    PathGenerator pathGen = null;
     [SerializeField]
     private float movementSpeed = 10.0f;
     [SerializeField]
@@ -12,14 +18,24 @@ public class BallMovement : MonoBehaviour
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-       
-            
+        if (isAuto && !isLineal)
+        {
+            splineAnimate = GetComponent<SplineAnimate>();
+            pathGen = GameObject.Find("PathGen").GetComponent<PathGenerator>();
+            SetPath(transform.position);
+            splineAnimate.MaxSpeed = movementSpeed;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (isAuto) AutoUpdate();
+        if (isAuto)
+        {
+            if (isLineal)
+                AutoLinealUpdate();
+            else AutoBezierUpdate();
+        }
         else KeyUpdate();
     }
 
@@ -55,10 +71,31 @@ public class BallMovement : MonoBehaviour
         }
     }
 
-    void AutoUpdate()
+    void AutoLinealUpdate()
     {
         if (transform.position.x > 1) dir = -1;
         else if (transform.position.x < -1) dir = 1;
         transform.position += dir * Vector3.right * Time.deltaTime * movementSpeed;
+    }
+
+    void AutoBezierUpdate()
+    {
+        if (splineAnimate != null && splineAnimate.Container != null && splineAnimate.ElapsedTime >= splineAnimate.Duration)
+        {
+            SetPath(splineAnimate.Container.Spline.ToArray()[splineAnimate.Container.Spline.ToArray().Length - 1].Position);
+        }
+    }
+    private void SetPath(Vector3 initPos)
+    {
+        Debug.Log("SetPath: " + initPos);
+        SplineContainer sp = pathGen.GeneratePath(initPos);
+        SplineContainer aux = splineAnimate.Container;
+        splineAnimate.Container = sp;
+        if (aux != null)
+        {
+            Destroy(aux.gameObject);
+        }
+        splineAnimate.ElapsedTime = 0;
+        splineAnimate.Play();
     }
 }
