@@ -674,6 +674,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 521ede0c7280746458b2098a97f34277, type: 3}
       insertIndex: -1
       addedObject: {fileID: 825766819}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 521ede0c7280746458b2098a97f34277, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 825766821}
   m_SourcePrefab: {fileID: 100100000, guid: 521ede0c7280746458b2098a97f34277, type: 3}
 --- !u!1 &825766816 stripped
 GameObject:
@@ -687,7 +690,7 @@ Cloth:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 825766816}
-  m_Enabled: 1
+  m_Enabled: 0
   m_StretchingStiffness: 1
   m_BendingStiffness: 0
   m_UseTethers: 1
@@ -833,7 +836,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 825766816}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa883dacb49e3474487078a70b9f7426, type: 3}
   m_Name: 
@@ -847,6 +850,26 @@ MonoBehaviour:
   filePrefix: clothDataset
   fileExtension: .csv
   snapShotTime: 0.3
+--- !u!33 &825766820 stripped
+MeshFilter:
+  m_CorrespondingSourceObject: {fileID: -5754084199372789682, guid: 521ede0c7280746458b2098a97f34277, type: 3}
+  m_PrefabInstance: {fileID: 825766815}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &825766821
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 825766816}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c40bc56cb6ff9a440b006d6c9e694f0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClothML
+  ball: {fileID: 339546649}
+  modelAsset: {fileID: 5022602860645237092, guid: 82d09d97d6b8c6647bc095168d18cde8, type: 3}
+  clothMeshFilter: {fileID: 825766820}
 --- !u!1 &963194225
 GameObject:
   m_ObjectHideFlags: 0

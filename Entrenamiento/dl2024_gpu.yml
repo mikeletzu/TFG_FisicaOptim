@@ -6,11 +6,15 @@ channels:
   - defaults
 dependencies:
   - python=3.12.7
+  - cmake
   - pip=24.2.0
   - pytorch-cuda=11.8
   - pytorch=2.5.0
   - torchvision=0.20.0
   - torchaudio=2.5.0
+  - onnx=1.21.0
+  - onnxruntime=1.24.2
+  - onnxscript=0.5.6
   - pip:
     - pytorch-lightning==2.4.0
     - tensorboard==2.17.1
@@ -22,6 +26,6 @@ dependencies:
     - matplotlib>=3.9.2
     - seaborn>=0.13.2
     - ipywidgets>=8.1.2
-    - onnx==1.15.0
-    - onnxruntime==1.17.3
-    - onnxruntime-gpu==1.17.3 
+    - onnx>=1.21.0
+    - onnxruntime>=1.24.2
+    - onnxscript>=0.5.6
