@@ -1,11 +1,19 @@
-using UnityEngine;
+using System.Drawing;
+using Unity.AppUI.UI;
 using Unity.InferenceEngine;
+using UnityEditor.Build.Content;
+using UnityEngine;
 
 public class ClothML : MonoBehaviour
 {
-    public Transform ball;
-    public ModelAsset modelAsset;
+    [SerializeField]
+    public GameObject ball;
+    public SphereCollider ballCollider; // collider o mesh 
+	public ModelAsset modelAsset;
     public MeshFilter clothMeshFilter;
+
+    private Vector3[] lastVertexPositions;
+    private Vector3[] maxDistance;
 
     Worker worker;
     Tensor<float> inputTensor;
@@ -18,6 +26,14 @@ public class ClothML : MonoBehaviour
         worker = new Worker(model, BackendType.GPUCompute);
 
         vertexCount = clothMeshFilter.mesh.vertexCount;
+
+        lastVertexPositions = new Vector3[vertexCount];
+        ballCollider = ball.GetComponent<SphereCollider>();
+
+        maxDistance = new Vector3[vertexCount];
+
+        // Necesitaremos mantener cloth para algo? Entiendo que no.
+        // Max distance se almacena y accede originalmente en cloth, aquí habría que añadirlo a mano en un vector
     }
 
     void Update()
@@ -30,10 +46,10 @@ public class ClothML : MonoBehaviour
 
         for (int i = 0; i < vertexCount; i++)
         {
-            Vector3 pos = vertices[i];
-            Vector3 vel = GetVelocity(i);          
-            float sdf = GetSDF(pos);               // distancia a la bola
-            Vector3 normal = normals[i];
+			Vector3 pos = clothMeshFilter.transform.TransformPoint(vertices[i]);
+            Vector3 vel = lastVertexPositions[i] - pos;        
+            float sdf = Vector3.Distance(pos, ballCollider.transform.position) - ballCollider.radius;             // distancia a la bola
+			Vector3 normal = normals[i];
             float maxDist = GetMaxDistance(i);     // constraint de la tela
             Vector2 uv = GetUV(i, mesh);
 

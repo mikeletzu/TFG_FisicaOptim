@@ -326,4 +326,24 @@ public class ClothDatasetRecorder : MonoBehaviour
 		// Nombre del csv generado a partir de la fecha, nombre, número de prueba y extension.
 		fileName = filePath + filePrefix + "_" + numRecord + "_" + fileExtension; //  DateTime.Now.ToString("-d-M-yyyy") // Si quisieramos guardar fecha
 	}
+
+	public Vector3 GetVelocity(int i)
+	{
+		return vel_t[i];
+	}
+
+	public float GetSDF(int i)
+	{
+		return sdf_t[i];
+	}
+
+	public float GetMaxDistance(int i)
+	{
+		return maxDist_t[i];
+	}
+
+	public Vector2 GetUV(int i, Mesh mesh)
+	{
+		return mesh.uv[i];
+	}
 }
