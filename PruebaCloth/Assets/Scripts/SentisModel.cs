@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.IO;
 using Unity.AppUI.UI;
 using Unity.InferenceEngine;
 using UnityEditor.Build.Content;
@@ -13,7 +14,7 @@ public class ClothML : MonoBehaviour
     public MeshFilter clothMeshFilter;
 
     private Vector3[] lastVertexPositions;
-    private Vector3[] maxDistance;
+    private float[] maxDistance;
 
     Worker worker;
     Tensor<float> inputTensor;
@@ -30,13 +31,32 @@ public class ClothML : MonoBehaviour
         lastVertexPositions = new Vector3[vertexCount];
         ballCollider = ball.GetComponent<SphereCollider>();
 
-        maxDistance = new Vector3[vertexCount];
+        maxDistance = new float[vertexCount];
 
         // Necesitaremos mantener cloth para algo? Entiendo que no.
         // Max distance se almacena y accede originalmente en cloth, aquí habría que añadirlo a mano en un vector
+
+
+        // set max distance
+        int i = 0;
+		for (;  i < 10; i++)
+        {
+            maxDistance[i] = 0f;
+        }
+        while(i<vertexCount)
+        {
+            maxDistance[i] = 0.2f;
+        }
     }
 
-    void Update()
+	public void SaveData(string data)
+	{
+		string filePath = Application.persistentDataPath + "/debugOutput.txt";
+        File.AppendAllText(filePath, "NEW FRAME" + "\n");
+		File.AppendAllText(filePath, data + "\n");
+	}
+
+	void Update()
     {
         var mesh = clothMeshFilter.mesh;
         var vertices = mesh.vertices;
@@ -88,6 +108,7 @@ public class ClothML : MonoBehaviour
 
         Vector3[] newVertices = new Vector3[vertexCount];
 
+        string vertex = "";
         for (int i = 0; i < vertexCount; i++)
         {
             newVertices[i] = new Vector3(
@@ -95,10 +116,16 @@ public class ClothML : MonoBehaviour
                 result[0, i, 1],
                 result[0, i, 2]
             );
+            vertex = vertex + newVertices[i].ToString() + "\n";
+        
         }
+        SaveData(vertex);
+		// print(mesh.vertices);
 
-        mesh.vertices = newVertices;
-        mesh.RecalculateNormals();
+		mesh.SetVertices(newVertices);
+		//mesh.vertices = newVertices;
+		mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
 
         inputTensor.Dispose();
         output.Dispose();
@@ -117,7 +144,7 @@ public class ClothML : MonoBehaviour
 
     float GetMaxDistance(int i)
     {
-        return 1f;
+        return maxDistance[i];
     }
 
     Vector2 GetUV(int i, Mesh mesh)
