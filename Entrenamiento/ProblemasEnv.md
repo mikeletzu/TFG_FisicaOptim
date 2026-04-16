@@ -10,9 +10,7 @@ Abrir code desde AnacondaPrompt colocándote en la carpeta d Entrenamiento con c
 
 Mirar archivo del environment dl2024\_gpu.yml y añadir cualquier dependencia.
 
-Luego desde la terminal: PS C:\\UCM5\\2.cuatri\\TFG\\TFG\_FisicaOptim\\Entrenamiento> conda env update --name=foo --file=dl2024\_gpu.yml
+Luego desde la terminal: PS C:\\UCM5\\2.cuatri\\TFG\\TFG\_FisicaOptim\\Entrenamiento> conda env update --name=dl2024 --file=dl2024\_gpu.yml
 
-
-
-c:\\Users\\mikel\\miniconda3\\envs\\dl2024\\python.exe
+O BOORRAR ENV Y VOLVER A CREAR
 
