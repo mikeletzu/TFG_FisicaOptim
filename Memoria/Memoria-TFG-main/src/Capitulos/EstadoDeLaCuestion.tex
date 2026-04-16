@@ -3,18 +3,25 @@
 En este capítulo se presenta una breve descripción del desarrollo de las simulaciones físicas en videojuegos, así como el hardware y software que ha hecho que esta evolución sea posible, se presenta la simulación de telas en específico, las maneras que existen de implementarla, los problamas de optimización que estas suponen y los avances en modelos de IA que permiten imaginar otras soluciones.
 
 \section{Simulación física en videojuegos}
-Como se puede ver en el artículo \cite{XGKD23}, se empezó a hablar en la década\dots
-Contexto histórico de simulaciones físicas en videojuegos, 
-prerender
-obj únicos
-coherencia: lo que se busca ahora (hiperrealismo tal) utilizo para justificar sistemas unidos d fisicas y las maneras d hacer esto:
+Basta con remontarse a la creación del Pong en 1972, para darse cuenta de la importancia que las simulaciones físicas han tenido en el ámbito de los videojuegos desde el primer momento. Al fin y al cabo, las físicas permiten crear situaciones de juego que no están predefinidas, enriqueciendo así la experiencia del jugador.
+
+En sus inicios hubo muchas maneras de implementar estas fisicas:
+prerenderización
+arrows
+
+De todas formas, estos métodos carecen de COHERENCIA, la cual es imprescindible para la inmersión del jugador. Con la introducción del 3D, subió el nivel. La coherencia necesaria para la inmersión creció exponencialmente, lo que se busca ahora (hiperrealismo tal) y la libertad que se le quiere dar al jugador en la experiencia de juego, por lo que se le ha dau gran importancia a las cosas real-time.
+
+Esto no nos sorprende, el mismo Ian Millingtong menciona en su libro Game Physics Engine Development \cite{millington2007game} el juego Exile, creado por Peter Irvin y Jeremy Smith. Si bien este juego fue publicado en 1988 ya contaba con colisiones "con intercambio de impulso" (esto no se entiende igual?), gravedad, fuerzas como por ejemplo el viento, explosiones, fuego y agua. Es probablemente el primer juego que contaba con un motor de físicas completo, y posteriormente se crearon muchos más y Estandar.
+.............incluir página web en la q el propio Peter explica esto y dice q Jeremy se muere? https://inventivity.co.uk/exileami/about.htm Dramatismo. Intensidad narrativa a la memoria.
 
 \subsection{Motores físicos}
 PHYSIS HAVOC BULLET
 intereses por trabajar cn la CPU vs GPU
 
 \subsection{Motores de videojuegos}
-estos usan physis: hoy en día unreal y UNITY (justificamos por qué unity: libre acceso, motor principal usado para desarrollo?)
+Breve definicion d lo q es un motor? Estos, se dividen en componentes y vamos a prestar atención a la evolución del componente encargado de la computación de calculos físicos.
+
+hoy en día unreal y UNITY (justificamos por qué unity: libre acceso, motor principal usado para desarrollo?)
 
 Unity es un motor de videojuegos creado por Unity Technologies en 2005. Su motor físico: PhysX, creado por la empresa Nvidia Corporation.
 Unreal es un motor de videojuegos creado por Epic Games en 1998 con el lanzamiento de Unreal Engine 1.
@@ -23,7 +30,7 @@ El código fuente de este motor está escrito en C++ y es accesible desde Github
 Usa PhysX igualmente asi q txau.
 
 \subsection{Simulación de telas}
-Los distintos tipos de simulaciones que se implementan en los motores de físicas previamente mencionados, podrían agruparse en los siguientes grupos: Collision detection,ragdoll physics, particle systems (fluids y fuzzy), deformable bodies (entre ellos rigid-bodies y soft-bodies). En concreto soft-bodies / cloth. EVA DALE.
+Los distintos tipos de simulaciones que se implementan en los motores de físicas previamente mencionados, podrían agruparse en los siguientes grupos: Collision detection,ragdoll physics, particle systems (fluids y fuzzy), deformable bodies (entre ellos rigid-bodies y soft-bodies). \cite{arnason2008evolution} En concreto soft-bodies / cloth. EVA DALE.
 
 \begin{figure}[H]
     \centering
