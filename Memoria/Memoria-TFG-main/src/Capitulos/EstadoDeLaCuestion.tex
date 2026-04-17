@@ -35,7 +35,35 @@ El código fuente de este motor está escrito en C++ y es accesible desde Github
 Usa PhysX igualmente asi q txau.
 
 \subsection{Simulación de telas}
-Los distintos tipos de simulaciones que se implementan en los motores de físicas previamente mencionados, podrían agruparse en los siguientes grupos: Collision detection,ragdoll physics, particle systems (fluids y fuzzy), deformable bodies (entre ellos rigid-bodies y soft-bodies). \cite{arnason2008evolution} En concreto soft-bodies / cloth. EVA DALE.
+Los distintos tipos de simulaciones que se implementan en los motores de físicas previamente mencionados, podrían agruparse en los siguientes grupos: Collision detection,ragdoll physics, particle systems (fluids y fuzzy), deformable bodies (entre ellos rigid-bodies y soft-bodies). En concreto soft-bodies / cloth. \cite{arnason2008evolution}
+
+\subsubsection{¿Qué es Cloth?}
+Entendemos los objetos deformables o soft-bodies como aquellos que no son rígidos. Así como en los objetos rígidos podemos simular su movimiento sabiendo su motion y centro de masa, para los objetos deformables necesitamos tener en cuenta todas las partículas y propiedades físicas que lo componen. Entre estos encontramos elementos como el cloth, el agua o el viento \cite{erlebenbook}. 
+
+
+Cloth es un componente que nos proporciona Unity3D que funciona junto al Skinned Mesh Renderer para simular telas. Está basado en Cloth de Physics pero fue incorporado con el objeto de poder disponer de ropa para personajes. Tiene múltiples propiedades como la resistencia a la flexión, rigidez, damping, uso de gravedad… Cada cloth está formado por un conjunto de vértices (partículas) que tienen cierta libertad de movimiento dependiendo de sus constraints. Un constraint de distancia máxima 0 significa que está fijo en el espacio y que no se calculan sus deformaciones. La cloth cuenta con capacidad de colisionar internamente y con dos tipos de colliders externos: cápsulas o esferas. Objetos más complejos con los que se quiera colisionar tendrán que ser un conjunto de estos colliders.
+
+Se trata la tela como una malla de partículas conectadas por restricciones. El Skinned Renderer calcula las transformaciones basándose en una malla de baja resolución sobre la que realiza los movimientos en los vértices, que dinámicamente se aplican en la malla real y obtenemos la simulación visual.
+
+Un solver es un algoritmo computacional que se encarga de predecir el comportamiento del objeto deformable computer graphics y simulaciones físicas. Encontramos infinitos tipos de solvers. Los primeros solvers se basan el algoritmos que emplean la fuerza bruta: realizan cálculos en masa para sistemas de muelles (MSS). Los solvers más actuales resultan en el PBD proceso iterativo que proyecta las posiciones de las partículas sobre un "espacio de restricciones"contraints.
+
+El solver de PhysX se basa en PBD: Position Based Dynamics desarollado por Müller \cite{muller_position_2007}. Este sistema omite las velocidades a la hora de resolver transformaciones, y trabaja directamente sobre las posiciones. XPBD \cite{macklin_xpbd_2016} es una versión extendida que puede incorporarse en proyectos.
+
+\subsubsection{El problema de optimización}
+La simulación de cloth en tiempo real es un problema muy común, que aún sigue buscando optimizarse a día de hoy. En Unity, los frames decaen inmediatamente en cuanto se complica o aumenta la geometría de la tela. Impide el realismo y en juegos donde se necesita altas frame rates como los juegos en VR, supone un impedimento.
+
+Mientras que el Cloth de PhysX puede delegar la simulación a CUDA capable GPUs, el Cloth implementado en Unity realiza todo su trabajo en la CPU, lo cual ralentiza mucho la ejecución. 
+
+\subsubsection{Soluciones}
+Encontramos varios tipos de soluciones para la optimización de la simulación de telas:
+
+\begin{itemize}
+  \item Optimización por CPU: encontramos la extensión de Obi Cloth \cite{obi}, que aprovecha el sistema de Jobs de Unity para paralelizar la simulación y acelerar la simulación sin salir de la CPU. Es uno de los paquetes más populares para solucionar este problema.
+
+  \item Paralelización en GPU
+  \item Entrenamiento con IA
+\end{itemize}
+
 
 \begin{figure}[H]
     \centering
