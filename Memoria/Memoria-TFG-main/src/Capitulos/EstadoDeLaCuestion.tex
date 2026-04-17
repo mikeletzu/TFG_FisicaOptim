@@ -21,7 +21,9 @@ Mirar incluir algo más concreto d juegos, primeros avances con motores? \cite{h
 
 En este contexto nacen los primeros motores físicos.
 VEO IMPORTANTE ESTE PARRAFO PARA INTRODUCIR TANTO PhysX COMO GPU vs CPU PERO ESTÁ FATAL EXPLICAU, POCA INFO FIABLE, ACORTAR Y SIMPLIFICAR
+
 http://ffden-2.phys.uaf.edu/webproj/211_fall_2014/Bryce_Melegari/history.html %buscar papers o fuentes más fiables
+
 En 2002, se funda Ageia Technologies, responsable de la creación de el primer procesador de física dedicado para ordenadores, denominado PhysX PPU (Physics Processing Unit), así como de el motor PhysX, el cual sigue siendo lider en la industria. Posteriormente, NVIDIA Corporation, conocida por su papel en la producción de GPUs adquiere Aegia, impulsando el cálculo de fisicas en GPU. https://developer.nvidia.com/physx-sdk Esto sumado a la dificultad de penetrar en el mercado del hardware hace que la producción de PPUs quede obsoleta.
 Por otro lado, Intel adquiere Havok (https://media.gdcvault.com/GD_Mag_Archives/GDM_October_2000.pdf), otro de los primeros motores de fisicas, en 2007, cancelando el programa HavokFX que pretendía llevar el cálcuulo de fisicas a la GPU. Posteriormente es adquirido por microsoft en 2015, que el 2016 empieza a trabajar en DirectPhysics, ????? ns que ha pasado cn esto ?????. Por lo que hoy en dia la carga computacional quede entre la CPU y GPU, que discutiremos durante el desarrollo de este proyecto.
 
@@ -60,12 +62,23 @@ Encontramos varios tipos de soluciones para la optimización de la simulación d
 \end{itemize}
 
 \section{Inteligencia Artificial en videojuegos}
-\subsection{Tecnologias existentes}
+Como se ha introducido previamente, en la industria del videojuego, así como en muchas otras, las miradas están fijadas en la inteligencia artificial. Entre las muchas aplicaciones que se le están dando, en este apartado se presentan los elementos más relevantes para el desarrollo de este proyecto.
+
 \subsection{Librerías}
+Las librerias Pytorch, ONNX y Sentis, han sido indispensables para entrenar los modelos de IA y conectarlos a la simulación en Unity.
+
 \subsubsection{Pytorch}
+Pytorch es una de las librerias de código abierto que permite escribir redes neuronales propias. Los tensores, matrices multi-dimensionales análogas a los NumPy arrays de Python, permiten optimizar las redes tanto para el uso de CPU como de GPU. \cite{pytorchDoc} Suele ser la más elegida en entornos academicos, ya que permite prototipado rápido y entrenamiento dinámico. Fue originalmente desarrollado por Facebook, y todavía cuenta con una enorme comunidad de desarrolladores.
+
+\subsubsection{ONNX}
+ONNX es un formato creado para representar modelos de aprendizaje automático. \cite{onnxWebsite} También fue introducido por Facebook y Microsoft en 2017, con el objetivo de facilitar el cambio de entornos de trabajo en aprendizaje automático. 
+
 \subsubsection{Sentis}
-https://docs.unity3d.com/Packages/com.unity.ai.inference@2.4/manual/index.html
+Sentis es una librería de inferencia de redes neuronales para Unity, predecesora introducida en el 2023 de la librería Barracuda. Permite importar modelos de redes neuronales entrenados a Unity y ejecutarlos en tiempo real tanto con la CPU como con la GPU. \cite{unity_sentis_2.4}
+
 \subsection{Modelos de optimización de telas}
+La optimización de simulaciones con redes neuronales cuenta ya con un amplio recorrido, en este apartado se describen los estudios más destacados de los últimos años. Son también inspiración directa para la implementación de nuestros experimentos.
+
 \subsubsection{Subspace Neural Physics: Fast Data-Driven Interactive Simulation}
 PCA + linear subspace ()
 \subsubsection{Neural Cloth Simulation}
