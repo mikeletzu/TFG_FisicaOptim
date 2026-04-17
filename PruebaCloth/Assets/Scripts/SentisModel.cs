@@ -166,7 +166,7 @@ public class ClothML : MonoBehaviour
 	//       output.Dispose();
 	//       result.Dispose();
 	//   }
-	void Update()
+	void FixedUpdate()
 	{
 		var mesh = clothMeshFilter.mesh;
 		var vertices = mesh.vertices;
@@ -180,16 +180,16 @@ public class ClothML : MonoBehaviour
 			Vector3 worldPos = clothMeshFilter.transform.TransformPoint(vertices[i]);
 			Debug.DrawRay(worldPos, Vector3.up * 0.1f, UnityEngine.Color.red);
 
-			Vector3 vel = (worldPos - lastVertexPositions[i]) / Time.deltaTime;
+			Vector3 vel = (worldPos - lastVertexPositions[i]) / Time.fixedDeltaTime;
 
 			float sdf = Vector3.Distance(worldPos, ball.transform.position) - ballCollider.radius;
 			Vector3 normal = normals[i];
 
 			int f = 0;
 			// Posicion
-			inputTensor[0, i, f++] = worldPos.x;
-			inputTensor[0, i, f++] = worldPos.y;
-			inputTensor[0, i, f++] = worldPos.z;
+			inputTensor[0, i, f++] = (worldPos.x - normData.mean[0]) / normData.std[0];
+			inputTensor[0, i, f++] = (worldPos.y - normData.mean[1]) / normData.std[1];
+			inputTensor[0, i, f++] = (worldPos.z - normData.mean[2]) / normData.std[2];
 
 			// Velocidad
 			inputTensor[0, i, f++] = vel.x;
@@ -223,10 +223,10 @@ public class ClothML : MonoBehaviour
 			float normalizedZ = result[0, i, 2];
 
 			// El que tendria que ser
-			Vector3 modelOutput = new Vector3(
-				((normData.std[0] * normalizedX) + normData.mean[0]),
-				((normData.std[1] * normalizedY) + normData.mean[1]),
-				((normData.std[2] * normalizedZ) + normData.mean[2]));
+			//Vector3 modelOutput = new Vector3(
+			//	((normData.std[0] * normalizedX) + normData.mean[0]),
+			//	((normData.std[1] * normalizedY) + normData.mean[1]),
+			//	((normData.std[2] * normalizedZ) + normData.mean[2]));
 
 			// Pequeñito
 			//Vector3 modelOutput = new Vector3(
@@ -235,10 +235,10 @@ public class ClothML : MonoBehaviour
 			//	((normData.std[2] * normalizedZ) + normData.mean[2]) * 0.000001f);
 
 			// Clamp
-			//Vector3 modelOutput = new Vector3(
-			//	Mathf.Clamp((normData.std[0] * normalizedX) + normData.mean[0], -1f, 1f),
-			//	Mathf.Clamp((normData.std[1] * normalizedY) + normData.mean[1], -1f, 1f),
-			//	Mathf.Clamp((normData.std[2] * normalizedZ) + normData.mean[2], -1f, 1f));
+			Vector3 modelOutput = new Vector3(
+				Mathf.Clamp((normData.std[0] * normalizedX) + normData.mean[0], -1f, 1f),
+				Mathf.Clamp((normData.std[1] * normalizedY) + normData.mean[1], -1f, 1f),
+				Mathf.Clamp((normData.std[2] * normalizedZ) + normData.mean[2], -1f, 1f));
 
 			// Vector3 modelOutput = new Vector3(normalizedX, normalizedY, normalizedZ);
 

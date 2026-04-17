@@ -489,7 +489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a36df33f06b569b4498b3ee70bb1aabc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  isLineal: 0
+  isLineal: 1
   movementSpeed: 1
   isAuto: 1
 --- !u!135 &339546646
@@ -1318,7 +1318,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: 521ede0c7280746458b2098a97f34277, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.713
+      value: 1.07
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 521ede0c7280746458b2098a97f34277, type: 3}
       propertyPath: m_LocalPosition.y
