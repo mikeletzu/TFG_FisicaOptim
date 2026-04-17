@@ -41,40 +41,30 @@ Hasta esta última versión (5.7) unreal usaba PhysX. Al igual q lo hace unity B
 y UNITY (justificamos por qué unity: libre acceso, motor principal usado para desarrollo?)
 Unity es un motor de videojuegos creado por Unity Technologies en 2005. Su motor físico: PhysX, creado por la empresa Nvidia Corporation.
 
-\subsection{Simulación de telas}
-Los distintos tipos de simulaciones que se implementan en los motores de físicas previamente mencionados, podrían agruparse en los siguientes grupos: Collision detection,ragdoll physics, particle systems (fluids y fuzzy), deformable bodies (entre ellos rigid-bodies y soft-bodies). En concreto soft-bodies / cloth. \cite{arnason2008evolution}
+\section{Simulación de telas}
+Entendemos los objetos deformables o soft-bodies como aquellos que no son rígidos. Así como en los objetos rígidos podemos simular su movimiento sabiendo su motion y centro de masa, para los objetos deformables necesitamos tener en cuenta todas las partículas y propiedades físicas que lo componen. Entre estos encontramos elementos como las telas, el agua o el viento \cite{erlebenbook}.
 
-\subsubsection{¿Qué es Cloth?}
-Entendemos los objetos deformables o soft-bodies como aquellos que no son rígidos. Así como en los objetos rígidos podemos simular su movimiento sabiendo su motion y centro de masa, para los objetos deformables necesitamos tener en cuenta todas las partículas y propiedades físicas que lo componen. Entre estos encontramos elementos como el cloth, el agua o el viento \cite{erlebenbook}. 
+\subsection{¿Qué es Cloth?}
+Cloth es un componente que nos proporciona Unity3D que funciona junto al Skinned Mesh Renderer para simular telas. Está basado en Cloth de PhysX y fue incorporado con el objeto de poder disponer de ropa para personajes. Tiene múltiples propiedades como la resistencia a la flexión, rigidez, damping, uso de gravedad\dots \newline
 
+Se trata la tela como una malla de partículas conectadas por restricciones. El Skinned Renderer calcula las transformaciones basándose en una malla de baja resolución sobre la que realiza los movimientos en los vértices, que dinámicamente se aplican en la malla real y obtenemos la simulación visual. Un constraint de distancia máxima 0 significa que está fijo en el espacio y que no se calculan sus deformaciones. La cloth cuenta con capacidad de colisionar internamente y con dos tipos de colliders externos: cápsulas o esferas. Cualquier objeto externo con el que se quiera colisionar tendrá que ser un conjunto de estos colliders. \newline
 
-Cloth es un componente que nos proporciona Unity3D que funciona junto al Skinned Mesh Renderer para simular telas. Está basado en Cloth de Physics pero fue incorporado con el objeto de poder disponer de ropa para personajes. Tiene múltiples propiedades como la resistencia a la flexión, rigidez, damping, uso de gravedad… Cada cloth está formado por un conjunto de vértices (partículas) que tienen cierta libertad de movimiento dependiendo de sus constraints. Un constraint de distancia máxima 0 significa que está fijo en el espacio y que no se calculan sus deformaciones. La cloth cuenta con capacidad de colisionar internamente y con dos tipos de colliders externos: cápsulas o esferas. Objetos más complejos con los que se quiera colisionar tendrán que ser un conjunto de estos colliders.
+Un solver es un algoritmo computacional que se encarga de predecir el comportamiento del objeto deformable en renderizados gráficos y simulaciones físicas. Encontramos infinitos tipos de solvers. Los primeros solvers se basan el algoritmos que emplean la fuerza bruta: realizan cálculos en masa para sistemas de muelles (MSS). Los solvers más actuales resultan en el PBD proceso iterativo que proyecta las posiciones de las partículas sobre un "espacio de restricciones" \cite{muller_position_2007}. \newline
 
-Se trata la tela como una malla de partículas conectadas por restricciones. El Skinned Renderer calcula las transformaciones basándose en una malla de baja resolución sobre la que realiza los movimientos en los vértices, que dinámicamente se aplican en la malla real y obtenemos la simulación visual.
+El solver de PhysX se basa en PBD, es decir, trabaja directamente sobre las posiciones. Encontramos también XPBD \cite{macklin_xpbd_2016} ,una versión extendida que puede incorporarse en proyectos.
 
-Un solver es un algoritmo computacional que se encarga de predecir el comportamiento del objeto deformable computer graphics y simulaciones físicas. Encontramos infinitos tipos de solvers. Los primeros solvers se basan el algoritmos que emplean la fuerza bruta: realizan cálculos en masa para sistemas de muelles (MSS). Los solvers más actuales resultan en el PBD proceso iterativo que proyecta las posiciones de las partículas sobre un "espacio de restricciones"contraints.
+\subsection{El problema de optimización}
+La simulación de cloth en tiempo real es un problema recurrente, que aún continúa buscando la optimización a día de hoy. Debido a la alta carga computacional, los frames decaen inmediatamente en cuanto se complica o aumenta la geometría de la tela. Esto dificulta enormemente el realismo, y resulta un gran impedimento en entornos dónde se requiere un alto framerate como son los juegos VR frente al motion sickeness.\newline
 
-El solver de PhysX se basa en PBD: Position Based Dynamics desarollado por Müller \cite{muller_position_2007}. Este sistema omite las velocidades a la hora de resolver transformaciones, y trabaja directamente sobre las posiciones. XPBD \cite{macklin_xpbd_2016} es una versión extendida que puede incorporarse en proyectos.
+Mientras que el Cloth de PhysX puede delegar la simulación a GPUs compatibles con CUDA, el Cloth integrado por defecto en Unity realiza todo su trabajo en la CPU, lo cual ralentiza mucho la ejecución. 
 
-\subsubsection{El problema de optimización}
-La simulación de cloth en tiempo real es un problema muy común, que aún sigue buscando optimizarse a día de hoy. En Unity, los frames decaen inmediatamente en cuanto se complica o aumenta la geometría de la tela. Impide el realismo y en juegos donde se necesita altas frame rates como los juegos en VR, supone un impedimento.
-
-Mientras que el Cloth de PhysX puede delegar la simulación a CUDA capable GPUs, el Cloth implementado en Unity realiza todo su trabajo en la CPU, lo cual ralentiza mucho la ejecución. 
-
-\subsubsection{Soluciones}
+\subsection{Soluciones}
 Encontramos varios tipos de soluciones para la optimización de la simulación de telas:
-
 \begin{itemize}
   \item Optimización por CPU: encontramos la extensión de Obi Cloth \cite{obi}, que aprovecha el sistema de Jobs de Unity para paralelizar la simulación y acelerar la simulación sin salir de la CPU. Es uno de los paquetes más populares para solucionar este problema.
-  \item Paralelización en GPU: Cloth as springs accelerated in Unity GPU shaders (paper)
-  \item Entrenamiento con IA
-        UNREAL CHAOS CLOTH:
-        Chaos Cloth también proporciona una simulación de tela mediante aprendizaje automático. Este sistema da como resultado una simulación de mayor realismo que el modelo tradicional basado en físicas mediante un conjunto de datos entrenados que se pueden usar en tiempo real para producir resultados que antes solo serían posibles mediante simulación sin conexión. https://dev.epicgames.com/documentation/unreal-engine/physics-in-unreal-engine
-        Funcionamiento: https://dev.epicgames.com/documentation/unreal-engine/machine-learning-cloth-simulation-overview 
-        Limitaciones: funciona con un NearestNeighborSearch por lo q "el sistema es capaz de predecir detalles como arrugas pero no movimiento dinámico como ondulaciones o drapeados".
-        IA ….que discutiremos en el próximo apartado
+  \item Paralelización en GPU: a través de shaders se delega la fuerza de cálculo del skinning en la GPU. Encontramos diferntes estudios que aportan diferentes enfoques para la optimización: Jim Hugunin realiza una investigación para alcanzar altas resoluciones y evitar colisiones en las mallas \cite{huguninunite16}, mientras que otros se centran en la mejora de rendimiento pura para adaptar simulaciones a entornos VR \cite{VRGPUoptim}.
+  \item Entrenamiento con IA: el enfoque más actual de la resolución de simulaciones complejas como Cloth es la Inteligencia Artificial. Se entrenan modelos de ML y DL con los datos de las mallas animadas o en simulación, con lo que obtenemos más adelante mejor rendimiento en tiempo real. Se sacrifica memoria y tiempo de entrenamiento para obtener mejores y mucho más rápidas simulaciones de tela en escena. Actualmente, nos encontramos en el paso de investigación a implementación en grandes empresas: Unreal ya proporciona una simulación de tela a través de aprendizaje automático \cite{chaoscloth}, en el que destaca su realismo. Aún así, cuenta con limitaciones al basarse un NearestNeighborSearch: 'el sistema es capaz de predecir detalles como arrugas pero no movimiento dinámico como ondulaciones o drapeados'.En la próxima sección detallaremos las numerosas investigaciones recientes que abarcan aspectos desde la reproducción de arrugas, el compromiso entre calidad, coste y reendimiento hasta colisiones y penetraciones en las mallas.
 \end{itemize}
-
 
 \begin{figure}[H]
     \centering
