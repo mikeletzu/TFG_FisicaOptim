@@ -14,32 +14,25 @@ En los inicios del desarrollo de videojuegos, las técnicas más rudimentarias p
 Estos métodos eran claramente limitados en la precisión que ofrecian, y quedaba clara la necesidad de una solución más general y reproducible. El mismo Ian Millingtong menciona en su libro Game Physics Engine Development \cite{millington2007game} el juego Exile, creado por Peter Irvin y Jeremy Smith. Si bien este juego fue publicado en 1988 ya contaba con colisiones "con intercambio de impulso" (esto no se entiende igual?), gravedad, fuerzas como por ejemplo el viento, explosiones y etc. Es probablemente el primer juego que cuenta con un motor de físicas completo. \newline
 
 .............incluir página web en la q el propio Peter explica esto y dice q Jeremy se muere? https://inventivity.co.uk/exileami/about.htm Dramatismo. Intensidad narrativa a la memoria.
-Mirar incluir algo más concreto d juegos? \cite{hiscomp2012engines}
 
 \subsection{Motores de fisica}
-De todas formas, con la introducción del 3D estos métodos carecen de COHERENCIA, la cual es imprescindible para la inmersión del jugador. \cite{hecker2000physics} Con la introducción del 3D, subió el nivel. La coherencia necesaria para la inmersión creció exponencialmente, lo que se busca ahora (hiperrealismo tal) y la libertad que se le quiere dar al jugador en la experiencia de juego, por lo que se le ha dau gran importancia a las cosas real-time.
-{ 
-    Although conventional wisdom in the game industry says the goal of the games is reality itself, especially as infinitely cheap and powerful computers become commonplace, the real goal is consistency. Reality is boring; escaping reality is why people play computer games in the first place. Consistency, on the other hand, is crucial for keeping players immersed in game environments; it's okay to be able to run 100 miles per hour and jump 20 feetas long as the rest of the world reacts appropriately. In effect, each computer game makes a contract with its players when they start playing; any inconsistency violates this contract, reminding the player "it's just a game." Getting stuck in a wall due to bad collision detection is not something a player wants to happen when adventuring in a dungeon. When inconsistencies occurlike when a boom microphone floats into a movie frame during an emotional scenethe creators of immersive environments have failed.
-}
+La creación de motores de fisica completos, aportaba a los videojuegos la escalabilidad de su gameplay manteniendo la coherencia de sus elementos fisicos, imprescindible para la inmersión del jugador. \cite{hecker2000physics} En los años 90, con la popularidad del 3D y gráficos cada vez más avanzados, la física era la siguiente area en la que marcar la diferencia, haciendo la evolución de estos motores inevitable. Todos estos cálculos en tiempo real suponian además una gran carga para la CPU, planteando así dos grandes retos: El avance de los motores físicos cada vez más precisos/realistas y potentes, y por otro lado, la optimización del hardware para llegar a la demanda computacional que esto suponía.
+Mirar incluir algo más concreto d juegos, primeros avances con motores? \cite{hiscomp2012engines} \newline
 
-PHYSIS HAVOC BULLET
-intereses por trabajar cn la CPU vs GPU
+En este contexto nacen los primeros motores físicos.
+VEO IMPORTANTE ESTE PARRAFO PARA INTRODUCIR TANTO PhysX COMO GPU vs CPU PERO ESTÁ FATAL EXPLICAU, POCA INFO FIABLE, ACORTAR Y SIMPLIFICAR
+http://ffden-2.phys.uaf.edu/webproj/211_fall_2014/Bryce_Melegari/history.html %buscar papers o fuentes más fiables
+En 2002, se funda Ageia Technologies, responsable de la creación de el primer procesador de física dedicado para ordenadores, denominado PhysX PPU (Physics Processing Unit), así como de el motor PhysX, el cual sigue siendo lider en la industria. Posteriormente, NVIDIA Corporation, conocida por su papel en la producción de GPUs adquiere Aegia, impulsando el cálculo de fisicas en GPU. https://developer.nvidia.com/physx-sdk Esto sumado a la dificultad de penetrar en el mercado del hardware hace que la producción de PPUs quede obsoleta.
+Por otro lado, Intel adquiere Havok (https://media.gdcvault.com/GD_Mag_Archives/GDM_October_2000.pdf), otro de los primeros motores de fisicas, en 2007, cancelando el programa HavokFX que pretendía llevar el cálcuulo de fisicas a la GPU. Posteriormente es adquirido por microsoft en 2015, que el 2016 empieza a trabajar en DirectPhysics, ????? ns que ha pasado cn esto ?????. Por lo que hoy en dia la carga computacional quede entre la CPU y GPU, que discutiremos durante el desarrollo de este proyecto.
 
 \subsection{Motores de videojuegos}
-Unity, Unreal Engine and custom game engines of large AAA studios continue to dominate the game engine market. https://app.sensortower.com/vgi/assets/reports/The_Big_Game_Engines_Report_of_2025.pdf
+Los motores físicos, sumados a otros elementos análogos como los motores de renderizado, de sonido... crean el software al que nos referimos como motores de videojuegos. Unreal Engine, Unity y los motores propios de los grandes estudios dominan el mercado. https://app.sensortower.com/vgi/assets/reports/The_Big_Game_Engines_Report_of_2025.pdf  \newline
 
-Breve definicion d lo q es un motor? Estos, se dividen en componentes y vamos a prestar atención a la evolución del componente encargado de la computación de calculos físicos.
+Unreal es un motor de videojuegos creado por Epic Games en 1998. Desde _____ y hasta la introducción de Chaos Physics en su versión más reciente, la 5.7, Unreal usaba PhysX. En lo que a este proyecto respecta chaos plantea nuevos avances en la simulación de telas muy intereseantes que se comentarán más adelante.  \newline
 
-Los dos principales motores para el desarrollo de videojuegos son:
-hoy en día unreal.....
-Unreal es un motor de videojuegos creado por Epic Games en 1998 con el lanzamiento de Unreal Engine 1.
-La versión estable actual es Unreal Engine 5.5, lanzada en noviembre de 2024.
-El código fuente de este motor está escrito en C++ y es accesible desde Github \footnote{Enlace a la página de Github de Epic: \url{https://github.com/epicgames}}.
-Usa PhysX igualmente asi q txau. Ahora chaos cloth. Comentaremos más adelante.
-
-Hasta esta última versión (5.7) unreal usaba PhysX. Al igual q lo hace unity Built-in 3D physics: Uses an integration of the Nvidia PhysX engine by default. https://docs.unity3d.com/Manual/physics-integrations.html
-y UNITY (justificamos por qué unity: libre acceso, motor principal usado para desarrollo?)
-Unity es un motor de videojuegos creado por Unity Technologies en 2005. Su motor físico: PhysX, creado por la empresa Nvidia Corporation.
+Sin embargo, ......UNITY (justificamos por qué unity: libre acceso, motor principal usado para desarrollo?)
+Unity es un motor de videojuegos creado por Unity Technologies en 2005. Utiliza como motor físico: PhysX. https://docs.unity3d.com/Manual/physics-integrations.html
+Extensiones accesibles , ej. Sentis, se indagará más adelante.
 
 \section{Simulación de telas}
 Entendemos los objetos deformables o soft-bodies como aquellos que no son rígidos. Así como en los objetos rígidos podemos simular su movimiento sabiendo su motion y centro de masa, para los objetos deformables necesitamos tener en cuenta todas las partículas y propiedades físicas que lo componen. Entre estos encontramos elementos como las telas, el agua o el viento \cite{erlebenbook}.
@@ -66,22 +59,12 @@ Encontramos varios tipos de soluciones para la optimización de la simulación d
   \item Entrenamiento con IA: el enfoque más actual de la resolución de simulaciones complejas como Cloth es la Inteligencia Artificial. Se entrenan modelos de ML y DL con los datos de las mallas animadas o en simulación, con lo que obtenemos más adelante mejor rendimiento en tiempo real. Se sacrifica memoria y tiempo de entrenamiento para obtener mejores y mucho más rápidas simulaciones de tela en escena. Actualmente, nos encontramos en el paso de investigación a implementación en grandes empresas: Unreal ya proporciona una simulación de tela a través de aprendizaje automático \cite{chaoscloth}, en el que destaca su realismo. Aún así, cuenta con limitaciones al basarse un NearestNeighborSearch: 'el sistema es capaz de predecir detalles como arrugas pero no movimiento dinámico como ondulaciones o drapeados'.En la próxima sección detallaremos las numerosas investigaciones recientes que abarcan aspectos desde la reproducción de arrugas, el compromiso entre calidad, coste y reendimiento hasta colisiones y penetraciones en las mallas.
 \end{itemize}
 
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.5\textwidth]{Imagenes/Bitmap/XSens.png}
-    \caption[Imágen del traje de captura de movimiento XSens]{Imágen del traje de captura de movimiento XSens \footnotemark }
-    \label{fig:XSensTraje}
-\end{figure}
-
-\footnotetext{Fuente de la imagen: \url{https://www.researchgate.net/figure/The-Xsens-MVN-full-body-motion-capture-suit-Picture-source-htttp-wwwxsenscom_fig1_233926874}}
-
-
 \section{Inteligencia Artificial en videojuegos}
 \subsection{Tecnologias existentes}
 \subsection{Librerías}
 \subsubsection{Pytorch}
-\subsubsection{Tensorflow}
 \subsubsection{Sentis}
+https://docs.unity3d.com/Packages/com.unity.ai.inference@2.4/manual/index.html
 \subsection{Modelos de optimización de telas}
 \subsubsection{Subspace Neural Physics: Fast Data-Driven Interactive Simulation}
 PCA + linear subspace ()
