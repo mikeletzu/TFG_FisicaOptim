@@ -5,26 +5,22 @@ En este capítulo se presenta una breve descripción del desarrollo de las simul
 \section{Simulación física en videojuegos}
 Basta con remontarse a la creación del Pong en 1972, para darse cuenta de la importancia que las simulaciones físicas han tenido en el ámbito de los videojuegos desde el primer momento. Al fin y al cabo, las físicas permiten crear situaciones del gameplay que no están predefinidas, enriqueciendo así la experiencia del jugador. \newline
 
-En los inicios del desarrollo de videojuegos, las técnicas más rudimentarias para implementar estas fisicas incluian:
+En los inicios del desarrollo de videojuegos, las técnicas más rudimentarias para implementar estas físicas incluían:
 \begin{itemize}
-\item \textbf{La prerenderización:} Dada la capacidad de computo con la que solían contar las máquinas, era imposible hacer todos los cálculos físicos en tiempo real, por lo que las interacciones físicas podían diseñarse previamente para parecer realistas. \cite{templet2021game}
-\item \textbf{La implementación forzada de cada elemento:} El comportamiento de cada elemento podía ser implementado únicamente para él, en vez de seguir unas normas físicas generales. Por ejemplo, en el caso de un proyectil, podía codificarse calculando su trayectoria y velocidad en pocas lineas de código. \newline
+\item \textbf{La prerenderización:} Dada la capacidad de cómputo con la que solían contar las máquinas, era imposible hacer todos los cálculos físicos en tiempo real, por lo que las interacciones físicas podían diseñarse previamente para parecer realistas. \cite{templet2021game}
+\item \textbf{La implementación forzada de cada elemento:} El comportamiento de cada elemento podía ser implementado únicamente para él, en vez de seguir unas normas físicas generales. Por ejemplo, en el caso de un proyectil, podía codificarse calculando su trayectoria y velocidad en pocas líneas de código. \newline
 \end{itemize}
 
-Estos métodos eran claramente limitados en la precisión que ofrecian, y quedaba clara la necesidad de una solución más general y reproducible. El mismo Ian Millingtong menciona en su libro Game Physics Engine Development \cite{millington2007game} el juego Exile, creado por Peter Irvin y Jeremy Smith. Si bien este juego fue publicado en 1988 ya contaba con colisiones "con intercambio de impulso" (esto no se entiende igual?), gravedad, fuerzas como por ejemplo el viento, explosiones y etc. Es probablemente el primer juego que cuenta con un motor de físicas completo. \newline
-
-.............incluir página web en la q el propio Peter explica esto y dice q Jeremy se muere? https://inventivity.co.uk/exileami/about.htm Dramatismo. Intensidad narrativa a la memoria.
+Estos métodos eran claramente limitados en la precisión que ofrecían, y quedaba clara la necesidad de una solución más general y reproducible. El mismo Ian Millingtong menciona en su libro \textit{Game Physics Engine Development} \cite{millington2007game} el juego Exile, creado por Peter Irvin y Jeremy Smith. Si bien este juego fue publicado en 1988 ya contaba con conservación del momento en colisiones, gravedad, fuerzas como el viento o explosiones. Lo resaltamos como uno de los primeros juegos que cuenta con un motor de físicas completo. \newline
 
 \subsection{Motores de fisica}
-La creación de motores de fisica completos, aportaba a los videojuegos la escalabilidad de su gameplay manteniendo la coherencia de sus elementos fisicos, imprescindible para la inmersión del jugador. \cite{hecker2000physics} En los años 90, con la popularidad del 3D y gráficos cada vez más avanzados, la física era la siguiente area en la que marcar la diferencia, haciendo la evolución de estos motores inevitable. Todos estos cálculos en tiempo real suponian además una gran carga para la CPU, planteando así dos grandes retos: El avance de los motores físicos cada vez más precisos/realistas y potentes, y por otro lado, la optimización del hardware para llegar a la demanda computacional que esto suponía.
+La creación de motores de fisica completos aportó a los videojuegos escalabilidad en su gameplay, manteniendo la coherencia de sus elementos fisicos. Esto último resulta imprescindible para la inmersión del jugador. \cite{hecker2000physics} En los años 90, con la popularidad del 3D y gráficos cada vez más avanzados, la física era la siguiente área en la que marcar la diferencia. La evolución de estos motores era inevitable. Todos estos cálculos en tiempo real suponían además una gran carga para la CPU, planteando así dos grandes retos: el avance de los motores físicos cada vez más precisos/realistas y potentes, y, por otro lado, la optimización del hardware para llegar a la demanda computacional que esto suponía.
 Mirar incluir algo más concreto d juegos, primeros avances con motores? \cite{hiscomp2012engines} \newline
 
-En este contexto nacen los primeros motores físicos.
-VEO IMPORTANTE ESTE PARRAFO PARA INTRODUCIR TANTO PhysX COMO GPU vs CPU PERO ESTÁ FATAL EXPLICAU, POCA INFO FIABLE, ACORTAR Y SIMPLIFICAR
-
-http://ffden-2.phys.uaf.edu/webproj/211_fall_2014/Bryce_Melegari/history.html %buscar papers o fuentes más fiables
-
-En 2002, se funda Ageia Technologies, responsable de la creación de el primer procesador de física dedicado para ordenadores, denominado PhysX PPU (Physics Processing Unit), así como de el motor PhysX, el cual sigue siendo lider en la industria. Posteriormente, NVIDIA Corporation, conocida por su papel en la producción de GPUs adquiere Aegia, impulsando el cálculo de fisicas en GPU. https://developer.nvidia.com/physx-sdk Esto sumado a la dificultad de penetrar en el mercado del hardware hace que la producción de PPUs quede obsoleta.
+En este contexto nacen los primeros motores físicos. 
+%VEO IMPORTANTE ESTE PARRAFO PARA INTRODUCIR TANTO PhysX COMO GPU vs CPU PERO ESTÁ FATAL EXPLICAU, POCA INFO FIABLE, ACORTAR Y SIMPLIFICAR
+%http://ffden-2.phys.uaf.edu/webproj/211_fall_2014/Bryce_Melegari/history.html% %buscar papers o fuentes más fiables
+En 2002, se funda Ageia Technologies, responsable de la creación del primer procesador de física dedicado para ordenadores, denominado PhysX PPU (Physics Processing Unit), así como del motor PhysX, que sigue siendo líder en la industria a día de hoy. Posteriormente, NVIDIA Corporation, conocida por su papel en la producción de GPUs, adquiere Aegia, impulsando el cálculo de fisicas en GPU. https://developer.nvidia.com/physx-sdk Esto sumado a la dificultad de penetrar en el mercado del hardware hace que la producción de PPUs quede obsoleta.
 Por otro lado, Intel adquiere Havok (https://media.gdcvault.com/GD_Mag_Archives/GDM_October_2000.pdf), otro de los primeros motores de fisicas, en 2007, cancelando el programa HavokFX que pretendía llevar el cálcuulo de fisicas a la GPU. Posteriormente es adquirido por microsoft en 2015, que el 2016 empieza a trabajar en DirectPhysics, ????? ns que ha pasado cn esto ?????. Por lo que hoy en dia la carga computacional quede entre la CPU y GPU, que discutiremos durante el desarrollo de este proyecto.
 
 \subsection{Motores de videojuegos}
