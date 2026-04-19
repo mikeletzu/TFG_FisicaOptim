@@ -76,7 +76,32 @@ Sentis es una librería de inferencia de redes neuronales para Unity, predecesor
 La optimización de simulaciones con redes neuronales cuenta ya con un amplio recorrido, en este apartado se describen los estudios más destacados de los últimos años. Son también inspiración directa para la implementación de nuestros experimentos.
 
 \subsubsection{Subspace Neural Physics: Fast Data-Driven Interactive Simulation}
-PCA + linear subspace ()
+(tengo que reducirlo pero buen + mention kolmogrov orv verlet)\newline
+Este desasallo de la unidad de investigación Ubisoft La Forge incorpora la primera técnica que incopora reducción de modelo o el uso de subespacios con colisiones con objetos externos en la cloth. El estudio se centra en conseguir un balance entre el rendimiento en tiempo real y el coste y memoria necesarios para realizar el precómputo. Se extraen las posiciones de los vértices de una simulación hecha en Maya. Las posiciones de los vértices se aplanan en un vector, y se construye otro vector plano con los parámteros necesarios como posición del suelo, valor del viento, o collisionadores con la tela. Se aplica un PCA denotando cuántos ejes de deformación de la tela se tienen en cuenta (64, 128, 256, siendo este último el que conserva casi el mismo nivel de detalle que la simulación original). (especificar la fórmula del PCA?)\newline
+
+El modelo que predice la posición del vértice tiene en cuenta los dos frames anteriores y los colisionadores ade ese frame:
+zt=α⊙zt−1+β⊙(zt−1−zt−2)\newline
+
+La  versión extendida: zt = ¯zt + Φ ¯zt zt−1 wt T (la que tiene en cuenta las colisiones externas).\newline
+
+Aquí dice una cosa importante sobre el error que hay que corregir usando window frames:
+\textit{We repeat this training procedure on mini-batches of size 16,
+usingoverlappingwindowsofsize32,foraround100epochsoruntil
+training converges. We use a learning rate of 0.0001, and a learning
+rate decay ratio of 0.999. We use a noise standard deviation rσ of
+0.01, which we found by visualizing the result of this perturbation
+in the first 3 components of the PCA space. Training takes between
+10 and 48 hours depending on the complexity of the setup and the
+number of PCA bases used.}\newline
+
+Finalmente se carga en una aplicación interactiva 3D los pesos en C++, y se deja al usuario manipular al personaje con un gamepad. Se aceleran calculos neceesarios para el input con shaders en GPU (gpu decompression).At render time it is not sufficient to only have access to vertex positions, as the deformed vertex normals are also needed for rendering. Esto no lo vamos a tener en cuenta porque aun no tenemos modelos complejos. Pero se tendría que hacer.\newline
+
+Limitaciones: simulacion erronea quitada a mano, falta de prubeas en objetos plasyicos, selfcoliioins may occur,external object fixed in place (such as throwing boxes at a deformable object and 
+having it react by rolling around on the floors)\newline
+
+%Forcloth-characterinteractionsweusealargemotion capturedatabaseof∼6.5×105animationframes,stitchedtogethertoformonelargeanimation.Wethensimulatetheentireseries.Aftersimulationwecheckthedataandexcludeanyframeswhereunstableorbadbehaviorwasseen.Fortheskirtsceneweremovethecharacter’sarmsbecausetheyintersectfrequentlywiththelegmeshgeometry,causingtheclothtobreak.generally,weattempttoacquirebetween105and106 framesoftrainingdata.Wefoundinmostcases∼105wassufficientfortesting,whilethebestresultswereachievedwithcloserto∼106frames.
+
+Se toman los ejes de deformación necesarios para reconstruir la simulación original.
 \subsubsection{Neural Cloth Simulation}
 Subspace, Recurrent encoder-decoder.
 \subsubsection{PBNS: Physically Based Neural Simulation for Unsupervised Garment Pose Space Deformation}
