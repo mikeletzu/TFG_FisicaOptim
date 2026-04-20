@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 
-public class ClothML : MonoBehaviour
+public class ClothMLPos : MonoBehaviour
 {
     [SerializeField]
     public GameObject ball;
@@ -71,7 +71,7 @@ public class ClothML : MonoBehaviour
 
         // set max distance
         int i = 0;
-		for (;  i < 10; i++)
+		for (;  i < 2; i++)
         {
             maxDistance[i] = 0f;
         }
