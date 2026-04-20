@@ -484,7 +484,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 339546644}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a36df33f06b569b4498b3ee70bb1aabc, type: 3}
   m_Name: 
@@ -859,7 +859,7 @@ MeshRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 804829631}
   m_Enabled: 1
-  m_CastShadows: 1
+  m_CastShadows: 2
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
   m_StaticShadowCaster: 0
@@ -876,7 +876,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: -3033667219593020291, guid: 8c41a61ebc0977741afb275e6ce2bab9, type: 3}
+  - {fileID: 2100000, guid: f68d31e8446af834d8e427c4de551dfd, type: 2}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -932,18 +932,19 @@ MonoBehaviour:
   m_GameObject: {fileID: 804829631}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dc3fce1c83b1e894ea47b81c3aab8586, type: 3}
+  m_Script: {fileID: 11500000, guid: c40bc56cb6ff9a440b006d6c9e694f0c, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ClothMLPos
+  m_EditorClassIdentifier: Assembly-CSharp::ClothML
   ball: {fileID: 339546644}
   ballCollider: {fileID: 339546646}
-  modelAsset: {fileID: 5022602860645237092, guid: 114aec6cb651bfe42984bab3e1f6bade, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: d4c73f454fab9db4093e25efa849d060, type: 3}
   clothMeshFilter: {fileID: 804829634}
-  jsonFile: {fileID: 4900000, guid: 259465932c1c85943816b76c49106767, type: 3}
+  jsonFile: {fileID: 4900000, guid: 0d5cec306ae338044a83e97a0c18c129, type: 3}
   normData:
     mean: []
     std: []
-    feature_prefixes: []
+    target_mean: []
+    target_std: []
 --- !u!1 &904514329
 GameObject:
   m_ObjectHideFlags: 0
@@ -1402,7 +1403,8 @@ MonoBehaviour:
   normData:
     mean: []
     std: []
-    feature_prefixes: []
+    target_mean: []
+    target_std: []
 --- !u!33 &1934972513 stripped
 MeshFilter:
   m_CorrespondingSourceObject: {fileID: -5754084199372789682, guid: 521ede0c7280746458b2098a97f34277, type: 3}
