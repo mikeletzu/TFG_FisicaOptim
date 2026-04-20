@@ -71,7 +71,7 @@ public class ClothML : MonoBehaviour
 
         // set max distance
         int i = 0;
-		for (;  i < 10; i++)
+		for (;  i < 2; i++)
         {
             maxDistance[i] = 0f;
         }
@@ -187,9 +187,9 @@ public class ClothML : MonoBehaviour
 
 			int f = 0;
 			// Posicion
-			inputTensor[0, i, f++] = (worldPos.x - normData.mean[0]) / normData.std[0];
-			inputTensor[0, i, f++] = (worldPos.y - normData.mean[1]) / normData.std[1];
-			inputTensor[0, i, f++] = (worldPos.z - normData.mean[2]) / normData.std[2];
+			inputTensor[0, i, f++] = (worldPos.x);// - normData.mean[0]) / normData.std[0];
+			inputTensor[0, i, f++] = (worldPos.y);// - normData.mean[1]) / normData.std[1];
+			inputTensor[0, i, f++] = (worldPos.z);// - normData.mean[2]) / normData.std[2];
 
 			// Velocidad
 			inputTensor[0, i, f++] = vel.x;
@@ -234,13 +234,17 @@ public class ClothML : MonoBehaviour
 			//	((normData.std[1] * normalizedY) + normData.mean[1])*0.00001f,
 			//	((normData.std[2] * normalizedZ) + normData.mean[2]) * 0.000001f);
 
-			// Clamp
-			Vector3 modelOutput = new Vector3(
-				Mathf.Clamp((normData.std[0] * normalizedX) + normData.mean[0], -1f, 1f),
-				Mathf.Clamp((normData.std[1] * normalizedY) + normData.mean[1], -1f, 1f),
-				Mathf.Clamp((normData.std[2] * normalizedZ) + normData.mean[2], -1f, 1f));
+		//	Clamp
+		   Vector3 modelOutput = new Vector3(
+			   Mathf.Clamp(normalizedX, -1f, 1f),
+			   Mathf.Clamp(normalizedY, -1f, 1f),
+			   Mathf.Clamp(normalizedZ, -1f, 1f));
+		   //Vector3 modelOutput = new Vector3(
+			  // Mathf.Clamp((normData.std[0] * normalizedX) + normData.mean[0], -1f, 1f),
+			  // Mathf.Clamp((normData.std[1] * normalizedY) + normData.mean[1], -1f, 1f),
+			  // Mathf.Clamp((normData.std[2] * normalizedZ) + normData.mean[2], -1f, 1f));
 
-			// Vector3 modelOutput = new Vector3(normalizedX, normalizedY, normalizedZ);
+			//Vector3 modelOutput = new Vector3(normalizedX, normalizedY, normalizedZ);
 
 			// En principio debería ser world space, pero el nuevo vértice en local space.
 			newVertices[i] = transform.InverseTransformPoint(modelOutput);
