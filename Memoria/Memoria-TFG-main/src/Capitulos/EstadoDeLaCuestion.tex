@@ -73,11 +73,54 @@ ONNX es un formato creado para representar modelos de aprendizaje automático. \
 Sentis es una librería de inferencia de redes neuronales para Unity, predecesora introducida en el 2023 de la librería Barracuda. Permite importar modelos de redes neuronales entrenados a Unity y ejecutarlos en tiempo real tanto con la CPU como con la GPU. \cite{unity_sentis_2.4}
 
 \subsection{Modelos de optimización de telas}
-La optimización de simulaciones con redes neuronales cuenta ya con un amplio recorrido, en este apartado se describen los estudios más destacados de los últimos años. Son también inspiración directa para la implementación de nuestros experimentos.
+La optimización de simulaciones con redes neuronales cuenta ya con un amplio recorrido, en este apartado se describen los estudios más destacados de los últimos años. Son también inspiración directa para la implementación de nuestros experimentos, con el objetivo de descubrir cuales de estas técnicas son verdaderamente aplicables a menor escala (q tal darle un aproach d no se puede hacer la mitad por q somos #indies)
 
+% A = LO MÁS SENCILLO POSE BASED
+\subsubsection{Towards Generalized Position-Based Dynamics}
+NO ES UNA OPTIMIZACIÓN CON MACHINE LEARNING
+- Presentan sus nuevas ecuaciones para el calculo físico
+- Hablan de data driven simulations pero son configuraciones pre grabadas POSES podemos comentarlo como machine learning (en tmbn lo q hace cahos d unreal)  
+En hood aparecen otros paper q tmbn hablan d esto: Learned Deformation Models [20, 30,39,42]
+    [20] Peng Guan, Loretta Reiss, David A Hirshberg, Alexander
+    Weiss, and Michael J Black. Drape: Dressing any person.
+    ACMTransactions on Graphics (ToG)
+    [30] Qianli Ma, Jinlong Yang, Anurag Ranjan, Sergi Pujades,
+    Gerard Pons-Moll, Siyu Tang, and Michael J Black. Learn
+    ing to dress 3d people in generative clothing. In Proceedings
+    of the IEEE/CVF Conference on Computer Vision and Pat
+    tern Recognition, pages 6469–6478, 2020
+    [39] Chaitanya Patel, Zhouyingcheng Liao, and Gerard Pons
+    Moll. Tailornet: Predicting clothing in 3d as a function of
+    human pose, shape and garment style. In Proceedings of
+    the IEEE/CVF Conference on Computer Vision and Pattern
+    Recognition, pages 7365–7375, 2020.
+    [42] Igor Santesteban, Miguel A Otaduy, and Dan Casas.
+    Learning-based animation of clothing for virtual try-on.
+    Computer Graphics Forum, 38(2):355–366, 2019
+
+we iterate over each individual force term in the system (for example, the force due to one element on its adjacent vertices in a FEM mesh), and update it implicitly using a low-dimensional Newton solve on the element strain. Our proposed scheme isexpressive enough to apply to any nonlinear energy-based elastic model
+
+is extremely popular in interactive applications due to its stability, performance, and ease of implementation. Unlike most other iterative techniques used for dynamics simulation, PBD is a so-called “dual” descent method [Macklin et al. 2020]: it iterates over the forces in the system, and updates the effect of each force one at a time, rather than updating vertex positions as in “primal” methods.all forces must be expressed as constraints and computed through Lagrange multipliers
+
+d𝑖 is the displacement caused by each force. position-baseddynamicscanbeviewedasawayto iteratively update d𝑖 for eachforce, and thus obtain the solution x
+
+\subsubsection{PBNS: Physically Based Neural Simulation for Unsupervised Garment Pose Space Deformation}
+MLP (LBS, relu)
+Pose based? Pau Pau Pau
+
+\subsubsection{SNUG}
+MUELLES UN POCO DISTINTO:
+    SNUG: interesante! 
+    - sistema de muelles para conseguir equilibrio estático + red recurrente = aprendizaje NO supervisado sin entrenamiento simulado fisicamente
+        Igor Santesteban, Miguel A Otaduy, and Dan Casas. SNUG:
+        Self-supervised neural dynamic garments. In Proceedings of
+        the IEEE/CVF Conference on Computer Vision and Pattern
+    Recognition, pages 8140–8150, 2022
+
+% B = SE VA COMPLICANDO, PRETENDE SIMULAR
 \subsubsection{Subspace Neural Physics: Fast Data-Driven Interactive Simulation}
 (tengo que reducirlo pero buen + mention kolmogrov orv verlet)\newline
-Este desasallo de la unidad de investigación Ubisoft La Forge incorpora la primera técnica que incopora reducción de modelo o el uso de subespacios con colisiones con objetos externos en la cloth. El estudio se centra en conseguir un balance entre el rendimiento en tiempo real y el coste y memoria necesarios para realizar el precómputo. Se extraen las posiciones de los vértices de una simulación hecha en Maya. Las posiciones de los vértices se aplanan en un vector, y se construye otro vector plano con los parámteros necesarios como posición del suelo, valor del viento, o collisionadores con la tela. Se aplica un PCA denotando cuántos ejes de deformación de la tela se tienen en cuenta (64, 128, 256, siendo este último el que conserva casi el mismo nivel de detalle que la simulación original). (especificar la fórmula del PCA?)\newline
+Este desasallo de la unidad de investigación Ubisoft La Forge implementa la primera técnica que incopora reducción de modelo o el uso de subespacios con colisiones con objetos externos en la cloth. El estudio se centra en conseguir un balance entre el rendimiento en tiempo real y el coste y memoria necesarios para realizar el precómputo. Se extraen las posiciones de los vértices de una simulación hecha en Maya. Las posiciones de los vértices se aplanan en un vector, y se construye otro vector plano con los parámteros necesarios como posición del suelo, valor del viento, o collisionadores con la tela. Se aplica un PCA denotando cuántos ejes de deformación de la tela se tienen en cuenta (64, 128, 256, siendo este último el que conserva casi el mismo nivel de detalle que la simulación original). (especificar la fórmula del PCA?)\newline
 
 El modelo que predice la posición del vértice tiene en cuenta los dos frames anteriores y los colisionadores ade ese frame:
 zt=α⊙zt−1+β⊙(zt−1−zt−2)\newline
@@ -102,13 +145,37 @@ having it react by rolling around on the floors)\newline
 %Forcloth-characterinteractionsweusealargemotion capturedatabaseof∼6.5×105animationframes,stitchedtogethertoformonelargeanimation.Wethensimulatetheentireseries.Aftersimulationwecheckthedataandexcludeanyframeswhereunstableorbadbehaviorwasseen.Fortheskirtsceneweremovethecharacter’sarmsbecausetheyintersectfrequentlywiththelegmeshgeometry,causingtheclothtobreak.generally,weattempttoacquirebetween105and106 framesoftrainingdata.Wefoundinmostcases∼105wassufficientfortesting,whilethebestresultswereachievedwithcloserto∼106frames.
 
 Se toman los ejes de deformación necesarios para reconstruir la simulación original.
+
 \subsubsection{Neural Cloth Simulation}
 Subspace, Recurrent encoder-decoder.
-\subsubsection{PBNS: Physically Based Neural Simulation for Unsupervised Garment Pose Space Deformation}
-MLP (LBS, relu)
-\subsubsection{HOOD: Hierarchical Graphs for Generalized Modelling of Clothing Dynamics}
-GNN
+
 \subsubsection{Cloth and Skin Deformation with a Triangle Mesh Based Convolutional Neural Network}
 Our networks are built using three basic building blocks, namely Convolution, Pooling and Unpooling operators that operate directly on a manifold triangle mesh.
+
 \subsection{DeepSD: Real-time Cloth Simulation with Deep Learning}
 CNN. Tambien esta deep wrinkles
+
+% C = SE COMPLICA APRENDIZAJE DE NORMAS FISICAS NO INMITAR LA SIMULACIÓN
+\subsubsection{HOOD: Hierarchical Graphs for Generalized Modelling of Clothing Dynamics}
+2023 avance!!!! tres pasos importantes
+
+a) graph neural networks that learn the local dynamics in a garment-independent way:
+trains its network using physics instead of labeled examples. el grafo sirve para propagar mensajes (pura física)
+NO SÉ SI PLANTEAMOS LLEGAR TAN LEJOS LOL:
+Our method learns to predict physically
+realistic fabric behavior by reasoning about the map between local deformations, forces, and accelerations. Thanks to its locality, our method is agnostic to both the global structure and shape of the garment and directly generalizes to arbitrary body shapes and motions.
+
+b) hierarchical message-passing for the efficient capture of long-range compling:
+related a MeshGraphNets pero con más mensajes (multi-level) y entre varias estrategias de pooling que se están llevando ellos hacen: graph coarsening strategy that allows our network to implicitly learn transitions between
+graph levels
+
+c) a physics-based loss function that enables self-supervised training:
+utiliza "incremental potential for implicit time stepping" como loss function
+  cn esto se refiere a la propia ecuación de simulación física: implicit time integration, where the next state of the cloth is found by minimizing an energy (potential) that encodes: stretching / bending energies, inertia (how velocity continues), contact, friction, etc. This energy (often called an incremental potential) is a scalar function of the cloth configuration at the next time step.
+Aplicando la propia fisica correcta como loss, consigue aprendizaje NO SUPERVISADO 
+
+Soluciona PROBLEMAS q otros estudios:
+- huesos a la tela para poder extender de las prendas apretadas
+- telas como point clouds para poder adaptarse a la topologia lo coloca dentro d Learned Deformation Models
+
+Limites: Velocidad d sim, self-coll...
