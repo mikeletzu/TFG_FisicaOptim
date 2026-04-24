@@ -152,6 +152,13 @@ Subspace, Recurrent encoder-decoder.
 \subsubsection{Cloth and Skin Deformation with a Triangle Mesh Based Convolutional Neural Network}
 Our networks are built using three basic building blocks, namely Convolution, Pooling and Unpooling operators that operate directly on a manifold triangle mesh.
 
+Este estudio es un ejemplo de uso de CNN para la simulación de cloth. Reseña la dificultad de intregar una CNN debido a la construcción de la malla, en primer lugar incompatible con una grid 2D. Resuelve el problema entrenando mallas "manifold" triangulares: es decir, mallas cuyos bordes están conectados por al menos dos caras (menos los extremos) dejando una separación entre exterior e interior. Mapear la mesh a una imagen 2D es lo que permite realizar la convolución. Crean un encoder-decoder network que está formado por bloques UpConv and DownConv con operadores nuevos de convolución, pooling y unpooling. Destacamos como reduce la dimensionalidad de la malla en el pooling: colpasa los edges siguiendo un método en espiral. También señala la importancia de usar Leaky-CNN: para no dejar neuronas muertas, que resulta un problema en la simulcación. también de usar L2 además de L2 para que no se quede el error concretado en ciertos vértices. Tambien usa el Adam optimizer.
+Este estudio afirma conseguir resultados muy cercanos a la GT, usa la Berkley animation base, cuenta con PC potente, y no obstante, indican una vez más los largos tiemps de entrenamiento (4-20horas) y la necesidad de calidad y cantudad de datos de entrenamiento. Y la incapacidad de asegurar deformaciones sin 
+
+Este estudio incluye joints, inclusion de brazos y manos, (maybe i should talk about this?)
+
++
+Cloth unsampling, Pose to cloth, PCA back to original space.
 \subsection{DeepSD: Real-time Cloth Simulation with Deep Learning}
 CNN. Tambien esta deep wrinkles
 

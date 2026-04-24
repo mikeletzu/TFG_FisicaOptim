@@ -190,7 +190,8 @@ public class ClothDatasetRecorder : MonoBehaviour
         for (int j = 0; j < vertexIndices.Length; j++)
         {
             int idx = vertexIndices[j];
-            pos_t[j] = transform.TransformPoint(particles[idx]); // Global position of vertices
+            pos_t[j] = particles[idx]; // Local position of vertices
+            //pos_t[j] = transform.TransformPoint(particles[idx]); // Global position of vertices
 
 			if (hasPrevious)
             {
@@ -201,7 +202,7 @@ public class ClothDatasetRecorder : MonoBehaviour
                 vel_t[j] = Vector3.zero;
             }
 
-            sdf_t[j] = SDFSphere(pos_t[j], spherePos, sphereRad);
+            sdf_t[j] = SDFSphere(pos_t[j], transform.InverseTransformPoint(spherePos), sphereRad);
             normal_t[j] = NormalToSphere(pos_t[j], spherePos);
 
             maxDist_t[j] = Mathf.Clamp(coeffs[idx].maxDistance, 0f, 1f);
