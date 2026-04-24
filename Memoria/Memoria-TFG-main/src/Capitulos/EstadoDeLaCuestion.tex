@@ -73,13 +73,23 @@ ONNX es un formato creado para representar modelos de aprendizaje automático. \
 Sentis es una librería de inferencia de redes neuronales para Unity, predecesora introducida en el 2023 de la librería Barracuda. Permite importar modelos de redes neuronales entrenados a Unity y ejecutarlos en tiempo real tanto con la CPU como con la GPU. \cite{unity_sentis_2.4}
 
 \subsection{Modelos de optimización de telas}
+Avance de simulación {Towards Generalized Position-Based Dynamics}
+
+
 La optimización de simulaciones con redes neuronales cuenta ya con un amplio recorrido, en este apartado se describen los estudios más destacados de los últimos años. Son también inspiración directa para la implementación de nuestros experimentos, con el objetivo de descubrir cuales de estas técnicas son verdaderamente aplicables a menor escala (q tal darle un aproach d no se puede hacer la mitad por q somos #indies)
 
 % A = LO MÁS SENCILLO POSE BASED
 \subsubsection{Towards Generalized Position-Based Dynamics}
-NO ES UNA OPTIMIZACIÓN CON MACHINE LEARNING
-- Presentan sus nuevas ecuaciones para el calculo físico
-- Hablan de data driven simulations pero son configuraciones pre grabadas POSES podemos comentarlo como machine learning (en tmbn lo q hace cahos d unreal)  
+- Partiendo de sus nuevas ecuaciones para el calculo físico: cite{chaudhary2025towards}
+  {
+    we iterate over each individual force term in the system (for example, the force due to one element on its adjacent vertices in a FEM mesh), and update it implicitly using a low-dimensional Newton solve on the element strain. Our proposed scheme isexpressive enough to apply to any nonlinear energy-based elastic model
+
+    is extremely popular in interactive applications due to its stability, performance, and ease of implementation. Unlike most other iterative techniques used for dynamics simulation, PBD is a so-called “dual” descent method [Macklin et al. 2020]: it iterates over the forces in the system, and updates the effect of each force one at a time, rather than updating vertex positions as in “primal” methods. All forces must be expressed as constraints and computed through Lagrange multipliers
+
+    d𝑖 is the displacement caused by each force. position-baseddynamicscanbeviewedasawayto iteratively update d𝑖 for eachforce, and thus obtain the solution x
+  }
+
+- Esto permite implementar: Hablan de data driven simulations pero son configuraciones pre grabadas POSES podemos comentarlo como machine learning (en tmbn lo q hace cahos d unreal)  
 En hood aparecen otros paper q tmbn hablan d esto: Learned Deformation Models [20, 30,39,42]
     [20] Peng Guan, Loretta Reiss, David A Hirshberg, Alexander
     Weiss, and Michael J Black. Drape: Dressing any person.
@@ -98,24 +108,15 @@ En hood aparecen otros paper q tmbn hablan d esto: Learned Deformation Models [2
     Learning-based animation of clothing for virtual try-on.
     Computer Graphics Forum, 38(2):355–366, 2019
 
-we iterate over each individual force term in the system (for example, the force due to one element on its adjacent vertices in a FEM mesh), and update it implicitly using a low-dimensional Newton solve on the element strain. Our proposed scheme isexpressive enough to apply to any nonlinear energy-based elastic model
 
-is extremely popular in interactive applications due to its stability, performance, and ease of implementation. Unlike most other iterative techniques used for dynamics simulation, PBD is a so-called “dual” descent method [Macklin et al. 2020]: it iterates over the forces in the system, and updates the effect of each force one at a time, rather than updating vertex positions as in “primal” methods.all forces must be expressed as constraints and computed through Lagrange multipliers
+\subsubsection{Neural Cloth Simulation}
+Subspace, Recurrent encoder-decoder.
 
-d𝑖 is the displacement caused by each force. position-baseddynamicscanbeviewedasawayto iteratively update d𝑖 for eachforce, and thus obtain the solution x
+ANTERIORMENTE tmbn hemos mencionado CAHOS UNREAL q hace lo mismo....
 
 \subsubsection{PBNS: Physically Based Neural Simulation for Unsupervised Garment Pose Space Deformation}
 MLP (LBS, relu)
 Pose based? Pau Pau Pau
-
-\subsubsection{SNUG}
-MUELLES UN POCO DISTINTO:
-    SNUG: interesante! 
-    - sistema de muelles para conseguir equilibrio estático + red recurrente = aprendizaje NO supervisado sin entrenamiento simulado fisicamente
-        Igor Santesteban, Miguel A Otaduy, and Dan Casas. SNUG:
-        Self-supervised neural dynamic garments. In Proceedings of
-        the IEEE/CVF Conference on Computer Vision and Pattern
-    Recognition, pages 8140–8150, 2022
 
 % B = SE VA COMPLICANDO, PRETENDE SIMULAR
 \subsubsection{Subspace Neural Physics: Fast Data-Driven Interactive Simulation}
@@ -146,9 +147,6 @@ having it react by rolling around on the floors)\newline
 
 Se toman los ejes de deformación necesarios para reconstruir la simulación original.
 
-\subsubsection{Neural Cloth Simulation}
-Subspace, Recurrent encoder-decoder.
-
 \subsubsection{Cloth and Skin Deformation with a Triangle Mesh Based Convolutional Neural Network}
 Our networks are built using three basic building blocks, namely Convolution, Pooling and Unpooling operators that operate directly on a manifold triangle mesh.
 
@@ -159,10 +157,16 @@ Este estudio incluye joints, inclusion de brazos y manos, (maybe i should talk a
 
 +
 Cloth unsampling, Pose to cloth, PCA back to original space.
+
 \subsection{DeepSD: Real-time Cloth Simulation with Deep Learning}
 CNN. Tambien esta deep wrinkles
 
 % C = SE COMPLICA APRENDIZAJE DE NORMAS FISICAS NO INMITAR LA SIMULACIÓN
+% - STATE OF THE ART DEL PRESENTE / FUTURO
+\subsubsection{SNUG}
+cite{santesteban2022snug}
+Sistema de muelles tmbn (fuerza bruta) pero entrenado cn una red recurrente para conseguir equilibrio estático (ley física) lo que hace que pueda ser prendizaje NO supervisado y NO necesitar base de datos de mallas ya simuladas
+
 \subsubsection{HOOD: Hierarchical Graphs for Generalized Modelling of Clothing Dynamics}
 2023 avance!!!! tres pasos importantes
 
