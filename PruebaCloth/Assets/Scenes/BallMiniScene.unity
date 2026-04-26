@@ -567,7 +567,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 339546644}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a36df33f06b569b4498b3ee70bb1aabc, type: 3}
   m_Name: 
@@ -710,10 +710,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClothMLPos
   ball: {fileID: 339546644}
   ballCollider: {fileID: 339546646}
-  modelAsset: {fileID: 5022602860645237092, guid: 0da28a90937760843885da0a07c11c7c, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: f72142798a7aa5c47ab9db26cec4a9fa, type: 3}
   clothMeshFilter: {fileID: 354067158}
   contador: 0
-  jsonFile: {fileID: 4900000, guid: f0d70e5ce1b6ff845be5ef7618ce640f, type: 3}
+  jsonFile: {fileID: 4900000, guid: 0d5cec306ae338044a83e97a0c18c129, type: 3}
   normData:
     mean: []
     std: []
