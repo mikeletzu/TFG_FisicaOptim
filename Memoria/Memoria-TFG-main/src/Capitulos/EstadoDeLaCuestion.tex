@@ -21,15 +21,15 @@ En este contexto nacen los primeros motores físicos.
 %VEO IMPORTANTE ESTE PARRAFO PARA INTRODUCIR TANTO PhysX COMO GPU vs CPU PERO ESTÁ FATAL EXPLICAU, POCA INFO FIABLE, ACORTAR Y SIMPLIFICAR
 %http://ffden-2.phys.uaf.edu/webproj/211_fall_2014/Bryce_Melegari/history.html% %buscar papers o fuentes más fiables
 En 2002, se funda Ageia Technologies, responsable de la creación del primer procesador de física dedicado para ordenadores, denominado PhysX PPU (Physics Processing Unit), así como del motor PhysX, que sigue siendo líder en la industria a día de hoy. Posteriormente, NVIDIA Corporation, conocida por su papel en la producción de GPUs, adquiere Aegia, impulsando el cálculo de fisicas en GPU. https://developer.nvidia.com/physx-sdk Esto sumado a la dificultad de penetrar en el mercado del hardware hace que la producción de PPUs quede obsoleta.
-Por otro lado, Intel adquiere Havok (https://media.gdcvault.com/GD_Mag_Archives/GDM_October_2000.pdf), otro de los primeros motores de fisicas, en 2007, cancelando el programa HavokFX que pretendía llevar el cálcuulo de fisicas a la GPU. Posteriormente es adquirido por microsoft en 2015, que el 2016 empieza a trabajar en DirectPhysics, ????? ns que ha pasado cn esto ?????. Por lo que hoy en dia la carga computacional quede entre la CPU y GPU, que discutiremos durante el desarrollo de este proyecto.
+Por otro lado, Intel adquiere Havok \url{https://media.gdcvault.com/GD_Mag_Archives/GDM_October_2000.pdf}, otro de los primeros motores de fisicas, en 2007, cancelando el programa HavokFX que pretendía llevar el cálcuulo de fisicas a la GPU. Posteriormente es adquirido por microsoft en 2015, que el 2016 empieza a trabajar en DirectPhysics, ????? ns que ha pasado cn esto ?????. Por lo que hoy en dia la carga computacional quede entre la CPU y GPU, que discutiremos durante el desarrollo de este proyecto.
 
 \subsection{Motores de videojuegos}
-Los motores físicos, sumados a otros elementos análogos como los motores de renderizado, de sonido... crean el software al que nos referimos como motores de videojuegos. Unreal Engine, Unity y los motores propios de los grandes estudios dominan el mercado. https://app.sensortower.com/vgi/assets/reports/The_Big_Game_Engines_Report_of_2025.pdf  \newline
+Los motores físicos, sumados a otros elementos análogos como los motores de renderizado, de sonido... crean el software al que nos referimos como motores de videojuegos. Unreal Engine, Unity y los motores propios de los grandes estudios dominan el mercado. \url{https://app.sensortower.com/vgi/assets/reports/The_Big_Game_Engines_Report_of_2025.pdf}  \newline
 
-Unreal es un motor de videojuegos creado por Epic Games en 1998. Desde _____ y hasta la introducción de Chaos Physics en su versión más reciente, la 5.7, Unreal usaba PhysX. En lo que a este proyecto respecta chaos plantea nuevos avances en la simulación de telas muy intereseantes que se comentarán más adelante.  \newline
+Unreal es un motor de videojuegos creado por Epic Games en 1998. Desde ... y hasta la introducción de Chaos Physics en su versión más reciente, la 5.7, Unreal usaba PhysX. En lo que a este proyecto respecta chaos plantea nuevos avances en la simulación de telas muy intereseantes que se comentarán más adelante.  \newline
 
 Sin embargo, ......UNITY (justificamos por qué unity: libre acceso, motor principal usado para desarrollo?)
-Unity es un motor de videojuegos creado por Unity Technologies en 2005. Utiliza como motor físico: PhysX. https://docs.unity3d.com/Manual/physics-integrations.html
+Unity es un motor de videojuegos creado por Unity Technologies en 2005. Utiliza como motor físico: PhysX. \url{https://docs.unity3d.com/Manual/physics-integrations.html}
 Extensiones accesibles , ej. Sentis, se indagará más adelante.
 
 \section{Simulación de telas}
@@ -76,7 +76,7 @@ Sentis es una librería de inferencia de redes neuronales para Unity, predecesor
 Avance de simulación {Towards Generalized Position-Based Dynamics}
 
 
-La optimización de simulaciones con redes neuronales cuenta ya con un amplio recorrido, en este apartado se describen los estudios más destacados de los últimos años. Son también inspiración directa para la implementación de nuestros experimentos, con el objetivo de descubrir cuales de estas técnicas son verdaderamente aplicables a menor escala (q tal darle un aproach d no se puede hacer la mitad por q somos #indies)
+La optimización de simulaciones con redes neuronales cuenta ya con un amplio recorrido, en este apartado se describen los estudios más destacados de los últimos años. Son también inspiración directa para la implementación de nuestros experimentos, con el objetivo de descubrir cuales de estas técnicas son verdaderamente aplicables a menor escala (q tal darle un aproach d no se puede hacer la mitad por q somos indies)
 
 % A = LO MÁS SENCILLO POSE BASED
 \subsubsection{Towards Generalized Position-Based Dynamics}
@@ -86,7 +86,7 @@ La optimización de simulaciones con redes neuronales cuenta ya con un amplio re
 
     is extremely popular in interactive applications due to its stability, performance, and ease of implementation. Unlike most other iterative techniques used for dynamics simulation, PBD is a so-called “dual” descent method [Macklin et al. 2020]: it iterates over the forces in the system, and updates the effect of each force one at a time, rather than updating vertex positions as in “primal” methods. All forces must be expressed as constraints and computed through Lagrange multipliers
 
-    d𝑖 is the displacement caused by each force. position-baseddynamicscanbeviewedasawayto iteratively update d𝑖 for eachforce, and thus obtain the solution x
+    $d_i$ is the displacement caused by each force. position-baseddynamicscanbeviewedasawayto iteratively update $d_i$ for eachforce, and thus obtain the solution x
   }
 
 - Esto permite implementar: Hablan de data driven simulations pero son configuraciones pre grabadas POSES podemos comentarlo como machine learning (en tmbn lo q hace cahos d unreal)  
@@ -124,15 +124,19 @@ Pose based? Pau Pau Pau
 Este desasallo de la unidad de investigación Ubisoft La Forge implementa la primera técnica que incopora reducción de modelo o el uso de subespacios con colisiones con objetos externos en la cloth. El estudio se centra en conseguir un balance entre el rendimiento en tiempo real y el coste y memoria necesarios para realizar el precómputo. Se extraen las posiciones de los vértices de una simulación hecha en Maya. Las posiciones de los vértices se aplanan en un vector, y se construye otro vector plano con los parámteros necesarios como posición del suelo, valor del viento, o collisionadores con la tela. Se aplica un PCA denotando cuántos ejes de deformación de la tela se tienen en cuenta (64, 128, 256, siendo este último el que conserva casi el mismo nivel de detalle que la simulación original). (especificar la fórmula del PCA?)\newline
 
 El modelo que predice la posición del vértice tiene en cuenta los dos frames anteriores y los colisionadores ade ese frame:
-zt=α⊙zt−1+β⊙(zt−1−zt−2)\newline
+\[
+z_t = \alpha \odot z_{t-1} + \beta \odot (z_{t-1} - z_{t-2})
+\]\newline
 
-La  versión extendida: zt = ¯zt + Φ ¯zt zt−1 wt T (la que tiene en cuenta las colisiones externas).\newline
+La  versión extendida: \[
+z_t = \bar{z}_t + \bar{z}_t \odot z_{t-1} \, w_t^T
+\] (la que tiene en cuenta las colisiones externas).\newline
 
 Aquí dice una cosa importante sobre el error que hay que corregir usando window frames:
 \textit{We repeat this training procedure on mini-batches of size 16,
 usingoverlappingwindowsofsize32,foraround100epochsoruntil
 training converges. We use a learning rate of 0.0001, and a learning
-rate decay ratio of 0.999. We use a noise standard deviation rσ of
+rate decay ratio of 0.999. We use a noise standard deviation r$\sigma$ of
 0.01, which we found by visualizing the result of this perturbation
 in the first 3 components of the PCA space. Training takes between
 10 and 48 hours depending on the complexity of the setup and the
