@@ -121,10 +121,6 @@ Reordenar???
 
 Subespacion tmbn!
 
-\subsubsection{PBNS: Physically Based Neural Simulation for Unsupervised Garment Pose Space Deformation}
-MLP (LBS, relu)
-Pose based? Pau Pau Pau
-
 % B = SE VA COMPLICANDO, PRETENDE SIMULAR
 \subsubsection{Subspace Neural Physics: Fast Data-Driven Interactive Simulation}
 (tengo que reducirlo pero buen + mention kolmogrov orv verlet)\newline
@@ -174,9 +170,22 @@ CNN. Tambien esta deep wrinkles
 
 % C = SE COMPLICA APRENDIZAJE DE NORMAS FISICAS NO INMITAR LA SIMULACIÓN
 % - STATE OF THE ART DEL PRESENTE / FUTURO
-\subsubsection{SNUG}
+
+\subsubsection{PBNS: Physically Based Neural Simulation for Unsupervised Garment Pose Space Deformation}
+MLP (LBS, relu)
+Pose based? Pau Pau Pau
+
+\subsubsection{SNUG} %ESTÁN VENGA A COMPARARSE CON PBNS
 cite{santesteban2022snug}
-Sistema de muelles tmbn (fuerza bruta) pero entrenado cn una red recurrente para conseguir equilibrio estático (ley física) lo que hace que pueda ser prendizaje NO supervisado y NO necesitar base de datos de mallas ya simuladas
+Sistema de muelles tmbn (fuerza bruta) pero entrenado cn una red recurrente para conseguir equilibrio estático (ley física) lo que hace que pueda ser prendizaje NO supervisado y NO necesitar base de datos de mallas de CLOTH ya simuladas
+Las bases d datos cn las que cuenta son los modelos en movimiento (underlying body parameters and motion) AMASS
+dataset [33], totaling 6,519 frames
+
+LAS NORMAS FISICAS DE LAS QUE HABLAMOS PARA EL SELF SUPERVISION:
+- Membrane Strain Energy: Energia transmitida entre dos puntos en base a la elasticidad del material.
+- Bending Energy: El ángulo diédrico entre dos caras en relación a su propiedad de rigidez.
+- Gravity: Gravedad.
+- Collision Penalty: Distancia prudencial al modelo del cuerpo.
 
 \subsubsection{HOOD: Hierarchical Graphs for Generalized Modelling of Clothing Dynamics}
 2023 avance!!!! tres pasos importantes

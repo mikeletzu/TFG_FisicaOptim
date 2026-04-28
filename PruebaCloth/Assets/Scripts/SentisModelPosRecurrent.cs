@@ -160,6 +160,8 @@ public class ClothMLPosRec : MonoBehaviour
                 (normData.target_std[2] * dz) + normData.target_mean[2]
             );
 
+            displacement = Vector3.ClampMagnitude(displacement, 0.05f);
+
             // Aplicamos el desplazamiento a la posición actual (en local)
             newVertices[i] = vertices[i] + displacement;
         }
