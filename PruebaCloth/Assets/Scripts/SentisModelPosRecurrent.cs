@@ -1,0 +1,179 @@
+using System;
+using System.IO;
+using Unity.InferenceEngine; // O Unity.Sentis dependiendo de tu versión exacta
+using UnityEngine;
+
+public class ClothMLPosRec : MonoBehaviour
+{
+    [SerializeField]
+    public GameObject ball;
+    public SphereCollider ballCollider;
+    public ModelAsset modelAsset;
+    public MeshFilter clothMeshFilter;
+
+    private float[] maxDistance;
+
+    Worker worker;
+    Tensor<float> inputTensor;
+
+    public int contador = 0;
+    int vertexCount;
+
+    // --- NUEVO: Parámetros de la Secuencia ---
+    private int seqLen = 5;
+    // Buffer para guardar el estado normalizado de los últimos 5 frames
+    // [tiempo, vertice, feature]
+    private float[,,] historyBuffer;
+
+    public TextAsset jsonFile;
+
+    [System.Serializable]
+    public class NormalizationData
+    {
+        public float[] mean;
+        public float[] std;
+        public float[] target_mean;
+        public float[] target_std;
+    }
+    public NormalizationData normData;
+
+    void Awake()
+    {
+        if (jsonFile != null)
+        {
+            normData = JsonUtility.FromJson<NormalizationData>(jsonFile.text);
+        }
+    }
+
+    void Start()
+    {
+        var model = ModelLoader.Load(modelAsset);
+        worker = new Worker(model, BackendType.GPUCompute);
+
+        clothMeshFilter.mesh.MarkDynamic();
+        vertexCount = clothMeshFilter.mesh.vertexCount;
+
+        maxDistance = new float[vertexCount];
+        historyBuffer = new float[seqLen, vertexCount, 4];
+
+        // Definir puntos anclados (0 = se mueve)
+        int i = 0;
+        maxDistance[i] = 0.2f;
+        i = 1;
+        for (; i < 3; i++)
+        {
+            maxDistance[i] = 0.2f; // Vértices 1 y 2 anclados
+        }
+        while (i < vertexCount)
+        {
+            maxDistance[i] = 0.2f; // El resto se mueve
+            i++;
+        }
+
+        // --- NUEVO: Llenar el buffer inicial ---
+        // Para que los primeros 5 frames no sean nulos, llenamos la historia
+        // asumiendo que la tela está quieta en su posición inicial.
+        var initialVertices = clothMeshFilter.mesh.vertices;
+        for (int t = 0; t < seqLen; t++)
+        {
+            for (int v = 0; v < vertexCount; v++)
+            {
+                Vector3 pos = initialVertices[v];
+                float sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
+
+                historyBuffer[t, v, 0] = (pos.x - normData.mean[0]) / normData.std[0];
+                historyBuffer[t, v, 1] = (pos.y - normData.mean[1]) / normData.std[1];
+                historyBuffer[t, v, 2] = (pos.z - normData.mean[2]) / normData.std[2];
+                historyBuffer[t, v, 3] = (sdf - normData.mean[3]) / normData.std[3];
+            }
+        }
+    }
+
+    void FixedUpdate()
+    {
+        var mesh = clothMeshFilter.mesh;
+        var vertices = mesh.vertices;
+
+        // 1. Desplazar la historia hacia atrás (t=0 desaparece, todo se mueve a la izquierda)
+        for (int t = 0; t < seqLen - 1; t++)
+        {
+            for (int v = 0; v < vertexCount; v++)
+            {
+                for (int f = 0; f < 4; f++)
+                {
+                    historyBuffer[t, v, f] = historyBuffer[t + 1, v, f];
+                }
+            }
+        }
+
+        // 2. Calcular los features del frame actual y ponerlos al final de la historia (t = seqLen - 1)
+        for (int i = 0; i < vertexCount; i++)
+        {
+            Vector3 pos = vertices[i];
+            float sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
+
+            historyBuffer[seqLen - 1, i, 0] = (pos.x - normData.mean[0]) / normData.std[0];
+            historyBuffer[seqLen - 1, i, 1] = (pos.y - normData.mean[1]) / normData.std[1];
+            historyBuffer[seqLen - 1, i, 2] = (pos.z - normData.mean[2]) / normData.std[2];
+            historyBuffer[seqLen - 1, i, 3] = (sdf - normData.mean[3]) / normData.std[3];
+        }
+
+        // 3. Crear el tensor con las 4 dimensiones que espera el modelo ONNX: [1, SeqLen, Vertices, Features]
+        inputTensor = new Tensor<float>(new TensorShape(1, seqLen, vertexCount, 4));
+
+        for (int t = 0; t < seqLen; t++)
+        {
+            for (int i = 0; i < vertexCount; i++)
+            {
+                inputTensor[0, t, i, 0] = historyBuffer[t, i, 0];
+                inputTensor[0, t, i, 1] = historyBuffer[t, i, 1];
+                inputTensor[0, t, i, 2] = historyBuffer[t, i, 2];
+                inputTensor[0, t, i, 3] = historyBuffer[t, i, 3];
+            }
+        }
+
+        // 4. Ejecutar modelo
+        worker.Schedule(inputTensor);
+        using var output = worker.PeekOutput() as Tensor<float>;
+        var result = output.ReadbackAndClone();
+
+        Vector3[] newVertices = new Vector3[vertexCount];
+
+        for (int i = 0; i < vertexCount; i++)
+        {
+            // --- NUEVO: Comprobamos si el vértice está anclado ---
+            // Si maxDistance es 0, el vértice no debe moverse bajo ninguna circunstancia
+            if (maxDistance[i] == 0f)
+            {
+                newVertices[i] = vertices[i];
+                continue; // Pasamos al siguiente vértice
+            }
+
+            // Denormalizamos el desplazamiento predicho
+            float dx = result[0, i, 0];
+            float dy = result[0, i, 1];
+            float dz = result[0, i, 2];
+
+            Vector3 displacement = new Vector3(
+                (normData.target_std[0] * dx) + normData.target_mean[0],
+                (normData.target_std[1] * dy) + normData.target_mean[1],
+                (normData.target_std[2] * dz) + normData.target_mean[2]
+            );
+
+            // Aplicamos el desplazamiento a la posición actual (en local)
+            newVertices[i] = vertices[i] + displacement;
+        }
+
+        mesh.SetVertices(newVertices);
+        mesh.RecalculateNormals();
+        mesh.RecalculateBounds();
+
+        inputTensor.Dispose();
+        result.Dispose();
+    }
+
+    void OnDestroy()
+    {
+        worker?.Dispose();
+    }
+}
