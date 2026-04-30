@@ -119,15 +119,7 @@ En hood aparecen otros paper q tmbn hablan d esto: Learned Deformation Models [2
 ANTERIORMENTE tmbn hemos mencionado CAHOS UNREAL q hace lo mismo....
 
 \subsubsection{Neural Cloth Simulation} 
-cite{bertiche2022neural}
-Subspace, Recurrent encoder-decoder.
-Authorsof [Bertiche et al . 2021a; Santesteban et al. 2022] identified thesedrawbacks and proposed UNSUPERVISED LEARNING schemes.
-Mikele: Lo estoy leyendo a ver como implementamos la red recurrente.
-
-Reordenar???
-  On one hand, PBNS [Bertiche et al . 2021a] uses a static formulation. Then, it isunable to learn cloth dynamics. On the other hand, the authors of SNUG [Santesteban et al. 2022] propose to use an inertia term fromthe computer graphics literature. Nonetheless, their adaptation ofthe inertia term to deep learning temporally smooths cloth particlevelocities (minimizes accelerations). We will see this is not the sameas learning cloth dynamics (Sec. 4.5).
-
-Subespacion tmbn!
+Neural Cloth Simulation \cite{bertiche2022neural} propone una metodologia no supervisada, unificando simulación y entrenamiento. Sigue el esquema clásico de este tipo de solvers, donde el estado de la tela depende de los instantes previos, gestionado por window frames cuyo tamaño y complejidad dependen del tipo de tela procesada. Su arquitectura consiste en un encoder-decoder recurrente que separa componentes estáticos y dinámicos, haciendo uso de modelos GRU en estos últimos y la cual permite mejorar la generalización y estabilidad del entrenamiento. Este se realiza mediante funciones de pérdida inspirandas en simulación física, incluyendo restricciones físicas en relación a deformaciones, colisiones e inercia. El dataset utilizado es AMASS \cite{mahmood2019AMASS}, que recopila información de mas de 40.000 poses, y el modelo físico extiende la idea del modelo mass-spring \cite{provot1995deformation}. En comparación con PBNS o SNUG, esta metodología consigue soluciones más robustas y simples que dan a simulaciones detalladas a costa de mayores tiempo de entrenamiento que sus predecesores, compensando, no obstante, la disminución de recursos al no realizar procesos de generación de datos. Esta perspectiva va de la mano con tendencias actuales en la industria, como la ya menciocionada e implementada Chaos Cloth de Unreal Engine.
 
 % B = SE VA COMPLICANDO, PRETENDE SIMULAR
 \subsubsection{Subspace Neural Physics: Fast Data-Driven Interactive Simulation}
@@ -180,8 +172,8 @@ CNN. Tambien esta deep wrinkles
 % - STATE OF THE ART DEL PRESENTE / FUTURO
 
 \subsubsection{PBNS: Physically Based Neural Simulation for Unsupervised Garment Pose Space Deformation}
-MLP (LBS, relu)
-Pose based? Pau Pau Pau
+PNBS \cite{bertiche2021PBNS} presenta una simulación neuronal DL no supervisada, como alternativa al enfoque clásico PBS. Integra principios físicos en el entrenamientos con funciones físicas de energía, entre ellas restricciones de fijación. En la arquitectura encontramos un perceptron multicapa (MLP) con funciones ReLU que genera deformaciones tipo PSD sobre modelos LBS, cuya aplicación en el mundo 3D garantiza la compatibilidad con los motores gráficos y su alta eficiencia. Esta metodología entrena sobre datasets públicos como AMASS \cite{mahmood2019AMASS} y CMU MoCap, siendo capaz de manejar colisiones en poses extremas, asi como colisiones cloth-to-cloth. Asimismo, permite la obtención de  prendas que se ajustan a diferentes cuerpos (garment resizing). En comparación a otros métodos como TailorNet \cite{patel2020tailornet}, logra una mayor consistencia física y generalización, además de un coste computacional considerablemente menor, incluso sin GPU. Sin embargo, se ve limitado por su enfoque en poses estáticas.
+
 
 \subsubsection{SNUG} %ESTÁN VENGA A COMPARARSE CON PBNS
 cite{santesteban2022snug}
