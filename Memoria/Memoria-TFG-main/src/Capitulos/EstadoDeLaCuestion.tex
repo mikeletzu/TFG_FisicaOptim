@@ -66,25 +66,23 @@ Encontramos varios tipos de soluciones para la optimización de la simulación d
 \end{itemize}
 
 \section{Inteligencia Artificial en videojuegos}
-Como se ha introducido previamente, en la industria del videojuego, así como en muchas otras, las miradas están fijadas en la inteligencia artificial. Entre las muchas aplicaciones que se le están dando, en este apartado se presentan los elementos más relevantes para el desarrollo de este proyecto.
+Como se ha introducido previamente, en la industria del videojuego, como en muchas otras, la atención esta fijada en la inteligencia artificial. En este apartado presentaremos los recursos e investigaciones más relevantes para el desarrollo de este proyecto.
 
 \subsection{Librerías}
-Las librerias Pytorch, ONNX y Sentis, han sido indispensables para entrenar los modelos de IA y conectarlos a la simulación en Unity.
+En este subapartado describiremos las librerías que han resultado indispensables para entrenar los modelos de IA y conectarlos a la simulación en Unity.
 
 \subsubsection{Pytorch}
-Pytorch es una de las librerias de código abierto que permite escribir redes neuronales propias. Los tensores, matrices multi-dimensionales análogas a los NumPy arrays de Python, permiten optimizar las redes tanto para el uso de CPU como de GPU. \cite{pytorchDoc} Suele ser la más elegida en entornos academicos, ya que permite prototipado rápido y entrenamiento dinámico. Fue originalmente desarrollado por Facebook, y todavía cuenta con una enorme comunidad de desarrolladores.
+Pytorch es una de las librerias de código abierto que permite escribir redes neuronales propias. Los tensores, matrices multi-dimensionales análogas a los NumPy arrays de Python, permiten optimizar las redes tanto para el uso de CPU como de GPU \cite{pytorchDoc}. Suele ser la más elegida en entornos academicos, ya que permite prototipado rápido y entrenamiento dinámico. Fue originalmente desarrollado por Facebook, y todavía cuenta con una enorme comunidad de desarrolladores.
 
 \subsubsection{ONNX}
-ONNX es un formato creado para representar modelos de aprendizaje automático. \cite{onnxWebsite} También fue introducido por Facebook y Microsoft en 2017, con el objetivo de facilitar el cambio de entornos de trabajo en aprendizaje automático. 
+ONNX es un formato creado para representar modelos de aprendizaje automático \cite{onnxWebsite}. Fue introducido por Facebook y Microsoft en 2017, con el objetivo de facilitar el cambio de entornos de trabajo en aprendizaje automático. 
 
 \subsubsection{Sentis}
-Sentis es una librería de inferencia de redes neuronales para Unity, predecesora introducida en el 2023 de la librería Barracuda. Permite importar modelos de redes neuronales entrenados a Unity y ejecutarlos en tiempo real tanto con la CPU como con la GPU. \cite{unity_sentis_2.4}
+Sentis es una librería de inferencia de redes neuronales para Unity, predecesora introducida en el 2023 de la librería Barracuda. Permite importar modelos de redes neuronales entrenados a Unity y ejecutarlos en tiempo real tanto con la CPU como con la GPU\cite{unity_sentis_2.4}. 
 
 \subsection{Modelos de optimización de telas}
-Avance de simulación {Towards Generalized Position-Based Dynamics}
-
-
-La optimización de simulaciones con redes neuronales cuenta ya con un amplio recorrido, en este apartado se describen los estudios más destacados de los últimos años. Son también inspiración directa para la implementación de nuestros experimentos, con el objetivo de descubrir cuales de estas técnicas son verdaderamente aplicables a menor escala (q tal darle un aproach d no se puede hacer la mitad por q somos indies)
+% Avance de simulación {Towards Generalized Position-Based Dynamics}%
+La optimización de simulaciones con redes neuronales cuenta ya con un amplio recorrido, en este apartado se describen los estudios más destacados de los últimos años. Son también inspiración directa para la implementación de nuestros experimentos, con el objetivo de descubrir cuales de estas técnicas son verdaderamente aplicables a menor escala, en desarollo indie con recursos limitados en cuanto a hardware y especialización físico-matemática.
 
 % A = LO MÁS SENCILLO POSE BASED
 \subsubsection{Towards Generalized Position-Based Dynamics}
@@ -123,21 +121,22 @@ Neural Cloth Simulation \cite{bertiche2022neural} propone una metodologia no sup
 
 % B = SE VA COMPLICANDO, PRETENDE SIMULAR
 \subsubsection{Subspace Neural Physics: Fast Data-Driven Interactive Simulation}
-(tengo que reducirlo pero buen + mention kolmogrov orv verlet)\newline
-Este desasallo de la unidad de investigación Ubisoft La Forge implementa la primera técnica que incopora reducción de modelo o el uso de subespacios con colisiones con objetos externos en la cloth. El estudio se centra en conseguir un balance entre el rendimiento en tiempo real y el coste y memoria necesarios para realizar el precómputo. Se extraen las posiciones de los vértices de una simulación hecha en Maya. Las posiciones de los vértices se aplanan en un vector, y se construye otro vector plano con los parámteros necesarios como posición del suelo, valor del viento, o collisionadores con la tela. Se aplica un PCA denotando cuántos ejes de deformación de la tela se tienen en cuenta (64, 128, 256, siendo este último el que conserva casi el mismo nivel de detalle que la simulación original). (especificar la fórmula del PCA?)\newline
+Este desasallo de la unidad de investigación Ubisoft La Forge implementa la primera técnica que incopora reducción de modelo o el uso de subespacios con colisiones con objetos externos en la tela. El estudio se centra en conseguir un balance entre el rendimiento en tiempo real y el coste y memoria necesarios para realizar el precómputo. \newline
 
-El modelo que predice la posición del vértice tiene en cuenta los dos frames anteriores y los colisionadores ade ese frame:
+El entrenamiento se realiza sobre las posiciones de una simulación realizada en Maya aplanados en un vector, al que se añade otro vector plano con los parámteros necesarios como posición del suelo, valor del viento, o collisionadores con la tela. Se aplica un PCA sobre ambos denotando cuántos ejes de deformación de la tela se tienen en cuenta para representar la complejidad de la recreación: 64, 128, 256; siendo este último el que conserva casi el mismo nivel de detalle que la simulación original. \newline
+
+El modelo que predice la posición del vértice tiene en cuenta los dos frames anteriores y los colisionadores de ese frame:
 \[
 z_t = \alpha \odot z_{t-1} + \beta \odot (z_{t-1} - z_{t-2})
 \]\newline
 
-La  versión extendida: \[
+La  versión extendida que tiene en cuenta colisiones externas: \[
 z_t = \bar{z}_t + \bar{z}_t \odot z_{t-1} \, w_t^T
-\] (la que tiene en cuenta las colisiones externas).\newline
+\] \newline
 
 Aquí dice una cosa importante sobre el error que hay que corregir usando window frames:
 \textit{We repeat this training procedure on mini-batches of size 16,
-usingoverlappingwindowsofsize32,foraround100epochsoruntil
+using overlapping windows of size32, for around 100 epochs or until
 training converges. We use a learning rate of 0.0001, and a learning
 rate decay ratio of 0.999. We use a noise standard deviation r$\sigma$ of
 0.01, which we found by visualizing the result of this perturbation
@@ -145,22 +144,20 @@ in the first 3 components of the PCA space. Training takes between
 10 and 48 hours depending on the complexity of the setup and the
 number of PCA bases used.}\newline
 
-Finalmente se carga en una aplicación interactiva 3D los pesos en C++, y se deja al usuario manipular al personaje con un gamepad. Se aceleran calculos neceesarios para el input con shaders en GPU (gpu decompression).At render time it is not sufficient to only have access to vertex positions, as the deformed vertex normals are also needed for rendering. Esto no lo vamos a tener en cuenta porque aun no tenemos modelos complejos. Pero se tendría que hacer.\newline
+El resultado se carga en una aplicación interactiva 3D propia, dónde se deja al usuario manipular a un personaje con un gamepad. Los cálculos necesarios se aceleran con shaders en GPU (GPU decompression) y se recalculan las normales de los vértices necesarias para el renderizado. \newline
 
-Limitaciones: simulacion erronea quitada a mano, falta de prubeas en objetos plasyicos, selfcoliioins may occur,external object fixed in place (such as throwing boxes at a deformable object and 
-having it react by rolling around on the floors)\newline
-
-%Forcloth-characterinteractionsweusealargemotion capturedatabaseof∼6.5×105animationframes,stitchedtogethertoformonelargeanimation.Wethensimulatetheentireseries.Aftersimulationwecheckthedataandexcludeanyframeswhereunstableorbadbehaviorwasseen.Fortheskirtsceneweremovethecharacter’sarmsbecausetheyintersectfrequentlywiththelegmeshgeometry,causingtheclothtobreak.generally,weattempttoacquirebetween105and106 framesoftrainingdata.Wefoundinmostcases∼105wassufficientfortesting,whilethebestresultswereachievedwithcloserto∼106frames.
-
-Se toman los ejes de deformación necesarios para reconstruir la simulación original.
+Sus principales limitaciones residen en la necesidad de quitar a mano errores producidos en la simulación, falta de pruebas en objetos plásticos, posibles colisiones internas fallidas, y limitación de objeto colisionador fijo en el espacio y sin contar con objetos cayendo por el espacio. Se necesitaron 10^{6} frames de simulación para entrenamiento para mejores resultados.\newline
 
 \subsubsection{Cloth and Skin Deformation with a Triangle Mesh Based Convolutional Neural Network}
-Our networks are built using three basic building blocks, namely Convolution, Pooling and Unpooling operators that operate directly on a manifold triangle mesh.
+%Our networks are built using three basic building blocks, namely Convolution, Pooling and Unpooling operators that operate directly on a manifold triangle mesh.%
 
-Este estudio es un ejemplo de uso de CNN para la simulación de cloth. Reseña la dificultad de intregar una CNN debido a la construcción de la malla, en primer lugar incompatible con una grid 2D. Resuelve el problema entrenando mallas "manifold" triangulares: es decir, mallas cuyos bordes están conectados por al menos dos caras (menos los extremos) dejando una separación entre exterior e interior. Mapear la mesh a una imagen 2D es lo que permite realizar la convolución. Crean un encoder-decoder network que está formado por bloques UpConv and DownConv con operadores nuevos de convolución, pooling y unpooling. Destacamos como reduce la dimensionalidad de la malla en el pooling: colpasa los edges siguiendo un método en espiral. También señala la importancia de usar Leaky-CNN: para no dejar neuronas muertas, que resulta un problema en la simulcación. también de usar L2 además de L2 para que no se quede el error concretado en ciertos vértices. Tambien usa el Adam optimizer.
-Este estudio afirma conseguir resultados muy cercanos a la GT, usa la Berkley animation base, cuenta con PC potente, y no obstante, indican una vez más los largos tiemps de entrenamiento (4-20horas) y la necesidad de calidad y cantudad de datos de entrenamiento. Y la incapacidad de asegurar deformaciones sin 
+Este estudio es un ejemplo de uso de CNN para la simulación de cloth. Reseña la dificultad de intregar una CNN debido a la construcción de la malla, incompatible antes de su modificación con una grid 2D. Resuelve el problema entrenando mallas "manifold" triangulares: es decir, mallas cuyos bordes están conectados por al menos dos caras (menos los extremos) dejando una separación entre exterior e interior. Mapear la mesh a una imagen 2D es lo que permite realizar la convolución. \newline
 
-Este estudio incluye joints, inclusion de brazos y manos, (maybe i should talk about this?)
+Crean una red encoder-decoder formada por bloques UpConv and DownConv con operadores nuevos de convolución, pooling y unpooling. Destacamos como reduce la dimensionalidad de la malla en el pooling: colapasa los edges siguiendo un método en espiral. También señala la importancia de usar Leaky-CNN: para no dejar neuronas muertas, que resulta un problema en la simulación. Además de usar L2 con la L1 para que no se quede el error acumulado en ciertos vértices. También usa el Adam optimizer.\newline
+
+Este estudio afirma conseguir resultados muy cercanos al \textit{ground truth¨}, usa base de animaciones (Berkley animation base), cuenta con PC potente, y no obstante, resaltan una vez más los largos tiemps de entrenamiento (entre 4 y 20 horas) y la necesidad de calidad y cantidad de datos de entrenamiento. Tampoco asegura deformaciones válidas en cualquier caso. 
+
+Este estudio, a diferencia del anterior, incluye brazos y manos (joints). Finalmente 
 
 +
 Cloth unsampling, Pose to cloth, PCA back to original space.
