@@ -48,7 +48,7 @@ Cloth es un componente que nos proporciona Unity3D que funciona junto al compone
 
 Se trata la tela como una malla de partículas conectadas por restricciones. El Skinned Renderer calcula las transformaciones basándose en una malla de baja resolución sobre la que realiza los movimientos en los vértices, que dinámicamente se aplican en la malla real y obtenemos la simulación visual. Aquellos constraints no visibles o de distancia 0, fijos, no serán calculados. La tela cuenta con capacidad de colisionar internamente y con dos tipos de colliders externos: cápsulas o esferas. Cualquier objeto externo con el que se quiera colisionar tendrá que ser un conjunto de estos colliders. \newline
 
-Pese a encontrar múltiples acepciones en el término solver con distintas resoluciones de problemas, aquí nos referiremos como solver al algoritmo computacional que se encarga de predecir el comportamiento del objeto deformable en renderizados gráficos y simulaciones físicas, específicamente, de telas. Encontramos infinitos tipos de solvers. Los primeros solvers se basan el algoritmos que emplean la fuerza bruta: realizan cálculos en masa para sistemas de muelles (MSS o Mass Spring Systems) \cite{provot}. Los solvers más actuales resultan en el PBD, proceso iterativo que proyecta las posiciones de las partículas sobre un ``espacio de restricciones'' \cite{muller_position_2007}. \newline
+Pese a encontrar múltiples acepciones en el término solver con distintas resoluciones de problemas, aquí nos referiremos como solver al algoritmo computacional que se encarga de predecir el comportamiento del objeto deformable en renderizados gráficos y simulaciones físicas, específicamente, de telas. Encontramos infinitos tipos de solvers. Los primeros solvers se basan el algoritmos que emplean la fuerza bruta: realizan cálculos en masa para sistemas de muelles (MSS o Mass Spring Systems) \cite{provot}. Los solvers más actuales resultan en el PBD, proceso iterativo que proyecta las posiciones de las partículas sobre un ``espacio de restricciones'' \cite{muller_position_2007}, es decir, se actualiza el desplazamiento generado por cada fuerza en cada vertice de la simulación (se entiende?) \cite{chaudhary2025towards}  \newline
 
 El solver de PhysX se basa en PBD, es decir, trabaja directamente sobre las posiciones. Encontramos también XPBD \cite{macklin_xpbd_2016}, una versión extendida que puede incorporarse en Unity.
 
@@ -62,7 +62,7 @@ Encontramos varios tipos de soluciones para la optimización de la simulación d
 \begin{itemize}
   \item Optimización por CPU: encontramos la extensión de Obi Cloth \cite{obi}, que aprovecha el sistema de Jobs de Unity para paralelizar la simulación y acelerar la simulación sin salir de la CPU. Es uno de los paquetes más populares para solucionar este problema.
   \item Paralelización en GPU: a través de shaders se delega la fuerza de cálculo del skinning en la GPU. Encontramos diferntes estudios que aportan diferentes enfoques para la optimización: Jim Hugunin realiza una investigación para alcanzar altas resoluciones y evitar colisiones en las mallas \cite{huguninunite16}, mientras que otros se centran en la mejora de rendimiento pura para adaptar simulaciones a entornos VR \cite{VRGPUoptim}.
-  \item Entrenamiento con IA: el enfoque más actual de la resolución de simulaciones complejas como Cloth es la Inteligencia Artificial. Se entrenan modelos de ML y DL con los datos de las mallas animadas o en simulación, con lo que obtenemos más adelante mejor rendimiento en tiempo real. Se sacrifica memoria y tiempo de entrenamiento para obtener mejores y mucho más rápidas simulaciones de tela en escena. Actualmente, nos encontramos en el paso de investigación a implementación en grandes empresas: Unreal ya proporciona una simulación de tela a través de aprendizaje automático \cite{chaoscloth}, en el que destaca su realismo. Aún así, cuenta con limitaciones al basarse un NearestNeighborSearch: 'el sistema es capaz de predecir detalles como arrugas pero no movimiento dinámico como ondulaciones o drapeados'.En la próxima sección detallaremos las numerosas investigaciones recientes que abarcan aspectos desde la reproducción de arrugas, el compromiso entre calidad, coste y reendimiento hasta colisiones y penetraciones en las mallas.
+  \item Entrenamiento con IA: el enfoque más actual de la resolución de simulaciones complejas como Cloth es la Inteligencia Artificial. Se entrenan modelos de ML y DL con los datos de las mallas animadas o en simulación, con lo que obtenemos más adelante mejor rendimiento en tiempo real. Se sacrifica memoria y tiempo de entrenamiento para obtener mejores y mucho más rápidas simulaciones de tela en escena. Actualmente, nos encontramos en el paso de investigación a implementación en grandes empresas: Unreal ya proporciona una simulación de tela a través de aprendizaje automático \cite{chaoscloth}, en el que destaca su realismo. Aún así, cuenta con limitaciones al basarse un NearestNeighborSearch: 'el sistema es capaz de predecir detalles como arrugas pero no movimiento dinámico como ondulaciones o drapeados'. En la próxima sección detallaremos las numerosas investigaciones recientes que abarcan aspectos desde la reproducción de arrugas, el compromiso entre calidad, coste y reendimiento hasta colisiones y penetraciones en las mallas.
 \end{itemize}
 
 \section{Inteligencia Artificial en videojuegos}
@@ -82,44 +82,8 @@ Sentis es una librería de inferencia de redes neuronales para Unity, predecesor
 
 \subsection{Modelos de optimización de telas}
 % Avance de simulación {Towards Generalized Position-Based Dynamics}%
-La optimización de simulaciones con redes neuronales cuenta ya con un amplio recorrido, en este apartado se describen los estudios más destacados de los últimos años. Son también inspiración directa para la implementación de nuestros experimentos, con el objetivo de descubrir cuales de estas técnicas son verdaderamente aplicables a menor escala, en desarollo indie con recursos limitados en cuanto a hardware y especialización físico-matemática.
+Desde la introducción del PBN, la optimización de simulaciones con redes neuronales cuenta ya con un amplio recorrido, en este apartado se describen los estudios más destacados de los últimos años. Son también inspiración directa para la implementación de nuestros experimentos, con el objetivo de descubrir cuales de estas técnicas son verdaderamente aplicables a menor escala, en desarollo indie con recursos limitados en cuanto a hardware y especialización físico-matemática.
 
-% A = LO MÁS SENCILLO POSE BASED
-\subsubsection{Towards Generalized Position-Based Dynamics}
-- Partiendo de sus nuevas ecuaciones para el calculo físico: cite{chaudhary2025towards}
-  {
-    we iterate over each individual force term in the system (for example, the force due to one element on its adjacent vertices in a FEM mesh), and update it implicitly using a low-dimensional Newton solve on the element strain. Our proposed scheme isexpressive enough to apply to any nonlinear energy-based elastic model
-
-    is extremely popular in interactive applications due to its stability, performance, and ease of implementation. Unlike most other iterative techniques used for dynamics simulation, PBD is a so-called “dual” descent method [Macklin et al. 2020]: it iterates over the forces in the system, and updates the effect of each force one at a time, rather than updating vertex positions as in “primal” methods. All forces must be expressed as constraints and computed through Lagrange multipliers
-
-    $d_i$ is the displacement caused by each force. position-baseddynamicscanbeviewedasawayto iteratively update $d_i$ for eachforce, and thus obtain the solution x
-  }
-
-- Esto permite implementar: Hablan de data driven simulations pero son configuraciones pre grabadas POSES podemos comentarlo como machine learning (en tmbn lo q hace cahos d unreal)  
-En hood aparecen otros paper q tmbn hablan d esto: Learned Deformation Models [20, 30,39,42]
-    [20] Peng Guan, Loretta Reiss, David A Hirshberg, Alexander
-    Weiss, and Michael J Black. Drape: Dressing any person.
-    ACMTransactions on Graphics (ToG)
-    [30] Qianli Ma, Jinlong Yang, Anurag Ranjan, Sergi Pujades,
-    Gerard Pons-Moll, Siyu Tang, and Michael J Black. Learn
-    ing to dress 3d people in generative clothing. In Proceedings
-    of the IEEE/CVF Conference on Computer Vision and Pat
-    tern Recognition, pages 6469–6478, 2020
-    [39] Chaitanya Patel, Zhouyingcheng Liao, and Gerard Pons
-    Moll. Tailornet: Predicting clothing in 3d as a function of
-    human pose, shape and garment style. In Proceedings of
-    the IEEE/CVF Conference on Computer Vision and Pattern
-    Recognition, pages 7365–7375, 2020.
-    [42] Igor Santesteban, Miguel A Otaduy, and Dan Casas.
-    Learning-based animation of clothing for virtual try-on.
-    Computer Graphics Forum, 38(2):355–366, 2019
-
-ANTERIORMENTE tmbn hemos mencionado CAHOS UNREAL q hace lo mismo....
-
-\subsubsection{Neural Cloth Simulation} 
-Neural Cloth Simulation \cite{bertiche2022neural} propone una metodologia no supervisada, unificando simulación y entrenamiento. Sigue el esquema clásico de este tipo de solvers, donde el estado de la tela depende de los instantes previos, gestionado por window frames cuyo tamaño y complejidad dependen del tipo de tela procesada. Su arquitectura consiste en un encoder-decoder recurrente que separa componentes estáticos y dinámicos, haciendo uso de modelos GRU en estos últimos y la cual permite mejorar la generalización y estabilidad del entrenamiento. Este se realiza mediante funciones de pérdida inspirandas en simulación física, incluyendo restricciones físicas en relación a deformaciones, colisiones e inercia. El dataset utilizado es AMASS \cite{mahmood2019AMASS}, que recopila información de mas de 40.000 poses, y el modelo físico extiende la idea del modelo mass-spring \cite{provot1995deformation}. En comparación con PBNS o SNUG, esta metodología consigue soluciones más robustas y simples que dan a simulaciones detalladas a costa de mayores tiempo de entrenamiento que sus predecesores, compensando, no obstante, la disminución de recursos al no realizar procesos de generación de datos. Esta perspectiva va de la mano con tendencias actuales en la industria, como la ya menciocionada e implementada Chaos Cloth de Unreal Engine.
-
-% B = SE VA COMPLICANDO, PRETENDE SIMULAR
 \subsubsection{Subspace Neural Physics: Fast Data-Driven Interactive Simulation}
 Este desasallo de la unidad de investigación Ubisoft La Forge implementa la primera técnica que incopora reducción de modelo o el uso de subespacios con colisiones con objetos externos en la tela. El estudio se centra en conseguir un balance entre el rendimiento en tiempo real y el coste y memoria necesarios para realizar el precómputo. \newline
 
@@ -162,48 +126,18 @@ Este estudio, a diferencia del anterior, incluye brazos y manos (joints). Finalm
 +
 Cloth unsampling, Pose to cloth, PCA back to original space.
 
-\subsection{DeepSD: Real-time Cloth Simulation with Deep Learning}
-CNN. Tambien esta deep wrinkles
-
-% C = SE COMPLICA APRENDIZAJE DE NORMAS FISICAS NO INMITAR LA SIMULACIÓN
-% - STATE OF THE ART DEL PRESENTE / FUTURO
+\subsubsection{DeepSD: Real-time Cloth Simulation with Deep Learning} HACE FALTA?? IGUAL NO
 
 \subsubsection{PBNS: Physically Based Neural Simulation for Unsupervised Garment Pose Space Deformation}
 PNBS \cite{bertiche2021PBNS} presenta una simulación neuronal DL no supervisada, como alternativa al enfoque clásico PBS. Integra principios físicos en el entrenamientos con funciones físicas de energía, entre ellas restricciones de fijación. En la arquitectura encontramos un perceptron multicapa (MLP) con funciones ReLU que genera deformaciones tipo PSD sobre modelos LBS, cuya aplicación en el mundo 3D garantiza la compatibilidad con los motores gráficos y su alta eficiencia. Esta metodología entrena sobre datasets públicos como AMASS \cite{mahmood2019AMASS} y CMU MoCap, siendo capaz de manejar colisiones en poses extremas, asi como colisiones cloth-to-cloth. Asimismo, permite la obtención de  prendas que se ajustan a diferentes cuerpos (garment resizing). En comparación a otros métodos como TailorNet \cite{patel2020tailornet}, logra una mayor consistencia física y generalización, además de un coste computacional considerablemente menor, incluso sin GPU. Sin embargo, se ve limitado por su enfoque en poses estáticas.
 
+\subsubsection{SNUG}
+Siguiendo la tendencia hacia el aprendizaje no supervisado basado en físicas, la técnica SNUG \cite{santesteban2022snug} va más allá de la deformación basada en poses. Si bien trabaja con 6,519 fotogramas de la misma base de datos, gracias a una red recurrente (no explica demasiado la arquitectura del modelo) consigue mejores tiempos de entrenamiento y resultados más detallados que la técnica anterior. Pone el foco del aprendizaje crear una serie de funciones de loss basadas en las físicas reales de deformaciones dinamicas: Membrane Strain Energy (la energia transmitida entre dos puntos en base a la elasticidad del material), Bending Energy (el ángulo diédrico entre dos caras en relación a su propiedad de rigidez), Gravity (gravedad) y Collision Penalty (la distancia prudencial entre el modelo y el cuerpo).
 
-\subsubsection{SNUG} %ESTÁN VENGA A COMPARARSE CON PBNS
-cite{santesteban2022snug}
-Sistema de muelles tmbn (fuerza bruta) pero entrenado cn una red recurrente para conseguir equilibrio estático (ley física) lo que hace que pueda ser prendizaje NO supervisado y NO necesitar base de datos de mallas de CLOTH ya simuladas
-Las bases d datos cn las que cuenta son los modelos en movimiento (underlying body parameters and motion) AMASS
-dataset [33], totaling 6,519 frames
-
-LAS NORMAS FISICAS DE LAS QUE HABLAMOS PARA EL SELF SUPERVISION:
-- Membrane Strain Energy: Energia transmitida entre dos puntos en base a la elasticidad del material.
-- Bending Energy: El ángulo diédrico entre dos caras en relación a su propiedad de rigidez.
-- Gravity: Gravedad.
-- Collision Penalty: Distancia prudencial al modelo del cuerpo.
+\subsubsection{Neural Cloth Simulation} 
+Neural Cloth Simulation \cite{bertiche2022neural} también propone una metodologia no supervisada, unificando simulación y entrenamiento. Sigue el esquema clásico de este tipo de solvers, donde el estado de la tela depende de los instantes previos, gestionado por window frames cuyo tamaño y complejidad dependen del tipo de tela procesada. Su arquitectura consiste en un encoder-decoder recurrente que separa componentes estáticos y dinámicos, haciendo uso de modelos GRU en estos últimos y la cual permite mejorar la generalización y estabilidad del entrenamiento. Este se realiza mediante funciones de pérdida inspirandas en simulación física, incluyendo restricciones físicas en relación a deformaciones, colisiones e inercia. El dataset utilizado también es AMASS \cite{mahmood2019AMASS}, que recopila información de mas de 40.000 poses, y el modelo físico extiende la idea del modelo mass-spring \cite{provot1995deformation}. En comparación con PBNS o SNUG, esta metodología consigue soluciones más robustas y simples que dan a simulaciones detalladas a costa de mayores tiempo de entrenamiento que sus predecesores, compensando, no obstante, la disminución de recursos al no realizar procesos de generación de datos. Esta perspectiva va de la mano con tendencias actuales en la industria, como la ya menciocionada e implementada Chaos Cloth de Unreal Engine.
 
 \subsubsection{HOOD: Hierarchical Graphs for Generalized Modelling of Clothing Dynamics}
-2023 avance!!!! tres pasos importantes
+En investigaciones más recientes, se aborda la cuestión de la posibilidad de abstraer también la topología de la tela del aprendizaje. En este caso, HOOD utiliza GNNs, una arquitectura de envio de mensajes jerarquico y por supuesto la función de perdida basada en física que hemos comentado en los previos estudios. \cite{grigorev_hood_2023} Los graph neural networks permiten crear un gráfico que incorpora los vertices del cuerpo colisionador, a traves de este se propagan los mensajes de acceleración recursivamente, lo que permite ajustar la precisión de la inferencia y adaptarse a distintos materiales, topoligias y modelos de colisión. \newline 
 
-a) graph neural networks that learn the local dynamics in a garment-independent way:
-trains its network using physics instead of labeled examples. el grafo sirve para propagar mensajes (pura física)
-NO SÉ SI PLANTEAMOS LLEGAR TAN LEJOS LOL:
-Our method learns to predict physically
-realistic fabric behavior by reasoning about the map between local deformations, forces, and accelerations. Thanks to its locality, our method is agnostic to both the global structure and shape of the garment and directly generalizes to arbitrary body shapes and motions.
-
-b) hierarchical message-passing for the efficient capture of long-range compling:
-related a MeshGraphNets pero con más mensajes (multi-level) y entre varias estrategias de pooling que se están llevando ellos hacen: graph coarsening strategy that allows our network to implicitly learn transitions between
-graph levels
-
-c) a physics-based loss function that enables self-supervised training:
-utiliza "incremental potential for implicit time stepping" como loss function
-  cn esto se refiere a la propia ecuación de simulación física: implicit time integration, where the next state of the cloth is found by minimizing an energy (potential) that encodes: stretching / bending energies, inertia (how velocity continues), contact, friction, etc. This energy (often called an incremental potential) is a scalar function of the cloth configuration at the next time step.
-Aplicando la propia fisica correcta como loss, consigue aprendizaje NO SUPERVISADO 
-
-Soluciona PROBLEMAS q otros estudios:
-- huesos a la tela para poder extender de las prendas apretadas
-- telas como point clouds para poder adaptarse a la topologia lo coloca dentro d Learned Deformation Models
-
-Limites: Velocidad d sim, self-coll...
+Este estudio sigue estando limitado en la velocidad d simulación, colisiones con la propia tela y etc. Al fin y al cabo este sigue siendo un campo de estidio creciente en el que todavía queda mucho por avanzar.

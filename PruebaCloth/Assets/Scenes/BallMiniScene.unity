@@ -201,6 +201,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d8fb33d8be9b3b34391a96860bc8ce27, type: 3}
       insertIndex: -1
       addedObject: {fileID: 354067159}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d8fb33d8be9b3b34391a96860bc8ce27, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 354067160}
   m_SourcePrefab: {fileID: 100100000, guid: d8fb33d8be9b3b34391a96860bc8ce27, type: 3}
 --- !u!1 &127802455
 GameObject:
@@ -760,7 +763,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 354067155}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b27fdda5777c10408704b7029997502, type: 3}
   m_Name: 
@@ -768,6 +771,29 @@ MonoBehaviour:
   ball: {fileID: 339546644}
   ballCollider: {fileID: 339546646}
   modelAsset: {fileID: 5022602860645237092, guid: 5593fc70445accc448bbe3adb55532ca, type: 3}
+  clothMeshFilter: {fileID: 354067158}
+  contador: 0
+  jsonFile: {fileID: 4900000, guid: 0d5cec306ae338044a83e97a0c18c129, type: 3}
+  normData:
+    mean: []
+    std: []
+    target_mean: []
+    target_std: []
+--- !u!114 &354067160
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 354067155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc3fce1c83b1e894ea47b81c3aab8586, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClothMLPos
+  ball: {fileID: 339546644}
+  ballCollider: {fileID: 339546646}
+  modelAsset: {fileID: 5022602860645237092, guid: ae8aa4fe9586a214c932d2877a17d1b8, type: 3}
   clothMeshFilter: {fileID: 354067158}
   contador: 0
   jsonFile: {fileID: 4900000, guid: 0d5cec306ae338044a83e97a0c18c129, type: 3}
@@ -947,7 +973,7 @@ Cloth:
   m_CapsuleColliders: []
   m_SphereColliders:
   - first: {fileID: 339546646}
-    second: {fileID: 339546646}
+    second: {fileID: 0}
   m_SelfCollisionDistance: 0
   m_SelfCollisionStiffness: 0.2
   m_SelfAndInterCollisionIndices: 

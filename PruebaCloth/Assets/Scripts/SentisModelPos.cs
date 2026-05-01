@@ -60,6 +60,7 @@ public class ClothMLPos : MonoBehaviour
 		for (int im = 0; im < vertexCount; im++)
 		{
 			lastVertexPositions[im] = new Vector3(0,0,0);
+            Debug.Log("V: " + im + " Pos: " + clothMeshFilter.mesh.vertices[im]);
 		}
 
         ballCollider = ball.GetComponent<SphereCollider>();
@@ -72,14 +73,13 @@ public class ClothMLPos : MonoBehaviour
 
         // set max distance
         int i = 0;
-        maxDistance[i] = 0.2f;
-		for (;  i < 3; i++)
+		for (;  i < 4; i++)
         {
-            maxDistance[i] = 0f;
+            maxDistance[i] = 0.2f;
         }
         while(i<vertexCount)
         {
-            maxDistance[i] = 0.2f;
+            maxDistance[i] = 0f;
             i++;
         }
 
@@ -133,6 +133,12 @@ public class ClothMLPos : MonoBehaviour
 		string vertex = "";
 		for (int i = 0; i < vertexCount; i++)
 		{
+            if (maxDistance[i] == 0f)
+            {
+                newVertices[i] = vertices[i];
+                continue; // Pasamos al siguiente vértice
+            }
+
             // Denormalizamos (world 
             float dx = result[0, i, 0];
             float dy = result[0, i, 1];
@@ -143,22 +149,12 @@ public class ClothMLPos : MonoBehaviour
             //    ((normData.target_std[1] * dy) + normData.target_mean[1]),
             //    ((normData.target_std[2] * dz) + normData.target_mean[2]));
             Vector3 displacement;
-            ////if(contador<10000)
-            //{
-            //    displacement = new Vector3(
-            //    ((normData.target_std[0] * dx) + normData.target_mean[0]),
-            //    0, (normData.target_std[2] * dz) + normData.target_mean[2]);
-            //}
-            //else
-            {
-                displacement = new Vector3(
-                    ((normData.target_std[0] * dx) + normData.target_mean[0]),
-                    ((normData.target_std[1] * dy) + normData.target_mean[1]),
-                    ((normData.target_std[2] * dz) + normData.target_mean[2])); 
+      
+            displacement = new Vector3(
+                ((normData.target_std[0] * dx) + normData.target_mean[0]),
+                ((normData.target_std[1] * dy) + normData.target_mean[1]),
+                ((normData.target_std[2] * dz) + normData.target_mean[2])); 
 
-            }
-
-            contador++;
 			//        Vector3 displacement = new Vector3(
 			//            0,
 			//            ((normData.target_std[1] * dy) + normData.target_mean[1]),

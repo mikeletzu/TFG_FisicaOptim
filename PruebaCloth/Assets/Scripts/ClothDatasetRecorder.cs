@@ -147,11 +147,12 @@ public class ClothDatasetRecorder : MonoBehaviour
     void SelectAllVertices()
     {
 		vertexIndices = new int[cloth.vertices.Length]; // Esto si desde luego
-		for (int i = 0; i < vertexIndices.Length; i++) // Creo que esto es prescindible
-			vertexIndices[i] = i;
+        for (int i = 0; i < vertexIndices.Length; i++)
+        {// Creo que esto es prescindible
+            vertexIndices[i] = i;
 
-        
-
+            Debug.Log("V: " + i + " Pos: " + cloth.vertices[i]);
+        }
     }
 
     void stopRecording()
