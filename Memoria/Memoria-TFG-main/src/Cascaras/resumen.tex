@@ -2,9 +2,13 @@
 
 \section*{\tituloPortadaVal}
 
-Nuestro estudio se basa en la comparativa de distintos modelos de IA para la frente a la simulación de físicas costosas en proyectos 3D en motores de videojuegos. 
-Para ello creamos una simulación en Unity con un objeto con componente Cloth y distintos colliders que interactuasen con ella. Tras generar los datasets, probamos distintos modelos de IA e integramos los datos. 
-Finalmente exportamos a unity con Sentis y realizamos comparativas teniendo en cuenta GPU, CPU. Observamos que el modelo que mejores resultados obtuvo en cuanto a tal métrica fue X.
+Nuestro estudio se basa en la comparativa de distintos modelos de IA para hacer frente a la simulación de físicas costosas en proyectos 3D en motores de videojuegos. \newline
+
+Para ello creamos una simulación en Unity3D con un objeto con componente Cloth y una esfera que actúe como colisionador con la tela. Tras generar los datasets, los exportamos a cuadernos de Jupyter dónde los entrenamos con diferentes modelos en Pytorch (con soporte GPU): una red neuronal sencilla, una RNN, un Encoder-Decoder.\newline
+
+Finalmente exportamos las redes entrenadas a Unity mediante el paquete de Sentis para simular el movimiento modificando los vértices de una tela sin componente Cloth. Realizamos comparativas entre los distintos modelos, tanto en cuanto a precisión del modelo como a resultados visuales.\newline
+
+Observamos que el modelo que mejores resultados obtuvo en cuanto a tal métrica fue X.
 
 \section*{Palabras clave}
 
