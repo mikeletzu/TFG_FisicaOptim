@@ -25,7 +25,7 @@ public class ClothMLPos : MonoBehaviour
     public int contador = 0;
     int vertexCount;
 
-	// Datos de normalización
+	// Datos de normalizaciï¿½n
 	public TextAsset jsonFile;
 
 	[System.Serializable]
@@ -73,7 +73,7 @@ public class ClothMLPos : MonoBehaviour
         maxDistance = new float[vertexCount];
 
         // Necesitaremos mantener cloth para algo? Entiendo que no.
-        // Max distance se almacena y accede originalmente en cloth, aquí habría que añadirlo a mano en un vector
+        // Max distance se almacena y accede originalmente en cloth, aquï¿½ habrï¿½a que aï¿½adirlo a mano en un vector
 
 
         // set max distance
@@ -90,10 +90,10 @@ public class ClothMLPos : MonoBehaviour
 
 	}
 
-	public void SaveData(string data)
+	public void SaveData(string moment, string data)
 	{
 		string filePath = Application.persistentDataPath + "/debugOutput.txt";
-        File.AppendAllText(filePath, "NEW FRAME" + "\n");
+        File.AppendAllText(filePath, moment + " NEW FRAME" + "\n");
 		File.AppendAllText(filePath, data + "\n");
 	}
 
@@ -103,14 +103,16 @@ public class ClothMLPos : MonoBehaviour
 		var vertices = mesh.vertices;
 		var normals = mesh.normals;
 		var uvs = mesh.uv; // Cachear las uvs fuera del bucle
+        string vertex = "";
 
-		inputTensor = new Tensor<float>(new TensorShape(1, vertexCount, 4));
+        inputTensor = new Tensor<float>(new TensorShape(1, vertexCount, 4));
 
 		for (int i = 0; i < vertexCount; i++)
 		{
-			//Vector3 pos = clothMeshFilter.transform.TransformPoint(vertices[i]);
 			Vector3 pos = vertices[i];
-			Debug.DrawRay(clothMeshFilter.transform.TransformPoint(pos), Vector3.up * 0.1f, UnityEngine.Color.red);
+            vertex += clothMeshFilter.transform.TransformPoint(pos) + "\n";
+
+            Debug.DrawRay(clothMeshFilter.transform.TransformPoint(pos), Vector3.up * 0.1f, UnityEngine.Color.red);
             
 			if (lastVertexPositions[i] == Vector3.zero) lastVertexPositions[i] = pos;
             Vector3 vel = (pos - lastVertexPositions[i]) / Time.fixedDeltaTime;
@@ -128,20 +130,22 @@ public class ClothMLPos : MonoBehaviour
             lastVertexPositions[i] = pos;
         }
 
-		worker.Schedule(inputTensor);
+        SaveData("pre", vertex);
+
+        worker.Schedule(inputTensor);
 
 		using var output = worker.PeekOutput() as Tensor<float>;
 		var result = output.ReadbackAndClone();
 
 		Vector3[] newVertices = new Vector3[vertexCount];
 		
-		string vertex = "";
+		vertex = "";
 		for (int i = 0; i < vertexCount; i++)
 		{
             if (maxDistance[i] == 0f)
             {
                 newVertices[i] = vertices[i];
-                continue; // Pasamos al siguiente vértice
+                continue; // Pasamos al siguiente vï¿½rtice
             }
 
             // Denormalizamos (world 
@@ -149,37 +153,29 @@ public class ClothMLPos : MonoBehaviour
             float dy = result[0, i, 1];
             float dz = result[0, i, 2];
 
-            //Vector3 displacement = new Vector3(
-            //    ((normData.target_std[0] * dx) + normData.target_mean[0]),
-            //    ((normData.target_std[1] * dy) + normData.target_mean[1]),
-            //    ((normData.target_std[2] * dz) + normData.target_mean[2]));
             Vector3 displacement;
-      
+
             displacement = new Vector3(
                 ((normData.target_std[0] * dx) + normData.target_mean[0]),
                 ((normData.target_std[1] * dy) + normData.target_mean[1]),
-                ((normData.target_std[2] * dz) + normData.target_mean[2])); 
+                ((normData.target_std[2] * dz) + normData.target_mean[2]));
 
-			//        Vector3 displacement = new Vector3(
-			//            0,
-			//            ((normData.target_std[1] * dy) + normData.target_mean[1]),
-			//(normData.target_std[2] * dz) + normData.target_mean[2]);
-			//Vector3 displacement = new Vector3(
-			//    0,
-			//    0,
-			//    ((normData.target_std[2] * dz) + normData.target_mean[2]));
+            //displacement = new Vector3(
+            //    ((normData.target_std[0] * dx) + normData.target_mean[0]),
+            //    0,
+            //    0);
 
-			// Añadimos el desplazamiento (Se ve que sustitución como que no)
-			//Vector3 currentWorldPos = clothMeshFilter.transform.TransformPoint(vertices[i]);
-			Vector3 newWorldPos = originalPositions[i] + displacement;
+            // Aï¿½adimos el desplazamiento (Se ve que sustituciï¿½n como que no)
+            //Vector3 currentWorldPos = clothMeshFilter.transform.TransformPoint(vertices[i]);
+            Vector3 newWorldPos = vertices[i] + displacement;
 
-            // Espacio local para vértices
+            // Espacio local para vï¿½rtices
             // newVertices[i] = transform.InverseTransformPoint(newWorldPos);
             newVertices[i] = newWorldPos;
 
             vertex += transform.TransformPoint(newWorldPos) + "\n";
         }
-		SaveData(vertex);
+		SaveData("post", vertex);
 		mesh.SetVertices(newVertices);
 		mesh.RecalculateNormals();
 		mesh.RecalculateBounds();

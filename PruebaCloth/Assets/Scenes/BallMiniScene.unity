@@ -204,6 +204,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d8fb33d8be9b3b34391a96860bc8ce27, type: 3}
       insertIndex: -1
       addedObject: {fileID: 354067160}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d8fb33d8be9b3b34391a96860bc8ce27, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 354067162}
   m_SourcePrefab: {fileID: 100100000, guid: d8fb33d8be9b3b34391a96860bc8ce27, type: 3}
 --- !u!1 &127802455
 GameObject:
@@ -665,7 +668,7 @@ Transform:
   m_GameObject: {fileID: 339546644}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.938, y: -0.426, z: 4.43}
+  m_LocalPosition: {x: 0.959, y: -0.426, z: -0.2}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -786,17 +789,39 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 354067155}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc3fce1c83b1e894ea47b81c3aab8586, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClothMLPos
   ball: {fileID: 339546644}
   ballCollider: {fileID: 339546646}
-  modelAsset: {fileID: 5022602860645237092, guid: ae8aa4fe9586a214c932d2877a17d1b8, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: f6e09f00203e01f4b8f5f06158a410e3, type: 3}
   clothMeshFilter: {fileID: 354067158}
   contador: 0
-  jsonFile: {fileID: 4900000, guid: d13274f091bdf2c43b31a5e9eff30965, type: 3}
+  jsonFile: {fileID: 4900000, guid: 4ad12f72af0fe904a8181461250c4e5e, type: 3}
+  normData:
+    mean: []
+    std: []
+    target_mean: []
+    target_std: []
+--- !u!114 &354067162
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 354067155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c40bc56cb6ff9a440b006d6c9e694f0c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClothML
+  ball: {fileID: 339546644}
+  ballCollider: {fileID: 339546646}
+  modelAsset: {fileID: 5022602860645237092, guid: 60f3530d8c435194c82e058e0a59711b, type: 3}
+  clothMeshFilter: {fileID: 354067158}
+  jsonFile: {fileID: 4900000, guid: 6f31d648c3abd354f93928af4f9963aa, type: 3}
   normData:
     mean: []
     std: []
@@ -1065,13 +1090,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClothDatasetRecorder
   autoRecord: 1
   record: 0
-  recordTime: 600
+  recordTime: 100
   recordTimeLeft: 0
   totalFramesRecorded: 0
   fileName: cloth_dataset.csv
   filePrefix: clothDataset
   fileExtension: .csv
-  snapShotTime: 0.6
+  snapShotTime: 0.1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1186,7 +1211,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f3f67414793b7554bb7ae8e9f44c539f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DataVerifier
-  fileName: clothDataset_33_.csv
+  fileName: clothDataset_34_.csv
+  snapShotTime: 0.1
   loop: 1
   playOnStart: 1
 --- !u!23 &827027963

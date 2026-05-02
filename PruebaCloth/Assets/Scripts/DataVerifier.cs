@@ -10,7 +10,7 @@ public class DataVerifier : MonoBehaviour
     public string fileName = "clothDataset_31_.csv";
 
     [Header("Control de Reproducción")]
-    private float snapShotTime = 0.6f;
+    public float snapShotTime = 0.6f;
     private float snapTimeLeft = 0.0f;
     public bool loop = true;
     public bool playOnStart = true;

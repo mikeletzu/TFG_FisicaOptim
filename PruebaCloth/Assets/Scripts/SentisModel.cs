@@ -69,47 +69,48 @@ public class ClothML : MonoBehaviour
         // Max distance se almacena y accede originalmente en cloth, aquí habría que añadirlo a mano en un vector
         // Set max distance
         int i = 0;
-		for (;  i < 2; i++)
-        {
-            maxDistance[i] = 0f;
-        }
-        while(i<vertexCount)
+        for (; i < 4; i++)
         {
             maxDistance[i] = 0.2f;
+        }
+        while (i < vertexCount)
+        {
+            maxDistance[i] = 0f;
             i++;
         }
+    }
 
-	}
+    public void SaveData(string moment, string data)
+    {
+        string filePath = Application.persistentDataPath + "/debugOutput.txt";
+        File.AppendAllText(filePath, moment + " NEW FRAME" + "\n");
+        File.AppendAllText(filePath, data + "\n");
+    }
 
-	public void SaveData(string data)
-	{
-		string filePath = Application.persistentDataPath + "/debugOutput.txt";
-        File.AppendAllText(filePath, "NEW FRAME" + "\n");
-		File.AppendAllText(filePath, data + "\n");
-	}
-
-	void FixedUpdate()
+    void FixedUpdate()
 	{
 		var mesh = clothMeshFilter.mesh;
 		var vertices = mesh.vertices;
 		var normals = mesh.normals;
 		var uvs = mesh.uv;
+        string vertex = "";
 
-		// Tamanyo 1 x num de vértices x características
-		inputTensor = new Tensor<float>(new TensorShape(1, vertexCount, 13));
+        // Tamanyo 1 x num de vértices x características
+        inputTensor = new Tensor<float>(new TensorShape(1, vertexCount, 13));
 
 		for (int i = 0; i < vertexCount; i++)
 		{
-			// Posición global del vértice
-			// Vector3 pos = clothMeshFilter.transform.TransformPoint(vertices[i]);
 			Vector3 pos = vertices[i];
+            vertex += clothMeshFilter.transform.TransformPoint(pos) + "\n";
 
-			// Picos de velocidad de primer frame? Sugerencia 
-			if (lastVertexPositions[i] == Vector3.zero) lastVertexPositions[i] = pos;
+            Debug.DrawRay(clothMeshFilter.transform.TransformPoint(pos), Vector3.up * 0.1f, UnityEngine.Color.red);
+
+            // Picos de velocidad de primer frame? Sugerencia 
+            if (lastVertexPositions[i] == Vector3.zero) lastVertexPositions[i] = pos;
 			Vector3 vel = (pos - lastVertexPositions[i]) / Time.fixedDeltaTime;
 
-			float sdf = Vector3.Distance(pos, ball.transform.position) - ballCollider.radius;
-			Vector3 normal = normals[i];
+            float sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
+            Vector3 normal = normals[i];
 
 			int f = 0;
 			inputTensor[0, i, f++] = (pos.x - normData.mean[0]) / normData.std[0];
@@ -133,17 +134,26 @@ public class ClothML : MonoBehaviour
 			lastVertexPositions[i] = pos;
 		}
 
-		worker.Schedule(inputTensor);
+        SaveData("pre", vertex);
+
+        worker.Schedule(inputTensor);
 
 		using var output = worker.PeekOutput() as Tensor<float>;
 		var result = output.ReadbackAndClone();
 
 		Vector3[] newVertices = new Vector3[vertexCount];
 
-		for (int i = 0; i < vertexCount; i++)
-		{
-			// Denormalizamos (world 
-			float dx = result[0, i, 0];
+        vertex = "";
+        for (int i = 0; i < vertexCount; i++)
+        {
+            if (maxDistance[i] == 0f)
+            {
+                newVertices[i] = vertices[i];
+                continue; // Pasamos al siguiente vértice
+            }
+
+            // Denormalizamos (world 
+            float dx = result[0, i, 0];
 			float dy = result[0, i, 1];
 			float dz = result[0, i, 2];
 
@@ -159,9 +169,12 @@ public class ClothML : MonoBehaviour
 			// Espacio local para vértices
 			// newVertices[i] = transform.InverseTransformPoint(newWorldPos);
 			newVertices[i] = newWorldPos;
-		}
 
-		mesh.vertices = newVertices;
+            vertex += transform.TransformPoint(newWorldPos) + "\n";
+        }
+        SaveData("post", vertex);
+
+        mesh.vertices = newVertices;
 		mesh.RecalculateNormals();
 		mesh.RecalculateBounds();
 
