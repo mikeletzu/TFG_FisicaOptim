@@ -1,0 +1,202 @@
+Forma de input_mean: torch.Size([4])
+Forma de target_mean: torch.Size([3])
+Train Epoch 001
+Epoch 001 | Train Loss: 0.575017 | Test Loss: 0.561191 | Avg Vertex Error: 0.012376 units
+Train Epoch 002
+Epoch 002 | Train Loss: 0.559876 | Test Loss: 0.558356 | Avg Vertex Error: 0.012323 units
+Train Epoch 003
+Epoch 003 | Train Loss: 0.558048 | Test Loss: 0.557015 | Avg Vertex Error: 0.012294 units
+Train Epoch 004
+Epoch 004 | Train Loss: 0.556944 | Test Loss: 0.556057 | Avg Vertex Error: 0.012272 units
+Train Epoch 005
+Epoch 005 | Train Loss: 0.556106 | Test Loss: 0.555380 | Avg Vertex Error: 0.012245 units
+Train Epoch 006
+Epoch 006 | Train Loss: 0.555217 | Test Loss: 0.554523 | Avg Vertex Error: 0.012226 units
+Train Epoch 007
+Epoch 007 | Train Loss: 0.554212 | Test Loss: 0.553221 | Avg Vertex Error: 0.012191 units
+Train Epoch 008
+Epoch 008 | Train Loss: 0.553112 | Test Loss: 0.551846 | Avg Vertex Error: 0.012152 units
+Train Epoch 009
+Epoch 009 | Train Loss: 0.551823 | Test Loss: 0.550402 | Avg Vertex Error: 0.012107 units
+Train Epoch 010
+Epoch 010 | Train Loss: 0.549833 | Test Loss: 0.548035 | Avg Vertex Error: 0.012023 units
+Train Epoch 011
+Epoch 011 | Train Loss: 0.546973 | Test Loss: 0.544133 | Avg Vertex Error: 0.011885 units
+Train Epoch 012
+Epoch 012 | Train Loss: 0.542242 | Test Loss: 0.538298 | Avg Vertex Error: 0.011683 units
+Train Epoch 013
+Epoch 013 | Train Loss: 0.535551 | Test Loss: 0.530072 | Avg Vertex Error: 0.011413 units
+Train Epoch 014
+Epoch 014 | Train Loss: 0.526784 | Test Loss: 0.520217 | Avg Vertex Error: 0.011095 units
+Train Epoch 015
+Epoch 015 | Train Loss: 0.516490 | Test Loss: 0.508827 | Avg Vertex Error: 0.010742 units
+Train Epoch 016
+Epoch 016 | Train Loss: 0.505462 | Test Loss: 0.497516 | Avg Vertex Error: 0.010385 units
+Train Epoch 017
+Epoch 017 | Train Loss: 0.494412 | Test Loss: 0.486588 | Avg Vertex Error: 0.010047 units
+Train Epoch 018
+Epoch 018 | Train Loss: 0.483698 | Test Loss: 0.475706 | Avg Vertex Error: 0.009713 units
+Train Epoch 019
+Epoch 019 | Train Loss: 0.473712 | Test Loss: 0.465622 | Avg Vertex Error: 0.009394 units
+Train Epoch 020
+Epoch 020 | Train Loss: 0.464414 | Test Loss: 0.456402 | Avg Vertex Error: 0.009099 units
+Train Epoch 021
+Epoch 021 | Train Loss: 0.456126 | Test Loss: 0.449713 | Avg Vertex Error: 0.008870 units
+Train Epoch 022
+Epoch 022 | Train Loss: 0.448883 | Test Loss: 0.443210 | Avg Vertex Error: 0.008659 units
+Train Epoch 023
+Epoch 023 | Train Loss: 0.442613 | Test Loss: 0.434780 | Avg Vertex Error: 0.008386 units
+Train Epoch 024
+Epoch 024 | Train Loss: 0.435396 | Test Loss: 0.436485 | Avg Vertex Error: 0.008471 units
+Train Epoch 025
+Epoch 025 | Train Loss: 0.432410 | Test Loss: 0.430692 | Avg Vertex Error: 0.008298 units
+Train Epoch 026
+Epoch 026 | Train Loss: 0.427194 | Test Loss: 0.426256 | Avg Vertex Error: 0.008150 units
+Train Epoch 027
+Epoch 027 | Train Loss: 0.421804 | Test Loss: 0.425230 | Avg Vertex Error: 0.008147 units
+Train Epoch 028
+Epoch 028 | Train Loss: 0.418063 | Test Loss: 0.417448 | Avg Vertex Error: 0.007877 units
+Train Epoch 029
+Epoch 029 | Train Loss: 0.413683 | Test Loss: 0.414727 | Avg Vertex Error: 0.007789 units
+Train Epoch 030
+Epoch 030 | Train Loss: 0.410444 | Test Loss: 0.414983 | Avg Vertex Error: 0.007833 units
+Train Epoch 031
+Epoch 031 | Train Loss: 0.407537 | Test Loss: 0.407108 | Avg Vertex Error: 0.007557 units
+Train Epoch 032
+Epoch 032 | Train Loss: 0.404620 | Test Loss: 0.405953 | Avg Vertex Error: 0.007525 units
+Train Epoch 033
+Epoch 033 | Train Loss: 0.402207 | Test Loss: 0.409500 | Avg Vertex Error: 0.007674 units
+Train Epoch 034
+Epoch 034 | Train Loss: 0.401077 | Test Loss: 0.405465 | Avg Vertex Error: 0.007536 units
+Train Epoch 035
+Epoch 035 | Train Loss: 0.398381 | Test Loss: 0.400334 | Avg Vertex Error: 0.007349 units
+Train Epoch 036
+Epoch 036 | Train Loss: 0.395295 | Test Loss: 0.386704 | Avg Vertex Error: 0.006877 units
+Train Epoch 037
+Epoch 037 | Train Loss: 0.395154 | Test Loss: 0.399353 | Avg Vertex Error: 0.007364 units
+Train Epoch 038
+Epoch 038 | Train Loss: 0.391895 | Test Loss: 0.396656 | Avg Vertex Error: 0.007279 units
+Train Epoch 039
+Epoch 039 | Train Loss: 0.390295 | Test Loss: 0.395626 | Avg Vertex Error: 0.007259 units
+Train Epoch 040
+Epoch 040 | Train Loss: 0.389301 | Test Loss: 0.390892 | Avg Vertex Error: 0.007072 units
+Train Epoch 041
+Epoch 041 | Train Loss: 0.385669 | Test Loss: 0.385707 | Avg Vertex Error: 0.006890 units
+Train Epoch 042
+Epoch 042 | Train Loss: 0.384141 | Test Loss: 0.385440 | Avg Vertex Error: 0.006900 units
+Train Epoch 043
+Epoch 043 | Train Loss: 0.382715 | Test Loss: 0.380378 | Avg Vertex Error: 0.006711 units
+Train Epoch 044
+Epoch 044 | Train Loss: 0.379710 | Test Loss: 0.386004 | Avg Vertex Error: 0.006947 units
+Train Epoch 045
+Epoch 045 | Train Loss: 0.379015 | Test Loss: 0.382806 | Avg Vertex Error: 0.006831 units
+Train Epoch 046
+Epoch 046 | Train Loss: 0.378007 | Test Loss: 0.376986 | Avg Vertex Error: 0.006621 units
+Train Epoch 047
+Epoch 047 | Train Loss: 0.375233 | Test Loss: 0.367260 | Avg Vertex Error: 0.006239 units
+Train Epoch 048
+Epoch 048 | Train Loss: 0.376384 | Test Loss: 0.384376 | Avg Vertex Error: 0.006938 units
+Train Epoch 049
+Epoch 049 | Train Loss: 0.376158 | Test Loss: 0.364251 | Avg Vertex Error: 0.006145 units
+Train Epoch 050
+Epoch 050 | Train Loss: 0.372995 | Test Loss: 0.382218 | Avg Vertex Error: 0.006828 units
+Train Epoch 051
+Epoch 051 | Train Loss: 0.371056 | Test Loss: 0.361266 | Avg Vertex Error: 0.006051 units
+Train Epoch 052
+Epoch 052 | Train Loss: 0.367510 | Test Loss: 0.358320 | Avg Vertex Error: 0.005961 units
+Train Epoch 053
+Epoch 053 | Train Loss: 0.368730 | Test Loss: 0.369757 | Avg Vertex Error: 0.006395 units
+Train Epoch 054
+Epoch 054 | Train Loss: 0.365733 | Test Loss: 0.355452 | Avg Vertex Error: 0.005900 units
+Train Epoch 055
+Epoch 055 | Train Loss: 0.367981 | Test Loss: 0.370596 | Avg Vertex Error: 0.006489 units
+Train Epoch 056
+Epoch 056 | Train Loss: 0.366091 | Test Loss: 0.357590 | Avg Vertex Error: 0.005954 units
+Train Epoch 057
+Epoch 057 | Train Loss: 0.360211 | Test Loss: 0.352215 | Avg Vertex Error: 0.005797 units
+Train Epoch 058
+Epoch 058 | Train Loss: 0.360646 | Test Loss: 0.356672 | Avg Vertex Error: 0.005958 units
+Train Epoch 059
+Epoch 059 | Train Loss: 0.360818 | Test Loss: 0.353548 | Avg Vertex Error: 0.005878 units
+Train Epoch 060
+Epoch 060 | Train Loss: 0.359156 | Test Loss: 0.353242 | Avg Vertex Error: 0.005886 units
+Train Epoch 061
+Epoch 061 | Train Loss: 0.357068 | Test Loss: 0.358953 | Avg Vertex Error: 0.006112 units
+Train Epoch 062
+Epoch 062 | Train Loss: 0.356521 | Test Loss: 0.349784 | Avg Vertex Error: 0.005757 units
+Train Epoch 063
+Epoch 063 | Train Loss: 0.358002 | Test Loss: 0.357261 | Avg Vertex Error: 0.005945 units
+Train Epoch 064
+Epoch 064 | Train Loss: 0.353498 | Test Loss: 0.352849 | Avg Vertex Error: 0.005917 units
+Train Epoch 065
+Epoch 065 | Train Loss: 0.356329 | Test Loss: 0.347290 | Avg Vertex Error: 0.005674 units
+Train Epoch 066
+Epoch 066 | Train Loss: 0.353473 | Test Loss: 0.344958 | Avg Vertex Error: 0.005623 units
+Train Epoch 067
+Epoch 067 | Train Loss: 0.351054 | Test Loss: 0.345403 | Avg Vertex Error: 0.005667 units
+Train Epoch 068
+Epoch 068 | Train Loss: 0.348836 | Test Loss: 0.344172 | Avg Vertex Error: 0.005630 units
+Train Epoch 069
+Epoch 069 | Train Loss: 0.349454 | Test Loss: 0.352548 | Avg Vertex Error: 0.005942 units
+Train Epoch 070
+Epoch 070 | Train Loss: 0.349031 | Test Loss: 0.346590 | Avg Vertex Error: 0.005743 units
+Train Epoch 071
+Epoch 071 | Train Loss: 0.347613 | Test Loss: 0.345022 | Avg Vertex Error: 0.005641 units
+Train Epoch 072
+Epoch 072 | Train Loss: 0.345510 | Test Loss: 0.338228 | Avg Vertex Error: 0.005430 units
+Train Epoch 073
+Epoch 073 | Train Loss: 0.344231 | Test Loss: 0.337455 | Avg Vertex Error: 0.005391 units
+Train Epoch 074
+Epoch 074 | Train Loss: 0.345664 | Test Loss: 0.346279 | Avg Vertex Error: 0.005715 units
+Train Epoch 075
+Epoch 075 | Train Loss: 0.345209 | Test Loss: 0.334347 | Avg Vertex Error: 0.005318 units
+Train Epoch 076
+Epoch 076 | Train Loss: 0.342816 | Test Loss: 0.332356 | Avg Vertex Error: 0.005282 units
+Train Epoch 077
+Epoch 077 | Train Loss: 0.340794 | Test Loss: 0.333854 | Avg Vertex Error: 0.005310 units
+Train Epoch 078
+Epoch 078 | Train Loss: 0.341710 | Test Loss: 0.330049 | Avg Vertex Error: 0.005210 units
+Train Epoch 079
+Epoch 079 | Train Loss: 0.339754 | Test Loss: 0.335692 | Avg Vertex Error: 0.005381 units
+Train Epoch 080
+Epoch 080 | Train Loss: 0.339459 | Test Loss: 0.331129 | Avg Vertex Error: 0.005244 units
+Train Epoch 081
+Epoch 081 | Train Loss: 0.337798 | Test Loss: 0.330137 | Avg Vertex Error: 0.005233 units
+Train Epoch 082
+Epoch 082 | Train Loss: 0.336442 | Test Loss: 0.329142 | Avg Vertex Error: 0.005183 units
+Train Epoch 083
+Epoch 083 | Train Loss: 0.334035 | Test Loss: 0.331240 | Avg Vertex Error: 0.005277 units
+Train Epoch 084
+Epoch 084 | Train Loss: 0.334474 | Test Loss: 0.339533 | Avg Vertex Error: 0.005503 units
+Train Epoch 085
+Epoch 085 | Train Loss: 0.337309 | Test Loss: 0.328303 | Avg Vertex Error: 0.005189 units
+Train Epoch 086
+Epoch 086 | Train Loss: 0.332647 | Test Loss: 0.331939 | Avg Vertex Error: 0.005328 units
+Train Epoch 087
+Epoch 087 | Train Loss: 0.331507 | Test Loss: 0.333498 | Avg Vertex Error: 0.005320 units
+Train Epoch 088
+Epoch 088 | Train Loss: 0.334701 | Test Loss: 0.333169 | Avg Vertex Error: 0.005387 units
+Train Epoch 089
+Epoch 089 | Train Loss: 0.333523 | Test Loss: 0.323173 | Avg Vertex Error: 0.005037 units
+Train Epoch 090
+Epoch 090 | Train Loss: 0.330280 | Test Loss: 0.319765 | Avg Vertex Error: 0.004982 units
+Train Epoch 091
+Epoch 091 | Train Loss: 0.332556 | Test Loss: 0.330290 | Avg Vertex Error: 0.005307 units
+Train Epoch 092
+Epoch 092 | Train Loss: 0.326639 | Test Loss: 0.319528 | Avg Vertex Error: 0.004969 units
+Train Epoch 093
+Epoch 093 | Train Loss: 0.327538 | Test Loss: 0.321417 | Avg Vertex Error: 0.005038 units
+Train Epoch 094
+Epoch 094 | Train Loss: 0.329169 | Test Loss: 0.318447 | Avg Vertex Error: 0.004956 units
+Train Epoch 095
+Epoch 095 | Train Loss: 0.325257 | Test Loss: 0.317625 | Avg Vertex Error: 0.004947 units
+Train Epoch 096
+Epoch 096 | Train Loss: 0.326619 | Test Loss: 0.320008 | Avg Vertex Error: 0.005054 units
+Train Epoch 097
+Epoch 097 | Train Loss: 0.324590 | Test Loss: 0.317235 | Avg Vertex Error: 0.004923 units
+Train Epoch 098
+Epoch 098 | Train Loss: 0.323606 | Test Loss: 0.314828 | Avg Vertex Error: 0.004919 units
+Train Epoch 099
+Epoch 099 | Train Loss: 0.322613 | Test Loss: 0.321222 | Avg Vertex Error: 0.005142 units
+Train Epoch 100
+Epoch 100 | Train Loss: 0.323177 | Test Loss: 0.313113 | Avg Vertex Error: 0.004854 units

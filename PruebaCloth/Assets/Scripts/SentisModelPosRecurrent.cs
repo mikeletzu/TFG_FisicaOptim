@@ -58,15 +58,13 @@ public class ClothMLPosRec : MonoBehaviour
 
         // Definir puntos anclados (0 = se mueve)
         int i = 0;
-        maxDistance[i] = 0.2f;
-        i = 1;
-        for (; i < 3; i++)
+        for (; i < 4; i++)
         {
-            maxDistance[i] = 0.2f; // Vértices 1 y 2 anclados
+            maxDistance[i] = 0.2f;
         }
         while (i < vertexCount)
         {
-            maxDistance[i] = 0.2f; // El resto se mueve
+            maxDistance[i] = 0f;
             i++;
         }
 
@@ -160,7 +158,7 @@ public class ClothMLPosRec : MonoBehaviour
                 (normData.target_std[2] * dz) + normData.target_mean[2]
             );
 
-            displacement = Vector3.ClampMagnitude(displacement, 0.05f);
+            //displacement = Vector3.ClampMagnitude(displacement, 0.05f);
 
             // Aplicamos el desplazamiento a la posición actual (en local)
             newVertices[i] = vertices[i] + displacement;

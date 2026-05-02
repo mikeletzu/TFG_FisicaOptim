@@ -773,10 +773,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClothMLPosRec
   ball: {fileID: 339546644}
   ballCollider: {fileID: 339546646}
-  modelAsset: {fileID: 5022602860645237092, guid: 2cad9bb9909229148bf5eb9cdc66f2dd, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 469f1fd61530c084d997cdf4b22ad499, type: 3}
   clothMeshFilter: {fileID: 354067158}
   contador: 0
-  jsonFile: {fileID: 4900000, guid: 0d5cec306ae338044a83e97a0c18c129, type: 3}
+  jsonFile: {fileID: 4900000, guid: 7ac568fe2f128f4429519ff7db243248, type: 3}
   normData:
     mean: []
     std: []
@@ -789,22 +789,23 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 354067155}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: dc3fce1c83b1e894ea47b81c3aab8586, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClothMLPos
   ball: {fileID: 339546644}
   ballCollider: {fileID: 339546646}
-  modelAsset: {fileID: 5022602860645237092, guid: f6e09f00203e01f4b8f5f06158a410e3, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 59a4eb9883be5cb45a08a44858d3e025, type: 3}
   clothMeshFilter: {fileID: 354067158}
   contador: 0
-  jsonFile: {fileID: 4900000, guid: 4ad12f72af0fe904a8181461250c4e5e, type: 3}
+  jsonFile: {fileID: 4900000, guid: 128623d20ec1d9f41a48d60dbe36f38f, type: 3}
   normData:
     mean: []
     std: []
     target_mean: []
     target_std: []
+  originalPositions: []
 --- !u!114 &354067162
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -812,7 +813,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 354067155}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: c40bc56cb6ff9a440b006d6c9e694f0c, type: 3}
   m_Name: 
@@ -827,7 +828,6 @@ MonoBehaviour:
     std: []
     target_mean: []
     target_std: []
-  originalPositions: []
 --- !u!1 &635915742
 GameObject:
   m_ObjectHideFlags: 0
@@ -1096,7 +1096,7 @@ MonoBehaviour:
   fileName: cloth_dataset.csv
   filePrefix: clothDataset
   fileExtension: .csv
-  snapShotTime: 0.1
+  timed: 0
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0

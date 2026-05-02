@@ -30,6 +30,7 @@ public class ClothDatasetRecorder : MonoBehaviour
     public string filePrefix = "clothDataset";
     public string fileExtension = ".csv";
     [SerializeField, Tooltip("Time between record frames")]
+    public bool timed = false;
     private float snapShotTime = 0.3f;
     private float snapTimeLeft = 0.0f;
 
@@ -223,7 +224,7 @@ public class ClothDatasetRecorder : MonoBehaviour
 
         // Guardamos snapshot
 		snapTimeLeft -= Time.deltaTime;
-		if (snapTimeLeft < 0)
+		if (snapTimeLeft < 0 || !timed)
 		{
             RecordSnapshot(pos_t, vel_t, sdf_t, normal_t, maxDist_t, uvs_t);
             snapTimeLeft = snapShotTime;
