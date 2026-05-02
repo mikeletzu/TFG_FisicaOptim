@@ -38,6 +38,8 @@ public class ClothMLPos : MonoBehaviour
     }
     public NormalizationData normData;
 
+    public Vector3[] originalPositions;
+
 	void Awake()
 	{
 		if (jsonFile != null)
@@ -56,11 +58,14 @@ public class ClothMLPos : MonoBehaviour
 		vertexCount = clothMeshFilter.mesh.vertexCount;
 
         lastVertexPositions = new Vector3[vertexCount];
+        originalPositions = new Vector3[vertexCount];
 
 		for (int im = 0; im < vertexCount; im++)
 		{
 			lastVertexPositions[im] = new Vector3(0,0,0);
-            Debug.Log("V: " + im + " Pos: " + clothMeshFilter.mesh.vertices[im]);
+            originalPositions[im] = clothMeshFilter.mesh.vertices[im];
+
+			Debug.Log("V: " + im + " Pos: " + clothMeshFilter.mesh.vertices[im]);
 		}
 
         ballCollider = ball.GetComponent<SphereCollider>();
@@ -114,9 +119,9 @@ public class ClothMLPos : MonoBehaviour
             Vector3 normal = normals[i];
 
             int f = 0;
-            inputTensor[0, i, f++] = (pos.x - normData.mean[0]) / normData.std[0];
-            inputTensor[0, i, f++] = (pos.y - normData.mean[1]) / normData.std[1];
-            inputTensor[0, i, f++] = (pos.z - normData.mean[2]) / normData.std[2];
+            inputTensor[0, i, f++] = (originalPositions[i].x - normData.mean[0]) / normData.std[0];
+            inputTensor[0, i, f++] = (originalPositions[i].y - normData.mean[1]) / normData.std[1];
+            inputTensor[0, i, f++] = (originalPositions[i].z - normData.mean[2]) / normData.std[2];
 
             inputTensor[0, i, f++] = (sdf - normData.mean[3]) / normData.std[3];
 
@@ -166,7 +171,7 @@ public class ClothMLPos : MonoBehaviour
 
 			// Añadimos el desplazamiento (Se ve que sustitución como que no)
 			//Vector3 currentWorldPos = clothMeshFilter.transform.TransformPoint(vertices[i]);
-			Vector3 newWorldPos = vertices[i] + displacement;
+			Vector3 newWorldPos = originalPositions[i] + displacement;
 
             // Espacio local para vértices
             // newVertices[i] = transform.InverseTransformPoint(newWorldPos);

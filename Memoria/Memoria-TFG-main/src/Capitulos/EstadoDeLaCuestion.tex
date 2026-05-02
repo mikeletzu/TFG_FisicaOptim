@@ -91,7 +91,7 @@ El entrenamiento se realiza sobre las posiciones de una simulación realizada en
 
 Para evitar que la simulación colapse con el error acumulado aplican dos estretegias: ventanas de frames superpuestas, con bloques de 32 frames con mini-batches para mantener la coherencia a largo plazo, y ruido gaussiano para que la red aprenda a corregirse. Además, los cálculos necesarios durante la ejecución se aceleran con shaders en GPU (GPU decompression) y se recalculan las normales de los vértices necesarias para el renderizado. \newline
 
-Sus principales limitaciones residen en la necesidad de quitar a mano errores producidos en la simulación, falta de pruebas en objetos plásticos, posibles colisiones internas fallidas, y limitación de objeto colisionador fijo en el espacio y sin contar con objetos cayendo por el espacio. Se necesitaron 10^{6} frames de simulación para entrenamiento para mejores resultados, así como períodos de entre 10 y 48 horas de entrenamiento.\newline
+Sus principales limitaciones residen en la necesidad de quitar a mano errores producidos en la simulación, falta de pruebas en objetos plásticos, posibles colisiones internas fallidas, y limitación de objeto colisionador fijo en el espacio y sin contar con objetos cayendo por el espacio. Se necesitaron $10^{6}$ frames de simulación para entrenamiento para mejores resultados, así como períodos de entre 10 y 48 horas de entrenamiento.\newline
 
 \subsubsection{Cloth and Skin Deformation with a Triangle Mesh Based Convolutional Neural Network}
 %Our networks are built using three basic building blocks, namely Convolution, Pooling and Unpooling operators that operate directly on a manifold triangle mesh.%
