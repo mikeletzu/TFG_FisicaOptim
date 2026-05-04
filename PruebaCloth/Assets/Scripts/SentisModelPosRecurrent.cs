@@ -117,7 +117,7 @@ public class ClothMLPosRec : MonoBehaviour
         for (int i = 0; i < vertexCount; i++)
         {
             Vector3 pos = vertices[i];
-            pos = transform.TransformPoint(pos); //CONFIRMAR QUE ESTO HACE FALTA LOL
+            // pos = transform.TransformPoint(pos); //CONFIRMAR QUE ESTO HACE FALTA LOL
             float sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
 
             historyBuffer[seqLen - 1, i, 0] = (pos.x - normData.mean[0]) / normData.std[0];
