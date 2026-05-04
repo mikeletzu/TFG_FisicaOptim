@@ -5,6 +5,19 @@
 
 
 
+**Gran enemigo: ERROR ACUMLADO**
+
+&#x09;*holden*
+
+* Noise Injection: Lo baja pero no lo suficiente
+* we develop a novel neural network training procedure that back-propagates errors through the entire simulationthat back-propagates errors through the entire simulation integration step, leading to stable long term predictions EN CADA BATCH (hoja 5)
+
+&#x09;*Chentanez*
+
+Este se basa en poses entonces es distinto por q no viene del t al t+1
+
+
+
 **Pasos:**
 
 * Crear simulación.

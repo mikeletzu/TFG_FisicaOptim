@@ -58,26 +58,35 @@ public class ClothMLPosRec : MonoBehaviour
 
         // Definir puntos anclados (0 = se mueve)
         int i = 0;
-        for (; i < 4; i++)
-        {
-            maxDistance[i] = 0.2f;
-        }
+        //MINI
+        //for (; i < 4; i++)
+        //{
+        //    maxDistance[i] = 1.0f;
+        //}
         while (i < vertexCount)
         {
-            maxDistance[i] = 0f;
+            maxDistance[i] = 0.2f;
             i++;
         }
+        //MAX
+        maxDistance[14] = 0f;
+        maxDistance[15] = 0f;
+        maxDistance[20] = 0f;
+        maxDistance[23] = 0f;
+        maxDistance[24] = 0f;
 
         // --- NUEVO: Llenar el buffer inicial ---
         // Para que los primeros 5 frames no sean nulos, llenamos la historia
         // asumiendo que la tela está quieta en su posición inicial.
+
         var initialVertices = clothMeshFilter.mesh.vertices;
         for (int t = 0; t < seqLen; t++)
         {
             for (int v = 0; v < vertexCount; v++)
             {
                 Vector3 pos = initialVertices[v];
-                float sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
+
+                float sdf = Vector3.Distance(transform.TransformPoint(pos), transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
 
                 historyBuffer[t, v, 0] = (pos.x - normData.mean[0]) / normData.std[0];
                 historyBuffer[t, v, 1] = (pos.y - normData.mean[1]) / normData.std[1];
@@ -108,6 +117,7 @@ public class ClothMLPosRec : MonoBehaviour
         for (int i = 0; i < vertexCount; i++)
         {
             Vector3 pos = vertices[i];
+            pos = transform.TransformPoint(pos); //CONFIRMAR QUE ESTO HACE FALTA LOL
             float sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
 
             historyBuffer[seqLen - 1, i, 0] = (pos.x - normData.mean[0]) / normData.std[0];
