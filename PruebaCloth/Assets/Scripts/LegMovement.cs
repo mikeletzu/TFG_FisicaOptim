@@ -1,6 +1,8 @@
+using System.Numerics;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
+using Vector3 = UnityEngine.Vector3;
 
 public class LegMovement : MonoBehaviour
 {
@@ -20,17 +22,13 @@ public class LegMovement : MonoBehaviour
         else dir = Vector3.back;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        if (isAuto)
-            AutoLinealUpdate();
-    }
+        if (transform.eulerAngles.z > maxRot && transform.eulerAngles.z < 180)
+		    dir = Vector3.back; 
+		else if(transform.eulerAngles.z < 330 && transform.eulerAngles.z >= 180)
+            dir = Vector3.forward; 
 
-    void AutoLinealUpdate()
-    {
-        if (transform.eulerAngles.z > maxRot) dir = Vector3.forward;
-        else if (transform.eulerAngles.x < -maxRot) dir = Vector3.back;
         transform.Rotate(dir * Time.deltaTime * movementSpeed);
     }
 }
