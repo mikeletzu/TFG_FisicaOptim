@@ -86,9 +86,9 @@ public class ClothMLRecAnchored : MonoBehaviour
 
                 float sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
 
-                historyBuffer[t, v, 0] = originalPositions[v].x;
-                historyBuffer[t, v, 1] = originalPositions[v].y;
-                historyBuffer[t, v, 2] = originalPositions[v].z;
+                historyBuffer[t, v, 0] = pos.x;
+                historyBuffer[t, v, 1] = pos.y;
+                historyBuffer[t, v, 2] = pos.z;
                 historyBuffer[t, v, 3] = (pos.x - normData.mean[3]) / normData.std[3];
                 historyBuffer[t, v, 4] = (pos.y - normData.mean[4]) / normData.std[4];
                 historyBuffer[t, v, 5] = (pos.z - normData.mean[5]) / normData.std[5];
@@ -96,14 +96,6 @@ public class ClothMLRecAnchored : MonoBehaviour
             }
         }
     }
-
-
-	public void SaveData(string data)
-	{
-		string filePath = Application.persistentDataPath + "/debugOutput.txt";
-        File.AppendAllText(filePath, "NEW FRAME" + "\n");
-		File.AppendAllText(filePath, data + "\n");
-	}
 
 	void FixedUpdate()
 	{
@@ -152,9 +144,9 @@ public class ClothMLRecAnchored : MonoBehaviour
                 float sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
 
                 int f = 0;
-                inputTensor[0, i, f++] = (originalPositions[i].x - normData.mean[0]) / normData.std[0];
-                inputTensor[0, i, f++] = (originalPositions[i].y - normData.mean[1]) / normData.std[1];
-                inputTensor[0, i, f++] = (originalPositions[i].z - normData.mean[2]) / normData.std[2];
+                inputTensor[0, i, f++] = originalPositions[i].x;
+                inputTensor[0, i, f++] = originalPositions[i].y;
+                inputTensor[0, i, f++] = originalPositions[i].z;
 
                 inputTensor[0, i, f++] = (pos.x - normData.mean[3]) / normData.std[3];
                 inputTensor[0, i, f++] = (pos.y - normData.mean[4]) / normData.std[4];
@@ -171,7 +163,6 @@ public class ClothMLRecAnchored : MonoBehaviour
 
 		Vector3[] newVertices = new Vector3[vertexCount];
 		
-		string vertex = "";
 		for (int i = 0; i < vertexCount; i++)
 		{
             if (maxDistance[i] == 0f)
@@ -190,17 +181,12 @@ public class ClothMLRecAnchored : MonoBehaviour
             displacement = new Vector3(
                 ((normData.target_std[0] * dx) + normData.target_mean[0]),
                 ((normData.target_std[1] * dy) + normData.target_mean[1]),
-                ((normData.target_std[2] * dz) + normData.target_mean[2]));
-            
-            Vector3 newWorldPos = vertices[i] + displacement;
+                ((normData.target_std[2] * dz) + normData.target_mean[2])
+            );            
 
             // Espacio local para vértices
-            newVertices[i] = newWorldPos;
-
-            //Para dataSave
-            vertex += transform.TransformPoint(newWorldPos) + "\n";
+            newVertices[i] = vertices[i] + displacement;
         }
-		SaveData(vertex);
 		mesh.SetVertices(newVertices);
 		mesh.RecalculateNormals();
 		mesh.RecalculateBounds();
