@@ -210,6 +210,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d8fb33d8be9b3b34391a96860bc8ce27, type: 3}
       insertIndex: -1
       addedObject: {fileID: 354067163}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: d8fb33d8be9b3b34391a96860bc8ce27, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 354067164}
   m_SourcePrefab: {fileID: 100100000, guid: d8fb33d8be9b3b34391a96860bc8ce27, type: 3}
 --- !u!1 &127802455
 GameObject:
@@ -769,7 +772,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 354067155}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b27fdda5777c10408704b7029997502, type: 3}
   m_Name: 
@@ -858,6 +861,30 @@ MonoBehaviour:
     target_std: []
     optimal_n: 0
     num_vertices: 0
+--- !u!114 &354067164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 354067155}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b581adcd7275abf46be090ae3574d3a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClothMLRecAnchored
+  ball: {fileID: 339546644}
+  ballCollider: {fileID: 339546646}
+  modelAsset: {fileID: 5022602860645237092, guid: fc65ef2f7a40fed409c16e1dbfc0887e, type: 3}
+  clothMeshFilter: {fileID: 354067158}
+  contador: 0
+  jsonFile: {fileID: 4900000, guid: c327a646dfa8c6741b14eed5720bcd49, type: 3}
+  normData:
+    mean: []
+    std: []
+    target_mean: []
+    target_std: []
+  originalPositions: []
 --- !u!1 &635915742
 GameObject:
   m_ObjectHideFlags: 0
