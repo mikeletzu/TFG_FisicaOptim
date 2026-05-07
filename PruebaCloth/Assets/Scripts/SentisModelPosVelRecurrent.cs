@@ -3,7 +3,7 @@ using System.IO;
 using Unity.InferenceEngine; // O Unity.Sentis dependiendo de tu versión exacta
 using UnityEngine;
 
-public class ClothMLPosRec : MonoBehaviour
+public class ClothMLPosVelRec : MonoBehaviour
 {
     [SerializeField]
     public GameObject ball;
@@ -11,12 +11,13 @@ public class ClothMLPosRec : MonoBehaviour
     public ModelAsset modelAsset;
     public MeshFilter clothMeshFilter;
 
+    private Vector3[] lastVertexPositions;
+
     private float[] maxDistance;
 
     Worker worker;
     Tensor<float> inputTensor;
 
-    public int contador = 0;
     int vertexCount;
 
     // --- NUEVO: Parámetros de la Secuencia ---
@@ -26,6 +27,9 @@ public class ClothMLPosRec : MonoBehaviour
     private float[,,] historyBuffer;
 
     public TextAsset jsonFile;
+
+    [SerializeField]
+    public int numFeatures = 4;
 
     [System.Serializable]
     public class NormalizationData
@@ -53,8 +57,14 @@ public class ClothMLPosRec : MonoBehaviour
         clothMeshFilter.mesh.MarkDynamic();
         vertexCount = clothMeshFilter.mesh.vertexCount;
 
+        lastVertexPositions = new Vector3[vertexCount];
+        for (int im = 0; im < vertexCount; im++)
+        {
+            lastVertexPositions[im] = new Vector3(0, 0, 0);
+        }
+
         maxDistance = new float[vertexCount];
-        historyBuffer = new float[seqLen, vertexCount, 4];
+        historyBuffer = new float[seqLen, vertexCount, numFeatures];
 
         // Definir puntos anclados (0 = se mueve)
         int i = 0;
@@ -68,7 +78,7 @@ public class ClothMLPosRec : MonoBehaviour
             maxDistance[i] = 0.2f;
             i++;
         }
-        //MAX
+        ////MAX
         //maxDistance[14] = 0f;
         //maxDistance[15] = 0f;
         //maxDistance[20] = 0f;
@@ -85,13 +95,17 @@ public class ClothMLPosRec : MonoBehaviour
             for (int v = 0; v < vertexCount; v++)
             {
                 Vector3 pos = initialVertices[v];
+                Vector3 vel = Vector3.zero;
 
                 float sdf = Vector3.Distance(transform.TransformPoint(pos), transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
 
                 historyBuffer[t, v, 0] = (pos.x - normData.mean[0]) / normData.std[0];
                 historyBuffer[t, v, 1] = (pos.y - normData.mean[1]) / normData.std[1];
                 historyBuffer[t, v, 2] = (pos.z - normData.mean[2]) / normData.std[2];
-                historyBuffer[t, v, 3] = (sdf - normData.mean[3]) / normData.std[3];
+                historyBuffer[t, v, 3] = (vel.x - normData.mean[3]) / normData.std[3];
+                historyBuffer[t, v, 4] = (vel.y - normData.mean[4]) / normData.std[4];
+                historyBuffer[t, v, 5] = (vel.z - normData.mean[5]) / normData.std[5];
+                historyBuffer[t, v, 6] = (sdf - normData.mean[6]) / normData.std[6];
             }
         }
     }
@@ -116,18 +130,24 @@ public class ClothMLPosRec : MonoBehaviour
         // 2. Calcular los features del frame actual y ponerlos al final de la historia (t = seqLen - 1)
         for (int i = 0; i < vertexCount; i++)
         {
-            Vector3 pos = vertices[i];
-            // pos = transform.TransformPoint(pos); //CONFIRMAR QUE ESTO HACE FALTA LOL
+            Vector3 pos = vertices[i]; 
+            if (lastVertexPositions[i] == Vector3.zero) lastVertexPositions[i] = pos;
+            Vector3 vel = (pos - lastVertexPositions[i]) / Time.fixedDeltaTime;
+
             float sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
+
 
             historyBuffer[seqLen - 1, i, 0] = (pos.x - normData.mean[0]) / normData.std[0];
             historyBuffer[seqLen - 1, i, 1] = (pos.y - normData.mean[1]) / normData.std[1];
             historyBuffer[seqLen - 1, i, 2] = (pos.z - normData.mean[2]) / normData.std[2];
-            historyBuffer[seqLen - 1, i, 3] = (sdf - normData.mean[3]) / normData.std[3];
+            historyBuffer[seqLen - 1, i, 3] = (vel.x - normData.mean[3]) / normData.std[3];
+            historyBuffer[seqLen - 1, i, 4] = (vel.y - normData.mean[4]) / normData.std[4];
+            historyBuffer[seqLen - 1, i, 5] = (vel.z - normData.mean[5]) / normData.std[5];
+            historyBuffer[seqLen - 1, i, 6] = (sdf - normData.mean[6]) / normData.std[6];
         }
 
         // 3. Crear el tensor con las 4 dimensiones que espera el modelo ONNX: [1, SeqLen, Vertices, Features]
-        inputTensor = new Tensor<float>(new TensorShape(1, seqLen, vertexCount, 4));
+        inputTensor = new Tensor<float>(new TensorShape(1, seqLen, vertexCount, numFeatures));
 
         for (int t = 0; t < seqLen; t++)
         {
@@ -137,6 +157,9 @@ public class ClothMLPosRec : MonoBehaviour
                 inputTensor[0, t, i, 1] = historyBuffer[t, i, 1];
                 inputTensor[0, t, i, 2] = historyBuffer[t, i, 2];
                 inputTensor[0, t, i, 3] = historyBuffer[t, i, 3];
+                inputTensor[0, t, i, 4] = historyBuffer[t, i, 4];
+                inputTensor[0, t, i, 5] = historyBuffer[t, i, 5];
+                inputTensor[0, t, i, 6] = historyBuffer[t, i, 6];
             }
         }
 

@@ -1464,7 +1464,7 @@ Cloth:
   m_CollisionMassScale: 1
   m_UseContinuousCollision: 1
   m_UseVirtualParticles: 1
-  m_SolverFrequency: 10000
+  m_SolverFrequency: 1000
   m_SleepThreshold: 0.05
   m_Coefficients:
   - maxDistance: 3.4028235e+38
@@ -4100,9 +4100,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fa883dacb49e3474487078a70b9f7426, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  autoRecord: 1
   record: 1
-  vertexIndices: 
+  recordTime: 3.5
+  recordTimeLeft: 0
+  totalFramesRecorded: 0
   fileName: cloth_dataset.csv
+  filePrefix: clothDataset
+  fileExtension: .csv
+  timed: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
