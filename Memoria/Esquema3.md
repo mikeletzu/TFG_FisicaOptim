@@ -58,3 +58,11 @@ El proyecto requiere d mucha traducción entre interfaces, por lo que se han uti
 * Normalización?
 * Probar el train y test exactamente igual para ver q no hay errores externos.
 
+
+
+
+
+**PENSAMIENTOS RESPECTO A VEL**
+
+* Escala! Cambiar la manera de registrar ???
+
