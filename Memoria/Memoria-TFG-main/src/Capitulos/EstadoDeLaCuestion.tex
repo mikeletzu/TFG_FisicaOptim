@@ -8,10 +8,21 @@ Basta con remontarse a la creación del Pong en 1972, para darse cuenta de la im
 En los inicios del desarrollo de videojuegos, las técnicas más rudimentarias para implementar estas físicas incluían:
 \begin{itemize}
 \item \textbf{La prerenderización:} Dada la capacidad de cómputo con la que solían contar las máquinas, era imposible hacer todos los cálculos físicos en tiempo real, por lo que las interacciones físicas podían diseñarse previamente para parecer realistas \cite{templet2021game}. 
-\item \textbf{La implementación forzada de cada elemento:} El comportamiento de cada elemento podía ser implementado únicamente para él, en vez de seguir unas normas físicas generales. Por ejemplo, en el caso de un proyectil, podía codificarse calculando su trayectoria y velocidad en pocas líneas de código. \newline
+\item \textbf{La implementación forzada de cada elemento:} El comportamiento de cada elemento podía ser implementado únicamente para él, en vez de seguir unas normas físicas generales. Por ejemplo, en el caso de un proyectil, podía codificarse calculando su trayectoria y velocidad en pocas líneas de código.  \newline
 \end{itemize}
 
 Estos métodos eran claramente limitados en la precisión que ofrecían, y quedaba clara la necesidad de una solución más general y reproducible. El mismo Ian Millingtong nos introduce en su libro \textit{Game Physics Engine Development} \cite{millington2007game} el juego Exile, creado por Peter Irvin y Jeremy Smith; si bien este juego fue publicado en 1988, ya contaba con conservación del momento en colisiones, gravedad, y fuerzas como el viento o explosiones. Lo resaltamos como uno de los primeros juegos que cuenta con un motor de físicas completo. \newline
+
+\subsection{Motores de videojuegos}
+Los motores físicos, sumados a otros elementos análogos como los motores de renderizado y sonido, crean el software al que nos referimos como motores de videojuegos. En el mercado encontramos establecidos motores como Unity o Unreal Engine, motores propios de grandes estudios y aquellos pequeños indies como Godot. Los motores con más presencia en el desarollo indie son: \newline
+
+\begin{itemize}
+\item \textbf{Unreal:}
+Es un motor de videojuegos creado por Epic Games en 1998.  Destaca por su motor gráfico, que permite gráficos realistas en tiempo real con tecnologias como Nanite para geometría virtualizada o Lumen para iluminación dinámica. Es multiplataforma y lo encontramos no sólo en desarolladores indie sino en grandes producciones AAA. Se caracteriza por su uso de Blueprints en programación con c++. Integraba Physx como motor físico hasta la introducción reciente de Chaos Physics en su versión 5.7, que aporta novedades que destacaremos en el apartado 2.2.3.
+
+\item \textbf{Unity:}
+Creado por Unity Technologies en 2005, abarca un porcentaje del 51\% de juegos publicados en 2024 y un 26\% \cite{enginereport} en las unidades vendidas en Steam. Es el motor más utilizado por desarrolladores indies y cuenta con documentación, gran comunidad y extensiones como Sentis para la integración de modelos de IA, que explicaremos más adelante. Unity3D integra PhysX como motor de físicas, pero puede incoporar otros sistemas de físicas como Havok bajo licencia \cite{unitypi}. Está basado en la arquitectura Entidad-Componente en c\#, y tiene un enfoque menos potente en cuanto a gráficos y tamaño del juego.
+\end{itemize}
 
 \subsection{Motores de fisica}
 La creación de motores de fisica completos aportó a los videojuegos escalabilidad en su gameplay, manteniendo la coherencia de sus elementos fisicos. Esto último resulta imprescindible para la inmersión del jugador \cite{hecker2000physics}.  \newline
@@ -24,16 +35,7 @@ Por otro lado, Intel adquiere en 2007 Havok \cite{havok}, otro de los primeros m
 
 Los motores físicos nacen en un contexto de competición entre empresas, quienes intentan establecer su hardware como óptimo para la simulación de físicas. La disputa y diversificación para carga computacional entre CPU y GPU la veremos durante todo el desarollo de este proyecto.\newline
 
-\subsection{Motores de videojuegos}
-Los motores físicos, sumados a otros elementos análogos como los motores de renderizado y sonido, crean el software al que nos referimos como motores de videojuegos. En el mercado encontramos establecidos motores como Unity o Unreal Engine, motores propios de grandes estudios y aquellos pequeños indies como Godot. Los motores con más presencia en el desarollo indie son: \newline
 
-\begin{itemize}
-\item \textbf{Unreal:}
-Es un motor de videojuegos creado por Epic Games en 1998.  Destaca por su motor gráfico, que permite gráficos realistas en tiempo real con tecnologias como Nanite para geometría virtualizada o Lumen para iluminación dinámica. Es multiplataforma y lo encontramos no sólo en desarolladores indie sino en grandes producciones AAA. Se caracteriza por su uso de Blueprints en programación con c++. Integraba Physx como motor físico hasta la introducción reciente de Chaos Physics en su versión 5.7, que aporta novedades que destacaremos en el apartado 2.2.3.
-
-\item \textbf{Unity:}
-Creado por Unity Technologies en 2005, abarca un porcentaje del 51\% de juegos publicados en 2024 y un 26\% \cite{enginereport} en las unidades vendidas en Steam. Es el motor más utilizado por desarrolladores indies y cuenta con documentación, gran comunidad y extensiones como Sentis para la integración de modelos de IA, que explicaremos más adelante. Unity3D integra PhysX como motor de físicas, pero puede incoporar otros sistemas de físicas como Havok bajo licencia \cite{unitypi}. Está basado en la arquitectura Entidad-Componente en c\#, y tiene un enfoque menos potente en cuanto a gráficos y tamaño del juego.
-\end{itemize}
 
 \section{Simulación de telas}
 Entendemos los objetos deformables o soft-bodies como aquellos que no son rígidos. Así como en los objetos rígidos podemos simular su movimiento sabiendo su trayectoria y centro de masa, para los objetos deformables necesitamos tener en cuenta todas las partículas y propiedades físicas que lo componen. Entre estos encontramos elementos como las telas, el agua o el viento \cite{erlebenbook}. \newline

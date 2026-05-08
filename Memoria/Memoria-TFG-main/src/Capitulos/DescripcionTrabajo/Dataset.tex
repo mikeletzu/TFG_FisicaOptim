@@ -1,7 +1,37 @@
-\section{Dataset}
+
+\section{El dataset}
 \label{sec:Dataset}
+Para poder entrenar nuestro modelo de Inteligencia Artificial y recrear el movimiento de una tela necesitaremos un dataset que represente el  comportamiento de esta.% alguna especificacion a declarar? tipo necesitamos que nuestros datos sean de tal forma %
+\subsection{La simulación}
+Generaremos los datasets de forma interna, creándolos a partir de simulaciones de telas grabadas por nosotros en Unity.  \newline
 
+Nuestra simulación base se lleva a cabo en un escenario formado por un plano-tela de 25 vértices con la parte superior fija en el espacio, y una esfera que colisiona con la tela para generar el movimiento.  \newline
 
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Imagenes/Bmap/maxDistance.png}
+    \caption{Malla de 25 vértices con parte superior fija.}
+    \label{fig:maxDistance}
+\end{figure}
 
+Para desarollar el modelo y poder identificar errores con más facilidad, hemos reducido el tamaño de la malla a un plano simple de 6 vértices. \newline
 
-UVs utilizadas para aproximarnos a graph nns pero d manera barata para nosotras
+La bola tiene dos movimientos descritos: uno lineal y horizontal, que oscila entre dos posiciones calculadas al comenzar la simulación, y otro aleatorio, que genera caminos en tres dimensiones gracias a splines. Adicionalmente, veremos más adelante que también desactivamos el movimiento y alejamos la bola durante periodos de tiempo en la ejecución para intentar limitar la dependencia entre la tela y su distancia a la esfera. \newline 
+
+No obstante, también hemos realizado pruebas con simulaciones más complejas como un torso con piernas simplificadas y una falda y una camiseta, con objeto de probar la efectividad de nuestro método y diferencias entre simulaciones más dinámicas y estáticas, más frecuentadas en PBD. EXTENDER O MOVER SI LO USAMOS PARA LAS PRUEBAS.
+
+\subsection{Los parámetros}
+Las telas que usamos para generar las simulaciones en las que se basarán nuestros modelos son mallas que tienen un componente Cloth (y su correspondiente Skinned Mesh Renderer) y un componente de grabación ClothDatasetRecorder, encargado de guardar los datos de la simulación. Pleanteamos recoger diferentes parámetros que representan las características más importantes de la tela durante la simulación:  \newline
+
+\begin{itemize}
+    \item \textbf{Posición}: las posiciones de los vértices de la tela son los parámetros básicos de las investiaciones en este campo.
+    \item \textbf{SDF}: los \textit{Signed Distance Field} representan la distancia entre un punto y la superficie más cercana de un objeto  o conjunto de coordenadas. Son frecuentemente usados en la informática gráfica y generalmente conllevan la distancia ortogonal a un espacio métrico REVISAR DEFINICION (no sé cómo de técnica ser). En nuestro caso, representará la distancia de cada vértice al objeto colisionador, llegando a ser 0 si toca la superfície, y un valor negativo si alcanzará a traspasar. Por el momento no usamos el gradiente del SDF.
+    \item \textbf{Velocidad}: planteamos que las velocidades de los vértices pueden ayudarnos a que el modelo sea capaz de replicar el dinamismo del movimiento. 
+    \item \textbf{Normales}: las normales de los vértices de la tela. REVISAR
+    \item \textbf{UVs}: conservar la geometría de la tela se plantea como uno de los mayores retos para nuestra simulación. Necesitamos que el modelo comprenda cómo están relacionados los vértices espacialmente para que no se lleven a cabo deformaciones érroneas. Ya que no comenzamos con geometrías complejas en tela o cuerpos blandos, usaremos las coordenadas de textura bidimensionales, \textit{UVs}, para representar la superfície.
+    \item \textbf{Máxima Distancia}: cada vértice tiene una distancia máxima a la que un vértice se puede mover desde su posición en la malla skinned. Queremos que los vértices no se pasen de su rango hábil de movimiento. Esto podemos corregirlo también en post-procesamiento.
+\end{itemize}
+
+\subsection{Generación del dataset}
+A través del \textit{ClothDatasetRecorder} realizamos ``snapshots'' cada intervalo de tiempo recordTime, que declaramos en un inicio como 3.5f. Estos datos del frame de guardan en una estructura SnapInfo que representa una captura del momento de tiempo de los vértices de la tela, que se añade a una lista de capturas de la simulación. 
+Todas estas capturas se transforman en texto que se vuelca en un CSV, en el que cada línea está compuesta por la información de un frame capturado.
