@@ -1,5 +1,6 @@
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public static class SDFUtil
 {
@@ -10,7 +11,7 @@ public static class SDFUtil
 	{
 		public Vector3 pointBase; // Centro de la semiesfera inferior.
 		public Vector3 pointTip; // Centro de semiesfera superior.
-		public float radius;      
+		public float radius;
 
 		public Capsule(Vector3 a, Vector3 b, float r)
 		{
@@ -27,8 +28,9 @@ public static class SDFUtil
 	/// <param name="center"> Centro de la esfera. </param>
 	/// <param name="radius"> Radio de la esfera. </param>
 	/// <returns></returns>
-	public static float SDFSphere(Vector3 point, Vector3 center, float radius)
+	public static float SDFSphere(Vector3 point, Vector3 center, float radius, Transform tr = null)
 	{
+		if (tr != null) tr.InverseTransformPoint(center);
 		float a = Vector3.Distance(point, center) - radius;
 		return a;
 	}
@@ -38,7 +40,7 @@ public static class SDFUtil
 	/// </summary>
 	/// <param name="col"> Collider de tipo cápsula. </param>
 	/// <returns></returns>
-	private static SDFUtil.Capsule GetSDFCapsuleFromCollider(CapsuleCollider col)
+	private static SDFUtil.Capsule GetSDFCapsuleFromCollider(CapsuleCollider col, Transform tr = null)
 	{
 		// Eje local según dirección del collider
 		Vector3 direction = Vector3.up; // Y
@@ -56,10 +58,25 @@ public static class SDFUtil
 		Vector3 worldA = col.transform.TransformPoint(localA);
 		Vector3 worldB = col.transform.TransformPoint(localB);
 
-		// Escala de radio
-		Vector3 lossyScale = col.transform.lossyScale;
-		float worldRadius = col.radius * Mathf.Max(lossyScale.x, Mathf.Max(lossyScale.y, lossyScale.z));
+		Vector3 colLossyScale = col.transform.lossyScale;
+		float worldRadius = col.radius * Mathf.Max(colLossyScale.x, Mathf.Max(colLossyScale.y, colLossyScale.z));
 
+		// Local space de la tela si queremos local
+		if (tr != null)
+		{
+			Vector3 finalA = tr.InverseTransformPoint(worldA);
+			Vector3 finalB = tr.InverseTransformPoint(worldB);
+
+			// El radio también debe convertirse al espacio local de la tela.
+			// Asumimos que la tela tiene escala uniforme. Si la tela está escalada x2 en el mundo, 
+			// el radio local debe dividirse entre 2 para que físicamente mida lo mismo.
+			Vector3 clothScale = tr.lossyScale;
+			float maxClothScale = Mathf.Max(clothScale.x, Mathf.Max(clothScale.y, clothScale.z));
+			float finalRadius = worldRadius / maxClothScale;
+
+			return new SDFUtil.Capsule(finalA, finalB, finalRadius);
+		}
+		// Sino en world space
 		return new SDFUtil.Capsule(worldA, worldB, worldRadius);
 	}
 
@@ -80,9 +97,9 @@ public static class SDFUtil
 	/// <param name="p">Punto desde el que queremos medir la distancia.</param>
 	/// <param name="capsule">Collider de la cápsula.</param>
 	/// <returns></returns>
-	public static float SDFCapsule(Vector3 p, CapsuleCollider capsule)
+	public static float SDFCapsule(Vector3 p, CapsuleCollider capsule, Transform tr = null)
 	{
-		return SDFCapsule(p, GetSDFCapsuleFromCollider(capsule));
+		return SDFCapsule(p, GetSDFCapsuleFromCollider(capsule, tr));
 	}
 
 	/// <summary>
@@ -108,7 +125,7 @@ public static class SDFUtil
 	/// <param name="capsules">Lista de cápsulas.</param>
 	/// <param name="smoothness">Parámetro de suavidad. 0 conlleva objetos separados completamente, 1 unión muy gruesa entre ellos.</param>
 	/// <returns></returns>
-	public static float getSDFOfSet(Vector3 p, CapsuleCollider[] capsules, SphereCollider[] spheres, float smoothness)
+	public static float getSDFOfSet(Vector3 p, CapsuleCollider[] capsules, SphereCollider[] spheres, float smoothness, Transform tr = null)
 	{
 		float totalDistance = float.MaxValue;
 		bool isFirstShape = true;
@@ -118,11 +135,11 @@ public static class SDFUtil
 		{
 			for (int i = 0; i < capsules.Length; i++)
 			{
-				float currentDist = SDFCapsule(p, capsules[i]);
+				float currentDist = SDFCapsule(p, capsules[i], tr);
 
 				if (isFirstShape)
 				{
-					totalDistance = currentDist; 
+					totalDistance = currentDist;
 					isFirstShape = false;
 				}
 				else
@@ -137,7 +154,7 @@ public static class SDFUtil
 		{
 			for (int i = 0; i < spheres.Length; i++)
 			{
-				float currentDist = SDFSphere(p, spheres[i].center, spheres[i].radius);
+				float currentDist = SDFSphere(p, spheres[i].center, spheres[i].radius, tr);
 
 				if (isFirstShape)
 				{
@@ -154,7 +171,4 @@ public static class SDFUtil
 		return totalDistance;
 	}
 }
-
-
-
-
+	

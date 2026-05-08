@@ -23,8 +23,14 @@ public class ClothDatasetRecorder : MonoBehaviour
 	private int[] vertexIndices;
 	[SerializeField, Tooltip("Frames Recorded")]
 	private int totalFramesRecorded = 0;
+    [SerializeField, Tooltip("Frames Recorded")]
+    private SphereCollider[] sphereColliders;
+	[SerializeField, Tooltip("Frames Recorded")]
+	private CapsuleCollider[] capsuleColliders;
+	[SerializeField, Tooltip("If items part of collision are blended in sdf.")]
+	private float collidersUnionSmoothness = 0.0f;
 
-    [Header("Output")]
+	[Header("Output")]
     public string fileName = "cloth_dataset.csv";
     private string fileDirectory;
     public string filePrefix = "clothDataset";
@@ -33,7 +39,6 @@ public class ClothDatasetRecorder : MonoBehaviour
     public bool timed = false;
     private float snapShotTime = 0.3f;
     private float snapTimeLeft = 0.0f;
-
     // Cloth 
     private Cloth cloth;
     private Vector3[] particles;
@@ -112,7 +117,7 @@ public class ClothDatasetRecorder : MonoBehaviour
         uvs_t = new Vector2[vertexIndices.Length];
 
         // Auxiliar para acceder rapidamente a las UVs
-        UVs = GetComponent<MeshFilter>().mesh.uv;
+        // UVs = GetComponent<MeshFilter>().mesh.uv;
 
         // Info del cloth
         particles = cloth.vertices;
@@ -186,8 +191,8 @@ public class ClothDatasetRecorder : MonoBehaviour
         ClothSkinningCoefficient[] coeffs = cloth.coefficients;
 
         // Sphere collider of cloth
-        Vector3 spherePos = cloth.sphereColliders[0].first.transform.position; // cventer para que es
-        float sphereRad = cloth.sphereColliders[0].first.radius;
+        //Vector3 spherePos = cloth.sphereColliders[0].first.transform.position; // cventer para que es
+        //float sphereRad = cloth.sphereColliders[0].first.radius;
 
         for (int j = 0; j < vertexIndices.Length; j++)
         {
@@ -203,9 +208,11 @@ public class ClothDatasetRecorder : MonoBehaviour
             {
                 vel_t[j] = Vector3.zero;
             }
+            //if()
+            //// sdf_t[j] = SDFSphere(pos_t[j], transform.InverseTransformPoint(spherePos), sphereRad);(
+            sdf_t[j] = SDFUtil.getSDFOfSet(pos_t[j], capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
+            normal_t[j] = Vector3.zero;  //NormalToSphere(pos_t[j], spherePos); ESTO PORQUE AUN NO LO USAMOS!!!
 
-            sdf_t[j] = SDFSphere(pos_t[j], transform.InverseTransformPoint(spherePos), sphereRad);
-            normal_t[j] = NormalToSphere(pos_t[j], spherePos);
 
             maxDist_t[j] = Mathf.Clamp(coeffs[idx].maxDistance, 0f, 1f);
             /**
@@ -217,7 +224,8 @@ public class ClothDatasetRecorder : MonoBehaviour
             pos_t_minus_1[j] = pos_t[j];
 
             // Recolectar UVs de cada vertice
-            uvs_t[j] = UVs[idx];
+            //
+            //uvs_t[j] = UVs[idx];
         }
         
         hasPrevious = true;

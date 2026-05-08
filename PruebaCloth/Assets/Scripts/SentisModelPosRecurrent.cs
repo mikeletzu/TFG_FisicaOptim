@@ -1,6 +1,6 @@
 using System;
 using System.IO;
-using Unity.InferenceEngine; // O Unity.Sentis dependiendo de tu versión exacta
+using Unity.InferenceEngine; // O Unity.Sentis dependiendo de tu versiï¿½n exacta
 using UnityEngine;
 
 public class ClothMLPosRec : MonoBehaviour
@@ -8,8 +8,13 @@ public class ClothMLPosRec : MonoBehaviour
     [SerializeField]
     public GameObject ball;
     public SphereCollider ballCollider;
+	[SerializeField]
+	public SphereCollider[] sphereColliders;
+	[SerializeField]
+	public CapsuleCollider[] capsuleColliders;
     public ModelAsset modelAsset;
     public MeshFilter clothMeshFilter;
+    public float collidersUnionSmoothness = 0.0f;
 
     private float[] maxDistance;
 
@@ -19,9 +24,9 @@ public class ClothMLPosRec : MonoBehaviour
     public int contador = 0;
     int vertexCount;
 
-    // --- NUEVO: Parámetros de la Secuencia ---
+    // --- NUEVO: Parï¿½metros de la Secuencia ---
     private int seqLen = 5;
-    // Buffer para guardar el estado normalizado de los últimos 5 frames
+    // Buffer para guardar el estado normalizado de los ï¿½ltimos 5 frames
     // [tiempo, vertice, feature]
     private float[,,] historyBuffer;
 
@@ -75,9 +80,20 @@ public class ClothMLPosRec : MonoBehaviour
         //maxDistance[23] = 0f;
         //maxDistance[24] = 0f;
 
+        /* // Falda 32 v
+        maxDistance[2] = 0f;
+        maxDistance[3] = 0f;
+        maxDistance[4] = 0f;
+        maxDistance[6] = 0f;
+        maxDistance[8] = 0f;
+        maxDistance[10] = 0f;
+        maxDistance[12] = 0f;
+        maxDistance[14] = 0f;
+        */
+
         // --- NUEVO: Llenar el buffer inicial ---
         // Para que los primeros 5 frames no sean nulos, llenamos la historia
-        // asumiendo que la tela está quieta en su posición inicial.
+        // asumiendo que la tela estï¿½ quieta en su posiciï¿½n inicial.
 
         var initialVertices = clothMeshFilter.mesh.vertices;
         for (int t = 0; t < seqLen; t++)
@@ -86,8 +102,12 @@ public class ClothMLPosRec : MonoBehaviour
             {
                 Vector3 pos = initialVertices[v];
 
-                float sdf = Vector3.Distance(transform.TransformPoint(pos), transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
-
+                float sdf;
+                if (ball != null)
+                    sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
+                else
+                    sdf = SDFUtil.getSDFOfSet(pos, capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
+    
                 historyBuffer[t, v, 0] = (pos.x - normData.mean[0]) / normData.std[0];
                 historyBuffer[t, v, 1] = (pos.y - normData.mean[1]) / normData.std[1];
                 historyBuffer[t, v, 2] = (pos.z - normData.mean[2]) / normData.std[2];
@@ -101,7 +121,7 @@ public class ClothMLPosRec : MonoBehaviour
         var mesh = clothMeshFilter.mesh;
         var vertices = mesh.vertices;
 
-        // 1. Desplazar la historia hacia atrás (t=0 desaparece, todo se mueve a la izquierda)
+        // 1. Desplazar la historia hacia atrï¿½s (t=0 desaparece, todo se mueve a la izquierda)
         for (int t = 0; t < seqLen - 1; t++)
         {
             for (int v = 0; v < vertexCount; v++)
@@ -118,9 +138,14 @@ public class ClothMLPosRec : MonoBehaviour
         {
             Vector3 pos = vertices[i];
             // pos = transform.TransformPoint(pos); //CONFIRMAR QUE ESTO HACE FALTA LOL
-            float sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
 
-            historyBuffer[seqLen - 1, i, 0] = (pos.x - normData.mean[0]) / normData.std[0];
+            float sdf;
+            if(ball!=null)
+               sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
+            else
+				sdf = SDFUtil.getSDFOfSet(pos, capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
+
+			historyBuffer[seqLen - 1, i, 0] = (pos.x - normData.mean[0]) / normData.std[0];
             historyBuffer[seqLen - 1, i, 1] = (pos.y - normData.mean[1]) / normData.std[1];
             historyBuffer[seqLen - 1, i, 2] = (pos.z - normData.mean[2]) / normData.std[2];
             historyBuffer[seqLen - 1, i, 3] = (sdf - normData.mean[3]) / normData.std[3];
@@ -149,12 +174,12 @@ public class ClothMLPosRec : MonoBehaviour
 
         for (int i = 0; i < vertexCount; i++)
         {
-            // --- NUEVO: Comprobamos si el vértice está anclado ---
-            // Si maxDistance es 0, el vértice no debe moverse bajo ninguna circunstancia
+            // --- NUEVO: Comprobamos si el vï¿½rtice estï¿½ anclado ---
+            // Si maxDistance es 0, el vï¿½rtice no debe moverse bajo ninguna circunstancia
             if (maxDistance[i] == 0f)
             {
                 newVertices[i] = vertices[i];
-                continue; // Pasamos al siguiente vértice
+                continue; // Pasamos al siguiente vï¿½rtice
             }
 
             // Denormalizamos el desplazamiento predicho
@@ -170,7 +195,7 @@ public class ClothMLPosRec : MonoBehaviour
 
             //displacement = Vector3.ClampMagnitude(displacement, 0.05f);
 
-            // Aplicamos el desplazamiento a la posición actual (en local)
+            // Aplicamos el desplazamiento a la posiciï¿½n actual (en local)
             newVertices[i] = vertices[i] + displacement;
         }
 
