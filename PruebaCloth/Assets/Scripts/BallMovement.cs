@@ -12,7 +12,7 @@ public class BallMovement : MonoBehaviour
     private float movementSpeed = 10.0f;
     [SerializeField]
     private bool isAuto = false;
-    private int dir = 1;
+    private int dir = -1;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created

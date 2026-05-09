@@ -1,8 +1,41 @@
 \section{EntrenamientoPython}
 \label{sec:EntrenamientoPython}
 
+Con los datasets registrados....
+EXPLICAMOS PIPELINE
+- Intro pytorch (environment para gpu, librerías usadas, etc)
+- Creación notebook
+- Procesamiento datos:
+    - limpieza(quitar 1er y último frame)
+    - normalizado de datos
 
-se acumula el error:
-- segundo modelo // segunda comprobación
-- red recurrente
-- .....
+\subsection{Los modelos}
+Dado a que el estado del arte propone una amplia variedad de tipos de aproaches que hacer en cuando a modelos, y nosotras al trabajar a escala pequeña decidimos empezar con un modelo muy sencillo y apartir de ahí ir aumentando la complejidad, en base a los resultados problemas y limitaciones que vayamos encontrando.
+
+El modelo inicial es un MLP...
+
+Empezamos con un MLP simple. Problemas con los que nos hemos encontrado y qué soluciones han supuesto:
+    Local vs Global positions
+    Snapshots hace que pierda linea del tiempo -> max frames
+    No tener en cuenta la linealidad del tiempo -> RNN (pasado)
+    No sabemos qué feature explota -> probar PCA
+    Reducimos features a mínimos (posición y SDF)
+    Error acumulado:
+        Añadimos el NOISE
+            Una de las técnicas mas sencillas para mejorar la capacidad del modelo de corregir sus errores es entrenarlo creando esos pequeños errores artificialmente, es decir, añadiendole ruido a los datos de entrada. De esta manera, el modelo aprende a corregir estos errores y depaso los suyos propios. Las magnitudes en las que nos movemos son entre un 2 y un 5 por ciento.
+            
+        Esto claramente mejoró el accuracy del modelo en las pruebas de python, pero al trasladarlo a unity seguimos con "explosiones" de la malla. Y nos dimos cuenta de que necesitabamos ir más allá (wow somos tan visionarias) eliminar el problema de base (radicales wow), cuando el error que se genera en un frame pasa a ser la base del siguiente, aunque el error estuviera en muchos casos por debajo de 0.005metros, a una velocidad de 60FPS basta con unos segundos para que la tela deje de actuar correctamente.
+
+        ANCHORED
+        La respuesta más intuitiva, y basada en varios papers consiste en coger un punto de referencia del que medir los desplazamientos. En nuestras simulaciones, como en la mayoría, que cuentan con unos puntos con constraints es seguro que la tela tiene algo a lo que anclarse. Esto dio resultados? Creo q sinmas.
+
+        Unrolled
+
+Frente a un modelo base del RNN optimizamos parámetros:
+    Windows size (pasado)
+    Rollout steps (futuro)
+    Noise
+    Batch size
+    Learning rate, tal…?
+    Epochs
+    Mínimo dataset size para resultado visual bueno

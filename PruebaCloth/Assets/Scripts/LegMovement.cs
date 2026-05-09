@@ -12,8 +12,6 @@ public class LegMovement : MonoBehaviour
     private float movementSpeed = 30.0f;
     [SerializeField]
     private float maxRot = 30.0f;
-    [SerializeField]
-    private bool isAuto = true;
     private Vector3 dir = Vector3.forward;
 
     private void Start()

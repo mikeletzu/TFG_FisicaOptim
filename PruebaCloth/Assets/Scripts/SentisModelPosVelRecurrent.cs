@@ -21,7 +21,8 @@ public class ClothMLPosVelRec : MonoBehaviour
     int vertexCount;
 
     // --- NUEVO: Parámetros de la Secuencia ---
-    private int seqLen = 5;
+    [SerializeField]
+    public int seqLen = 5;
     // Buffer para guardar el estado normalizado de los últimos 5 frames
     // [tiempo, vertice, feature]
     private float[,,] historyBuffer;
@@ -86,7 +87,7 @@ public class ClothMLPosVelRec : MonoBehaviour
         //maxDistance[24] = 0f;
 
         // --- NUEVO: Llenar el buffer inicial ---
-        // Para que los primeros 5 frames no sean nulos, llenamos la historia
+        // Para que los primeros frames no sean nulos, llenamos la historia
         // asumiendo que la tela está quieta en su posición inicial.
 
         var initialVertices = clothMeshFilter.mesh.vertices;
@@ -102,9 +103,9 @@ public class ClothMLPosVelRec : MonoBehaviour
                 historyBuffer[t, v, 0] = (pos.x - normData.mean[0]) / normData.std[0];
                 historyBuffer[t, v, 1] = (pos.y - normData.mean[1]) / normData.std[1];
                 historyBuffer[t, v, 2] = (pos.z - normData.mean[2]) / normData.std[2];
-                historyBuffer[t, v, 3] = (vel.x - normData.mean[3]) / normData.std[3];
-                historyBuffer[t, v, 4] = (vel.y - normData.mean[4]) / normData.std[4];
-                historyBuffer[t, v, 5] = (vel.z - normData.mean[5]) / normData.std[5];
+                historyBuffer[t, v, 3] = 0.0f;
+                historyBuffer[t, v, 4] = 0.0f;
+                historyBuffer[t, v, 5] = 0.0f;
                 historyBuffer[t, v, 6] = (sdf - normData.mean[6]) / normData.std[6];
             }
         }
@@ -120,7 +121,7 @@ public class ClothMLPosVelRec : MonoBehaviour
         {
             for (int v = 0; v < vertexCount; v++)
             {
-                for (int f = 0; f < 4; f++)
+                for (int f = 0; f < numFeatures; f++)
                 {
                     historyBuffer[t, v, f] = historyBuffer[t + 1, v, f];
                 }
