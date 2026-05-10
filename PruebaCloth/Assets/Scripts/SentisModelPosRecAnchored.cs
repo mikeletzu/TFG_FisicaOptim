@@ -24,7 +24,9 @@ public class ClothMLRecAnchored : MonoBehaviour
     public int contador = 0;
     int vertexCount;
 
-    private int seqLen = 5;
+    [SerializeField]
+    public int seqLen = 5;
+    private int numFeatures = 7;
     private float[,,] historyBuffer;
 
     // Datos de normalización
@@ -109,7 +111,7 @@ public class ClothMLRecAnchored : MonoBehaviour
         {
             for (int v = 0; v < vertexCount; v++)
             {
-                for (int f = 0; f < 4; f++)
+                for (int f = 0; f < numFeatures; f++)
                 {
                     historyBuffer[t, v, f] = historyBuffer[t + 1, v, f];
                 }
@@ -132,7 +134,7 @@ public class ClothMLRecAnchored : MonoBehaviour
         }
 
 
-        inputTensor = new Tensor<float>(new TensorShape(1, seqLen, vertexCount, 7));
+        inputTensor = new Tensor<float>(new TensorShape(1, seqLen, vertexCount, numFeatures));
 
         for (int t = 0; t < seqLen; t++)
         {

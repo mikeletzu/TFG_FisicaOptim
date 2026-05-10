@@ -27,9 +27,10 @@ Empezamos con un MLP simple. Problemas con los que nos hemos encontrado y qué s
         Esto claramente mejoró el accuracy del modelo en las pruebas de python, pero al trasladarlo a unity seguimos con "explosiones" de la malla. Y nos dimos cuenta de que necesitabamos ir más allá (wow somos tan visionarias) eliminar el problema de base (radicales wow), cuando el error que se genera en un frame pasa a ser la base del siguiente, aunque el error estuviera en muchos casos por debajo de 0.005metros, a una velocidad de 60FPS basta con unos segundos para que la tela deje de actuar correctamente.
 
         ANCHORED
-        La respuesta más intuitiva, y basada en varios papers consiste en coger un punto de referencia del que medir los desplazamientos. En nuestras simulaciones, como en la mayoría, que cuentan con unos puntos con constraints es seguro que la tela tiene algo a lo que anclarse. Esto dio resultados? Creo q sinmas.
+        La respuesta más intuitiva, y basada en varios papers consiste en coger un punto de referencia del que medir los desplazamientos. En nuestras simulaciones, como en la mayoría, que cuentan con unos puntos con constraints es seguro que la tela tiene algo a lo que anclarse. Esto dio resultados? Creo q sinmas. 
 
         Unrolled
+        Aquí sí q sí. 
 
 Frente a un modelo base del RNN optimizamos parámetros:
     Windows size (pasado)

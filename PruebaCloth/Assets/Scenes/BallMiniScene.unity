@@ -436,7 +436,7 @@ Transform:
   m_GameObject: {fileID: 292682433}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.89, z: 0}
+  m_LocalPosition: {x: 0, y: -1.16, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -582,7 +582,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 339546644}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a36df33f06b569b4498b3ee70bb1aabc, type: 3}
   m_Name: 
@@ -874,7 +874,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 354067155}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: b581adcd7275abf46be090ae3574d3a3, type: 3}
   m_Name: 
@@ -884,6 +884,7 @@ MonoBehaviour:
   modelAsset: {fileID: 5022602860645237092, guid: fc65ef2f7a40fed409c16e1dbfc0887e, type: 3}
   clothMeshFilter: {fileID: 354067158}
   contador: 0
+  seqLen: 8
   jsonFile: {fileID: 4900000, guid: c327a646dfa8c6741b14eed5720bcd49, type: 3}
   normData:
     mean: []
@@ -898,7 +899,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 354067155}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d57d527bda9b7504295c6280f7219125, type: 3}
   m_Name: 

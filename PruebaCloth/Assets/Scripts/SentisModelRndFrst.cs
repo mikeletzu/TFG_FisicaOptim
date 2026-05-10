@@ -3,7 +3,7 @@ using System.IO;
 using Unity.InferenceEngine; // O Unity.Sentis dependiendo de tu versi�n exacta
 using UnityEngine;
 
-public class ClothMLPosRec : MonoBehaviour
+public class ClothMLRndFrst : MonoBehaviour
 {
     [SerializeField]
     public GameObject ball;
@@ -25,7 +25,7 @@ public class ClothMLPosRec : MonoBehaviour
     int vertexCount;
 
     // --- NUEVO: Par�metros de la Secuencia ---
-    private int seqLen = 8;
+    private int seqLen = 5;
     // Buffer para guardar el estado normalizado de los �ltimos 5 frames
     // [tiempo, vertice, feature]
     private float[,,] historyBuffer;
@@ -64,21 +64,21 @@ public class ClothMLPosRec : MonoBehaviour
         // Definir puntos anclados (0 = se mueve)
         int i = 0;
         //MINI
-        //for (; i < 4; i++)
-        //{
-        //    maxDistance[i] = 1.0f;
-        //}
+        for (; i < 4; i++)
+        {
+            maxDistance[i] = 1.0f;
+        }
         while (i < vertexCount)
         {
             maxDistance[i] = 0.2f;
             i++;
         }
         //MAX
-        maxDistance[11] = 0f;
-        maxDistance[12] = 0f;
-        maxDistance[18] = 0f;
-        maxDistance[22] = 0f;
-        maxDistance[24] = 0f;
+        //maxDistance[14] = 0f;
+        //maxDistance[15] = 0f;
+        //maxDistance[20] = 0f;
+        //maxDistance[23] = 0f;
+        //maxDistance[24] = 0f;
 
         /* // Falda 32 v
         maxDistance[2] = 0f;
@@ -98,12 +98,9 @@ public class ClothMLPosRec : MonoBehaviour
         var initialVertices = clothMeshFilter.mesh.vertices;
         for (int t = 0; t < seqLen; t++)
         {
-            Debug.Log("SEQUENCIA");
             for (int v = 0; v < vertexCount; v++)
             {
                 Vector3 pos = initialVertices[v];
-
-                Debug.Log("vertex: " + v + ", pos: " + pos);
 
                 float sdf;
                 if (ball != null)
