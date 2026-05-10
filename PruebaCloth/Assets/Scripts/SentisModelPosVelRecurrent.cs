@@ -82,7 +82,7 @@ public class ClothMLPosVelRec : MonoBehaviour
         ////MAX
         //maxDistance[14] = 0f;
         //maxDistance[15] = 0f;
-        //maxDistance[20] = 0f;
+        //maxDistance[20] = 0f;               +++  MAL REVISAR +++
         //maxDistance[23] = 0f;
         //maxDistance[24] = 0f;
 
@@ -104,7 +104,7 @@ public class ClothMLPosVelRec : MonoBehaviour
                 historyBuffer[t, v, 1] = (pos.y - normData.mean[1]) / normData.std[1];
                 historyBuffer[t, v, 2] = (pos.z - normData.mean[2]) / normData.std[2];
                 historyBuffer[t, v, 3] = 0.0f;
-                historyBuffer[t, v, 4] = 0.0f;
+                historyBuffer[t, v, 4] = 0.0f;      //   +++  REVISAR +++
                 historyBuffer[t, v, 5] = 0.0f;
                 historyBuffer[t, v, 6] = (sdf - normData.mean[6]) / normData.std[6];
             }

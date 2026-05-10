@@ -17,6 +17,7 @@ public class ClothMLRndFrst : MonoBehaviour
     public float collidersUnionSmoothness = 0.0f;
 
     private float[] maxDistance;
+    private Vector3[] lastVertexPositions;
 
     Worker worker;
     Tensor<float> inputTensor;
@@ -26,7 +27,8 @@ public class ClothMLRndFrst : MonoBehaviour
 
     // --- NUEVO: Par�metros de la Secuencia ---
     private int seqLen = 5;
-    // Buffer para guardar el estado normalizado de los �ltimos 5 frames
+    private int numFeatures = 13;  // todas
+    // Buffer para guardar el estado normalizado de los �ltimos frames
     // [tiempo, vertice, feature]
     private float[,,] historyBuffer;
 
@@ -57,28 +59,32 @@ public class ClothMLRndFrst : MonoBehaviour
 
         clothMeshFilter.mesh.MarkDynamic();
         vertexCount = clothMeshFilter.mesh.vertexCount;
+        var normals = clothMeshFilter.mesh.normals;
+        var uvs = clothMeshFilter.mesh.uv;
 
         maxDistance = new float[vertexCount];
-        historyBuffer = new float[seqLen, vertexCount, 4];
+        historyBuffer = new float[seqLen, vertexCount, numFeatures];
+
+        lastVertexPositions = clothMeshFilter.mesh.vertices;
 
         // Definir puntos anclados (0 = se mueve)
         int i = 0;
         //MINI
-        for (; i < 4; i++)
-        {
-            maxDistance[i] = 1.0f;
-        }
+        //for (; i < 4; i++)
+        //{
+        //    maxDistance[i] = 1.0f;
+        //}
         while (i < vertexCount)
         {
             maxDistance[i] = 0.2f;
             i++;
         }
         //MAX
-        //maxDistance[14] = 0f;
-        //maxDistance[15] = 0f;
-        //maxDistance[20] = 0f;
-        //maxDistance[23] = 0f;
-        //maxDistance[24] = 0f;
+        maxDistance[11] = 0f;
+        maxDistance[12] = 0f;
+        maxDistance[18] = 0f;
+        maxDistance[22] = 0f;
+        maxDistance[24] = 0f;
 
         /* // Falda 32 v
         maxDistance[2] = 0f;
@@ -95,23 +101,36 @@ public class ClothMLRndFrst : MonoBehaviour
         // Para que los primeros 5 frames no sean nulos, llenamos la historia
         // asumiendo que la tela est� quieta en su posici�n inicial.
 
-        var initialVertices = clothMeshFilter.mesh.vertices;
         for (int t = 0; t < seqLen; t++)
         {
             for (int v = 0; v < vertexCount; v++)
             {
-                Vector3 pos = initialVertices[v];
+                Vector3 pos = lastVertexPositions[v];
+                Vector3 vel = Vector3.zero;
 
                 float sdf;
                 if (ball != null)
                     sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
                 else
                     sdf = SDFUtil.getSDFOfSet(pos, capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
-    
+
                 historyBuffer[t, v, 0] = (pos.x - normData.mean[0]) / normData.std[0];
                 historyBuffer[t, v, 1] = (pos.y - normData.mean[1]) / normData.std[1];
                 historyBuffer[t, v, 2] = (pos.z - normData.mean[2]) / normData.std[2];
-                historyBuffer[t, v, 3] = (sdf - normData.mean[3]) / normData.std[3];
+
+                historyBuffer[t, v, 3] = (vel.x - normData.mean[3]) / normData.std[3];
+                historyBuffer[t, v, 4] = (vel.y - normData.mean[4]) / normData.std[4];
+                historyBuffer[t, v, 5] = (vel.z - normData.mean[5]) / normData.std[5];
+
+                historyBuffer[t, v, 6] = (sdf - normData.mean[6]) / normData.std[6];
+
+                historyBuffer[t, v, 7] = (normals[v].x - normData.mean[7]) / normData.std[7];
+                historyBuffer[t, v, 8] = (normals[v].y - normData.mean[8]) / normData.std[8];
+                historyBuffer[t, v, 9] = (normals[v].z - normData.mean[9]) / normData.std[9];
+
+                historyBuffer[t, v, 10] = (maxDistance[v] - normData.mean[10]) / normData.std[10];
+                historyBuffer[t, v, 11] = (uvs[v].x - normData.mean[11]) / normData.std[11];
+                historyBuffer[t, v, 12] = (uvs[v].y - normData.mean[12]) / normData.std[12];
             }
         }
     }
@@ -120,24 +139,20 @@ public class ClothMLRndFrst : MonoBehaviour
     {
         var mesh = clothMeshFilter.mesh;
         var vertices = mesh.vertices;
+        var normals = mesh.normals;
+        var uvs = mesh.uv;
 
         // 1. Desplazar la historia hacia atr�s (t=0 desaparece, todo se mueve a la izquierda)
         for (int t = 0; t < seqLen - 1; t++)
-        {
             for (int v = 0; v < vertexCount; v++)
-            {
-                for (int f = 0; f < 4; f++)
-                {
+                for (int f = 0; f < numFeatures; f++)
                     historyBuffer[t, v, f] = historyBuffer[t + 1, v, f];
-                }
-            }
-        }
 
         // 2. Calcular los features del frame actual y ponerlos al final de la historia (t = seqLen - 1)
-        for (int i = 0; i < vertexCount; i++)
+        for (int v = 0; v < vertexCount; v++)
         {
-            Vector3 pos = vertices[i];
-            // pos = transform.TransformPoint(pos); //CONFIRMAR QUE ESTO HACE FALTA LOL
+            Vector3 pos = vertices[v];
+            Vector3 vel = (pos - lastVertexPositions[v]) / Time.fixedDeltaTime;
 
             float sdf;
             if(ball!=null)
@@ -145,25 +160,37 @@ public class ClothMLRndFrst : MonoBehaviour
             else
 				sdf = SDFUtil.getSDFOfSet(pos, capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
 
-			historyBuffer[seqLen - 1, i, 0] = (pos.x - normData.mean[0]) / normData.std[0];
-            historyBuffer[seqLen - 1, i, 1] = (pos.y - normData.mean[1]) / normData.std[1];
-            historyBuffer[seqLen - 1, i, 2] = (pos.z - normData.mean[2]) / normData.std[2];
-            historyBuffer[seqLen - 1, i, 3] = (sdf - normData.mean[3]) / normData.std[3];
+            historyBuffer[seqLen - 1, v, 0] = (pos.x - normData.mean[0]) / normData.std[0];
+            historyBuffer[seqLen - 1, v, 1] = (pos.y - normData.mean[1]) / normData.std[1];
+            historyBuffer[seqLen - 1, v, 2] = (pos.z - normData.mean[2]) / normData.std[2];
+
+            historyBuffer[seqLen - 1, v, 3] = (vel.x - normData.mean[3]) / normData.std[3];
+            historyBuffer[seqLen - 1, v, 4] = (vel.y - normData.mean[4]) / normData.std[4];
+            historyBuffer[seqLen - 1, v, 5] = (vel.z - normData.mean[5]) / normData.std[5];
+
+            historyBuffer[seqLen - 1, v, 6] = (sdf - normData.mean[6]) / normData.std[6];
+
+            historyBuffer[seqLen - 1, v, 7] = (normals[v].x - normData.mean[7]) / normData.std[7];
+            historyBuffer[seqLen - 1, v, 8] = (normals[v].y - normData.mean[8]) / normData.std[8];
+            historyBuffer[seqLen - 1, v, 9] = (normals[v].z - normData.mean[9]) / normData.std[9];
+
+            historyBuffer[seqLen - 1, v, 10] = (maxDistance[v] - normData.mean[10]) / normData.std[10];
+            historyBuffer[seqLen - 1, v, 11] = (uvs[v].x - normData.mean[11]) / normData.std[11];
+            historyBuffer[seqLen - 1, v, 12] = (uvs[v].y - normData.mean[12]) / normData.std[12];
+
+            lastVertexPositions[v] = pos;
         }
 
-        // 3. Crear el tensor con las 4 dimensiones que espera el modelo ONNX: [1, SeqLen, Vertices, Features]
-        inputTensor = new Tensor<float>(new TensorShape(1, seqLen, vertexCount, 4));
+        // 3. Crear el tensor con las dimensiones que espera el modelo ONNX: [1, SeqLen, Vertices, Features]
+        // RF  espera:   [1, seqLen * vertexCount * numFeatures] (vector plano 1D)
+        int inputDim = seqLen * vertexCount * numFeatures;
+        inputTensor = new Tensor<float>(new TensorShape(1, inputDim));
 
+        int idx = 0;
         for (int t = 0; t < seqLen; t++)
-        {
-            for (int i = 0; i < vertexCount; i++)
-            {
-                inputTensor[0, t, i, 0] = historyBuffer[t, i, 0];
-                inputTensor[0, t, i, 1] = historyBuffer[t, i, 1];
-                inputTensor[0, t, i, 2] = historyBuffer[t, i, 2];
-                inputTensor[0, t, i, 3] = historyBuffer[t, i, 3];
-            }
-        }
+            for (int v = 0; v < vertexCount; v++)
+                for (int f = 0; f < numFeatures; f++)
+                    inputTensor[0, idx++] = historyBuffer[t, v, f];
 
         // 4. Ejecutar modelo
         worker.Schedule(inputTensor);
@@ -183,9 +210,10 @@ public class ClothMLRndFrst : MonoBehaviour
             }
 
             // Denormalizamos el desplazamiento predicho
-            float dx = result[0, i, 0];
-            float dy = result[0, i, 1];
-            float dz = result[0, i, 2];
+            int base_idx = i * 3;
+            float dx = result[0, base_idx + 0];
+            float dy = result[0, base_idx + 1];
+            float dz = result[0, base_idx + 2];
 
             Vector3 displacement = new Vector3(
                 (normData.target_std[0] * dx) + normData.target_mean[0],
@@ -193,9 +221,6 @@ public class ClothMLRndFrst : MonoBehaviour
                 (normData.target_std[2] * dz) + normData.target_mean[2]
             );
 
-            //displacement = Vector3.ClampMagnitude(displacement, 0.05f);
-
-            // Aplicamos el desplazamiento a la posici�n actual (en local)
             newVertices[i] = vertices[i] + displacement;
         }
 
