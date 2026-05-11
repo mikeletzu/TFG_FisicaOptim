@@ -18,10 +18,13 @@ Empezamos con un MLP simple. Problemas con los que nos hemos encontrado y qué s
     Local vs Global positions
     Snapshots hace que pierda linea del tiempo -> max frames
     No tener en cuenta la linealidad del tiempo -> RNN (pasado)
+    
     Que parametros?
         No sabemos qué feature explota -> probar PCA
         Reducimos features a mínimos (posición y SDF)
         Random forest para ver a q parametros se les da importancia (por lo que vemos U, V y MD nada)
+        Reducimos features a mínimos (posición y SDF) y añadimos VEL
+
     Error acumulado:
         Añadimos el NOISE
             Una de las técnicas mas sencillas para mejorar la capacidad del modelo de corregir sus errores es entrenarlo creando esos pequeños errores artificialmente, es decir, añadiendole ruido a los datos de entrada. De esta manera, el modelo aprende a corregir estos errores y depaso los suyos propios. Las magnitudes en las que nos movemos son entre un 2 y un 5 por ciento.

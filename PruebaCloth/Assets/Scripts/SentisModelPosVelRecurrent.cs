@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Unity.InferenceEngine; // O Unity.Sentis dependiendo de tu versión exacta
 using UnityEngine;
+using static UnityEditor.PlayerSettings;
 
 public class ClothMLPosVelRec : MonoBehaviour
 {
@@ -58,11 +59,7 @@ public class ClothMLPosVelRec : MonoBehaviour
         clothMeshFilter.mesh.MarkDynamic();
         vertexCount = clothMeshFilter.mesh.vertexCount;
 
-        lastVertexPositions = new Vector3[vertexCount];
-        for (int im = 0; im < vertexCount; im++)
-        {
-            lastVertexPositions[im] = new Vector3(0, 0, 0);
-        }
+        lastVertexPositions = clothMeshFilter.mesh.vertices;
 
         maxDistance = new float[vertexCount];
         historyBuffer = new float[seqLen, vertexCount, numFeatures];
@@ -90,12 +87,11 @@ public class ClothMLPosVelRec : MonoBehaviour
         // Para que los primeros frames no sean nulos, llenamos la historia
         // asumiendo que la tela está quieta en su posición inicial.
 
-        var initialVertices = clothMeshFilter.mesh.vertices;
         for (int t = 0; t < seqLen; t++)
         {
             for (int v = 0; v < vertexCount; v++)
             {
-                Vector3 pos = initialVertices[v];
+                Vector3 pos = lastVertexPositions[v];
                 Vector3 vel = Vector3.zero;
 
                 float sdf = Vector3.Distance(transform.TransformPoint(pos), transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
@@ -104,13 +100,9 @@ public class ClothMLPosVelRec : MonoBehaviour
                 historyBuffer[t, v, 1] = (pos.y - normData.mean[1]) / normData.std[1];
                 historyBuffer[t, v, 2] = (pos.z - normData.mean[2]) / normData.std[2];
 
-                //historyBuffer[t, v, 3] = (vel.x - normData.mean[3]) / normData.std[3];
-                //historyBuffer[t, v, 4] = (vel.y - normData.mean[4]) / normData.std[4];
-                //historyBuffer[t, v, 5] = (vel.z - normData.mean[5]) / normData.std[5];
-                
-                historyBuffer[t, v, 3] = vel.x;
-                historyBuffer[t, v, 4] = vel.y;
-                historyBuffer[t, v, 5] = vel.z;
+                historyBuffer[t, v, 3] = (vel.x - normData.mean[3]) / normData.std[3];
+                historyBuffer[t, v, 4] = (vel.y - normData.mean[4]) / normData.std[4];
+                historyBuffer[t, v, 5] = (vel.z - normData.mean[5]) / normData.std[5];
 
                 historyBuffer[t, v, 6] = (sdf - normData.mean[6]) / normData.std[6];
             }
@@ -137,10 +129,9 @@ public class ClothMLPosVelRec : MonoBehaviour
         // 2. Calcular los features del frame actual y ponerlos al final de la historia (t = seqLen - 1)
         for (int i = 0; i < vertexCount; i++)
         {
-            Vector3 pos = vertices[i]; 
-            if (lastVertexPositions[i] == Vector3.zero) lastVertexPositions[i] = pos;
-            Vector3 vel = Vector3.zero;
-            //Vector3 vel = (pos - lastVertexPositions[i]) / Time.fixedDeltaTime;
+            Vector3 pos = vertices[i];
+            //Vector3 vel = Vector3.zero;
+            Vector3 vel = (pos - lastVertexPositions[i]) / Time.fixedDeltaTime;
 
             float sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
 
@@ -149,13 +140,9 @@ public class ClothMLPosVelRec : MonoBehaviour
             historyBuffer[seqLen - 1, i, 1] = (pos.y - normData.mean[1]) / normData.std[1];
             historyBuffer[seqLen - 1, i, 2] = (pos.z - normData.mean[2]) / normData.std[2];
 
-            //historyBuffer[seqLen - 1, i, 3] = (vel.x - normData.mean[3]) / normData.std[3];
-            //historyBuffer[seqLen - 1, i, 4] = (vel.y - normData.mean[4]) / normData.std[4];
-            //historyBuffer[seqLen - 1, i, 5] = (vel.z - normData.mean[5]) / normData.std[5];
-
-            historyBuffer[seqLen - 1, i, 3] = vel.x;
-            historyBuffer[seqLen - 1, i, 4] = vel.y;
-            historyBuffer[seqLen - 1, i, 5] = vel.z;
+            historyBuffer[seqLen - 1, i, 3] = (vel.x - normData.mean[3]) / normData.std[3];
+            historyBuffer[seqLen - 1, i, 4] = (vel.y - normData.mean[4]) / normData.std[4];
+            historyBuffer[seqLen - 1, i, 5] = (vel.z - normData.mean[5]) / normData.std[5];
 
             historyBuffer[seqLen - 1, i, 6] = (sdf - normData.mean[6]) / normData.std[6];
         }
@@ -176,6 +163,8 @@ public class ClothMLPosVelRec : MonoBehaviour
                 inputTensor[0, t, i, 6] = historyBuffer[t, i, 6];
             }
         }
+
+        lastVertexPositions = vertices;
 
         // 4. Ejecutar modelo
         worker.Schedule(inputTensor);
