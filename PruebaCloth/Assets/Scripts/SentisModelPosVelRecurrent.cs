@@ -70,21 +70,21 @@ public class ClothMLPosVelRec : MonoBehaviour
         // Definir puntos anclados (0 = se mueve)
         int i = 0;
         //MINI
-        for (; i < 4; i++)
-        {
-            maxDistance[i] = 1.0f;
-        }
+        //for (; i < 4; i++)
+        //{
+        //    maxDistance[i] = 1.0f;
+        //}
         while (i < vertexCount)
         {
             maxDistance[i] = 0.2f;
             i++;
         }
         ////MAX
-        //maxDistance[14] = 0f;
-        //maxDistance[15] = 0f;
-        //maxDistance[20] = 0f;               +++  MAL REVISAR +++
-        //maxDistance[23] = 0f;
-        //maxDistance[24] = 0f;
+        maxDistance[11] = 0f;
+        maxDistance[12] = 0f;
+        maxDistance[18] = 0f;
+        maxDistance[22] = 0f;
+        maxDistance[24] = 0f;
 
         // --- NUEVO: Llenar el buffer inicial ---
         // Para que los primeros frames no sean nulos, llenamos la historia
@@ -103,9 +103,15 @@ public class ClothMLPosVelRec : MonoBehaviour
                 historyBuffer[t, v, 0] = (pos.x - normData.mean[0]) / normData.std[0];
                 historyBuffer[t, v, 1] = (pos.y - normData.mean[1]) / normData.std[1];
                 historyBuffer[t, v, 2] = (pos.z - normData.mean[2]) / normData.std[2];
-                historyBuffer[t, v, 3] = 0.0f;
-                historyBuffer[t, v, 4] = 0.0f;      //   +++  REVISAR +++
-                historyBuffer[t, v, 5] = 0.0f;
+
+                //historyBuffer[t, v, 3] = (vel.x - normData.mean[3]) / normData.std[3];
+                //historyBuffer[t, v, 4] = (vel.y - normData.mean[4]) / normData.std[4];
+                //historyBuffer[t, v, 5] = (vel.z - normData.mean[5]) / normData.std[5];
+                
+                historyBuffer[t, v, 3] = vel.x;
+                historyBuffer[t, v, 4] = vel.y;
+                historyBuffer[t, v, 5] = vel.z;
+
                 historyBuffer[t, v, 6] = (sdf - normData.mean[6]) / normData.std[6];
             }
         }
@@ -133,7 +139,8 @@ public class ClothMLPosVelRec : MonoBehaviour
         {
             Vector3 pos = vertices[i]; 
             if (lastVertexPositions[i] == Vector3.zero) lastVertexPositions[i] = pos;
-            Vector3 vel = (pos - lastVertexPositions[i]) / Time.fixedDeltaTime;
+            Vector3 vel = Vector3.zero;
+            //Vector3 vel = (pos - lastVertexPositions[i]) / Time.fixedDeltaTime;
 
             float sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
 
@@ -141,9 +148,15 @@ public class ClothMLPosVelRec : MonoBehaviour
             historyBuffer[seqLen - 1, i, 0] = (pos.x - normData.mean[0]) / normData.std[0];
             historyBuffer[seqLen - 1, i, 1] = (pos.y - normData.mean[1]) / normData.std[1];
             historyBuffer[seqLen - 1, i, 2] = (pos.z - normData.mean[2]) / normData.std[2];
-            historyBuffer[seqLen - 1, i, 3] = (vel.x - normData.mean[3]) / normData.std[3];
-            historyBuffer[seqLen - 1, i, 4] = (vel.y - normData.mean[4]) / normData.std[4];
-            historyBuffer[seqLen - 1, i, 5] = (vel.z - normData.mean[5]) / normData.std[5];
+
+            //historyBuffer[seqLen - 1, i, 3] = (vel.x - normData.mean[3]) / normData.std[3];
+            //historyBuffer[seqLen - 1, i, 4] = (vel.y - normData.mean[4]) / normData.std[4];
+            //historyBuffer[seqLen - 1, i, 5] = (vel.z - normData.mean[5]) / normData.std[5];
+
+            historyBuffer[seqLen - 1, i, 3] = vel.x;
+            historyBuffer[seqLen - 1, i, 4] = vel.y;
+            historyBuffer[seqLen - 1, i, 5] = vel.z;
+
             historyBuffer[seqLen - 1, i, 6] = (sdf - normData.mean[6]) / normData.std[6];
         }
 

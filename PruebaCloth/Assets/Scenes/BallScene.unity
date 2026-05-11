@@ -1633,6 +1633,7 @@ GameObject:
   - component: {fileID: 1872676681}
   - component: {fileID: 1872676680}
   - component: {fileID: 1872676684}
+  - component: {fileID: 1872676685}
   m_Layer: 0
   m_Name: MLRotPlane
   m_TagString: Untagged
@@ -1745,7 +1746,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1872676679}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a2ca684f7a2677741a255472a7168cdf, type: 3}
   m_Name: 
@@ -1759,6 +1760,30 @@ MonoBehaviour:
   collidersUnionSmoothness: 0
   contador: 0
   jsonFile: {fileID: 4900000, guid: e7ca4cc2d23d396488b832d63f6217c5, type: 3}
+  normData:
+    mean: []
+    std: []
+    target_mean: []
+    target_std: []
+--- !u!114 &1872676685
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1872676679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d57d527bda9b7504295c6280f7219125, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClothMLPosVelRec
+  ball: {fileID: 339546644}
+  ballCollider: {fileID: 339546646}
+  modelAsset: {fileID: 5022602860645237092, guid: e3f0dcc8d9971c64b90e2da3e3e51414, type: 3}
+  clothMeshFilter: {fileID: 1872676682}
+  seqLen: 8
+  jsonFile: {fileID: 4900000, guid: a92997e8e43e11544899b835032c0158, type: 3}
+  numFeatures: 7
   normData:
     mean: []
     std: []
