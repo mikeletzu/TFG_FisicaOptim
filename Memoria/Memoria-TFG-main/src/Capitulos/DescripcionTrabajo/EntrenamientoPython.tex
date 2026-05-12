@@ -1,23 +1,96 @@
 \section{EntrenamientoPython}
 \label{sec:EntrenamientoPython}
 
-Con los datasets registrados....
-EXPLICAMOS PIPELINE
-- Intro pytorch (environment para gpu, librerías usadas, etc)
-- Creación notebook
-- Procesamiento datos:
-    - limpieza(quitar 1er y último frame)
-    - normalizado de datos
+En este apartado se describen las fases de entrenamiento de los modelos, así como la evolución de los mismos y la serie de decisiones tomadas para esas adaptaciones. El código al que se hace referencia puede encontrarse en el drectorio /Entrenamiento del repositorio de GitHub del proyecto. \newline
+
+\subsection{El entorno de trabajo}
+
+Para crear un entorno de trabajo adaptable, y asegurar la consistencia entre los distintos equipos utilizados por las integrantes, se ha decidido crear en el repositorio un archivo YAML en el que concretar las dependencias del proyecto y las versiones de estas librerias. Este es un tipo de archivo de configuración que permite, entre otras muchas cosas, crear fácilmente Conda Environments, estos entornos virtuales se generan en un directorio con todas las dependencias especificadas. Se ha cogido como base el entorno propocionado por la Universidad de Amsterdam en sus cursos introductorios de Deep Learning con Pytorch.
+\begin{table}[t]
+    \begin{center}
+        \begin{tabular}{ | m{4cm} | m{2cm} | }
+        \hline Librerias utilizadas & Versiones \\ \hline
+            python & 3.12.7 \\ \hline
+            cmake & - \\ \hline
+            notebook & 7.2.2 \\ \hline 
+            jupyterlab & 4.2.5 \\ \hline 
+            matplotlib & 3.9.2 \\ \hline 
+            scikit-learn & - \\ \hline
+            pytorch-cuda & 11.8 \\ \hline
+            pytorch & 2.5.0 \\ \hline
+            onnx & 1.21.0 \\ \hline
+            onnxruntime & 1.24.2 \\ \hline
+            onnxscript & 0.5.6 \\ \hline
+            skl2onnx & 1.20.0 \\ \hline
+        \end{tabular}
+    \end{center}
+\end{table}
+
+\subsection{Apartados de la ejecución}
+
+Dada su flexibilidad para interactuar con la ejecución y la capacidad de visualicar los resultados claramente, se ha elegido IPython Notebook (.ipynb) como formato de código en el que trabajar con los modelos. Cada tipo de modelo se ha creado en un archivo distinto, si bien todos comparten la misma estructura.
+
+\begin{enumerate}[label=\Alph*]
+
+    \item \textbf{Carga y procesamiento de datos}: 
+    Los datos se leen del archivo .csv utilizando la librería pandas. Esta permite llevar a cabo la limpieza de estas fácilmente. 
+    \begin{itemize}
+        \item Se eliminan el primer y el último frame registrados;el primero no tiene un antecesor apartir del cual deducir el movimiento y el último no tiene el siguiente frame necesario para confirmar su posterior predicción.
+        \item Se elimina la columna "frame"  de la tabla ya que no aporta información pertinente para el aprendizaje. Su función es meramente auxiliar para debugear.
+        \item asímismo, en los casos que se explicarán más adelante, en los que muchos de los parámetros registrados no son necesarios, se filtran esas columnas para no sobrecargar innecesariamente el dataset.
+    \end{itemize}
+    Tras hacer la limpieza de los datos estos se transforman al formato de tensores de Pytorch. 
+
+    \item \textbf{Dataset de Pytorch}: Pytorch ofrece dos clases base con las que ordenar y gestionar los datos que requiere el modelo. \textit{torch.utils.data.Dataset} almacena las muestras y sus etiquetas correspondientes, y \textit{torch.utils.data.DataLoader} permite un fácil acceso a las muestras. En este bloque se definen las carácteristicas del Dataset en base a las necesidades del modelo; este recibe en su constructora el tensor con la información filtrada y el tamaño de los lotes en los que dividirlo.
+
+    \item \textbf{Estadísticas de normalización}: Se dividen los datos entre el entrenamiento y las pruebas, generalmente en un ratio de 80/20 respectivamente. Se itera sobre los datos de entrenamiento para calcular los deltas (movimientos de cada punto en cada frame) y se normaliza tanto el input completo como los deltas generados. La normal y la desviación típica tanto del input como del target se guardan el un archivo de formato JSON, para utilizarlo posteriormente en la integración en Unity.
+
+    \item \textbf{Modelo de Pytorch}: Pytorch ofrece también una clase base apartir de la que implementar sus modelos de redes neuronales, \textit{torch.nn.Module}. En este apartado se extiende esta clase a las especificaciones deseadas y se genera utilizando el DataLoader mencionado un primer batch de prueba.
+    
+    \item \textbf{Entrenamiento}: En este apartado se determinan los parámetros de ruido que añadir al dataset o las iteraciones que hacer sobre él. El entrenamiento consiste en una fase de train y otra de test, en la que se observa el aprendizaje del modelo através de la caida del error medio de la posición de cada vértice.
+    
+    \item \textbf{Visualización de resultados}: Al trabajar con una simulación físisca en un entorno 3D, la visualización por gráficos de las predicciones de los modelos han resultado muy útiles. En las figuras pueden apreciarse los gráficos más destacados que han podido ser de ayuda.
+    
+    
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.91\textwidth]{Imagenes/ejemploVisualA.png}
+	\caption{Visualización de los puntos de la tela simulada e inferida a lo largo del tiempo}
+\end{figure}
+    \begin{figure}[H]
+        \centering
+        \begin{minipage}{0.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Imagenes/ejemploVisualB.png}
+            \caption{Visualización del error medio a lo largo del tiempo}
+        \end{minipage}
+        \hfill
+        \begin{minipage}{0.48\textwidth}
+            \centering
+            \includegraphics[width=\textwidth]{Imagenes/ejemploVisualC.png}
+            \caption{Visualización del error relativo medio por cada vertice}
+        \end{minipage}
+    \end{figure}
+\end{figure}
+    
+    \item \textbf{Exportación}: Por último, tras confirmar los buenos resultados con ayuda de los apartados anteriores se procede a exportar el archivo ONNX de la red neuronal.
+
+\end{enumerate}
 
 \subsection{Los modelos}
-Dado a que el estado del arte propone una amplia variedad de tipos de aproaches que hacer en cuando a modelos, y nosotras al trabajar a escala pequeña decidimos empezar con un modelo muy sencillo y apartir de ahí ir aumentando la complejidad, en base a los resultados problemas y limitaciones que vayamos encontrando.
+Como se ha mencionado previamente, las dos nociones principales que han guiado el desarrollo de este proyecto son el ejemplo de las técnicas utilizadas en las diversas investigaciones citadas en el estado del arte y el objetivo de priorizar la simplicidad y accesibilidad de nuestro modelo. Por lo tanto, a la hora de empezar con el entrenamiento, se optó por empezar por una red neuronal muy sencilla y apartir de ahí ir aumentando la complejidad, en base a los resultados problemas y limitaciones que fueran surgiendo.
 
-El modelo inicial es un MLP...
+El modelo inicial es un perceptrón multicapa (MLP) que infiere la diferencia de desplazamiento entre un frame y el siguiente. Los lotes que recibe son aleatorios y contienen pares de [frame, frame + 1]. Como función de activación utiliza 
+
+
+model = ClothPhysicsNet(num_inputs=13, hidden_dim=128, num_outputs=3)
+criterion = nn.MSELoss()
+
 
 Empezamos con un MLP simple. Problemas con los que nos hemos encontrado y qué soluciones han supuesto:
     Local vs Global positions
     Snapshots hace que pierda linea del tiempo -> max frames
-    No tener en cuenta la linealidad del tiempo -> RNN (pasado)
+    El problema con un modelo markoviano. No tener en cuenta la linealidad del tiempo -> RNN (pasado)
     
     Que parametros?
         No sabemos qué feature explota -> probar PCA
@@ -39,7 +112,8 @@ Empezamos con un MLP simple. Problemas con los que nos hemos encontrado y qué s
         TODO: Igual deberíamos probar con la posición global??
 
         UNROLLED
-        Otra de las técnicas que probamos, que nos resultó mucho más exitosa fue esto \cite{holden_subspace_2019}
+        Otra
+         de las técnicas que probamos, que nos resultó mucho más exitosa fue esto \cite{holden_subspace_2019}
         TODO: Sabemos si es un RNN ? Q ostias es un RNN ?
             {    
                 pero el modelo es un RNN de 5 frames que para cada batch predice con esos 5 de input 1 frame, cn 4 del input mas el pred otro frame, 3in + 2pred otro mas... y así saca hasta 5. Calcula el loss haciendo la media del real - los 5 pred  y así aprende a sacar no solo un frame correcto sino un frame correcto y q sea bueno para los siguientes

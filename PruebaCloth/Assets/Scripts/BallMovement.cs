@@ -87,7 +87,6 @@ public class BallMovement : MonoBehaviour
     }
     private void SetPath(Vector3 initPos)
     {
-        Debug.Log("SetPath: " + initPos);
         SplineContainer sp = pathGen.GeneratePath(initPos);
         SplineContainer aux = splineAnimate.Container;
         splineAnimate.Container = sp;

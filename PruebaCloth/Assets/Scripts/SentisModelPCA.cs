@@ -78,15 +78,33 @@ public class ClothMLpca : MonoBehaviour
 
         // Definir puntos anclados (0 = se mueve)
         int i = 0;
-        for (; i < 4; i++)
-        {
-            maxDistance[i] = 0.2f;
-        }
+        //MINI
+        //for (; i < 4; i++)
+        //{
+        //    maxDistance[i] = 1.0f;
+        //}
         while (i < vertexCount)
         {
-            maxDistance[i] = 0f;
+            maxDistance[i] = 0.2f;
             i++;
         }
+        //MAX
+        maxDistance[11] = 0f;
+        maxDistance[12] = 0f;
+        maxDistance[18] = 0f;
+        maxDistance[22] = 0f;
+        maxDistance[24] = 0f;
+
+        /* // Falda 32 v
+        maxDistance[2] = 0f;
+        maxDistance[3] = 0f;
+        maxDistance[4] = 0f;
+        maxDistance[6] = 0f;
+        maxDistance[8] = 0f;
+        maxDistance[10] = 0f;
+        maxDistance[12] = 0f;
+        maxDistance[14] = 0f;
+        */
 
 
         int expectedSize = optimalN * rawFeatureSize;
