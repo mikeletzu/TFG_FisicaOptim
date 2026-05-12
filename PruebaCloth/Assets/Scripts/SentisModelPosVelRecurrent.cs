@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using Unity.InferenceEngine; // O Unity.Sentis dependiendo de tu versión exacta
 using UnityEngine;
+using UnityEngine.UIElements;
 using static UnityEditor.PlayerSettings;
 
 public class ClothMLPosVelRec : MonoBehaviour
@@ -31,7 +32,7 @@ public class ClothMLPosVelRec : MonoBehaviour
     public TextAsset jsonFile;
 
     [SerializeField]
-    public int numFeatures = 4;
+    public int numFeatures = 7;
 
     [System.Serializable]
     public class NormalizationData
@@ -83,11 +84,12 @@ public class ClothMLPosVelRec : MonoBehaviour
         maxDistance[22] = 0f;
         maxDistance[24] = 0f;
 
-        // --- NUEVO: Llenar el buffer inicial ---
-        // Para que los primeros frames no sean nulos, llenamos la historia
-        // asumiendo que la tela está quieta en su posición inicial.
+		// --- NUEVO: Llenar el buffer inicial ---
+		// Para que los primeros frames no sean nulos, llenamos la historia
+		// asumiendo que la tela está quieta en su posición inicial.
 
-        for (int t = 0; t < seqLen; t++)
+		
+		for (int t = 0; t < seqLen; t++)
         {
             for (int v = 0; v < vertexCount; v++)
             {
@@ -103,7 +105,7 @@ public class ClothMLPosVelRec : MonoBehaviour
                 historyBuffer[t, v, 3] = (vel.x - normData.mean[3]) / normData.std[3];
                 historyBuffer[t, v, 4] = (vel.y - normData.mean[4]) / normData.std[4];
                 historyBuffer[t, v, 5] = (vel.z - normData.mean[5]) / normData.std[5];
-
+                
                 historyBuffer[t, v, 6] = (sdf - normData.mean[6]) / normData.std[6];
             }
         }
@@ -126,8 +128,10 @@ public class ClothMLPosVelRec : MonoBehaviour
             }
         }
 
-        // 2. Calcular los features del frame actual y ponerlos al final de la historia (t = seqLen - 1)
-        for (int i = 0; i < vertexCount; i++)
+		string vertex = "";
+
+		// 2. Calcular los features del frame actual y ponerlos al final de la historia (t = seqLen - 1)
+		for (int i = 0; i < vertexCount; i++)
         {
             Vector3 pos = vertices[i];
             //Vector3 vel = Vector3.zero;
@@ -144,11 +148,13 @@ public class ClothMLPosVelRec : MonoBehaviour
             historyBuffer[seqLen - 1, i, 4] = (vel.y - normData.mean[4]) / normData.std[4];
             historyBuffer[seqLen - 1, i, 5] = (vel.z - normData.mean[5]) / normData.std[5];
 
-            historyBuffer[seqLen - 1, i, 6] = (sdf - normData.mean[6]) / normData.std[6];
+			vertex += vel + "/n";
+			historyBuffer[seqLen - 1, i, 6] = (sdf - normData.mean[6]) / normData.std[6];
         }
+		SaveData("vel", vertex);
 
-        // 3. Crear el tensor con las 4 dimensiones que espera el modelo ONNX: [1, SeqLen, Vertices, Features]
-        inputTensor = new Tensor<float>(new TensorShape(1, seqLen, vertexCount, numFeatures));
+		// 3. Crear el tensor con las 4 dimensiones que espera el modelo ONNX: [1, SeqLen, Vertices, Features]
+		inputTensor = new Tensor<float>(new TensorShape(1, seqLen, vertexCount, numFeatures));
 
         for (int t = 0; t < seqLen; t++)
         {
@@ -164,7 +170,7 @@ public class ClothMLPosVelRec : MonoBehaviour
             }
         }
 
-        lastVertexPositions = vertices;
+         // lastVertexPositions = vertices;
 
         // 4. Ejecutar modelo
         worker.Schedule(inputTensor);
@@ -199,16 +205,21 @@ public class ClothMLPosVelRec : MonoBehaviour
             // Aplicamos el desplazamiento a la posición actual (en local)
             newVertices[i] = vertices[i] + displacement;
         }
-
-        mesh.SetVertices(newVertices);
+		lastVertexPositions = vertices;
+		mesh.SetVertices(newVertices);
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
 
         inputTensor.Dispose();
         result.Dispose();
     }
-
-    void OnDestroy()
+	public void SaveData(string moment, string data)
+	{
+		string filePath = Application.persistentDataPath + "/velML.txt";
+		File.AppendAllText(filePath, moment + " NEW FRAME" + "\n");
+		File.AppendAllText(filePath, data + "\n");
+	}
+	void OnDestroy()
     {
         worker?.Dispose();
     }

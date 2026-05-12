@@ -5,14 +5,11 @@ En este capítulo se presenta una breve resumen del desarrollo de las simulacion
 \section{Simulación física en videojuegos}
 Basta con remontarse a la creación del Pong en 1972, para darse cuenta de la importancia que las simulaciones físicas han tenido en el ámbito de los videojuegos desde el primer momento. Las físicas permiten crear situaciones del gameplay que no están predefinidas, enriqueciendo inmensamente la experiencia del jugador. \newline
 
-En los inicios del desarrollo de videojuegos, las técnicas más rudimentarias para implementar estas físicas incluían:
-\begin{itemize}
-\item \textbf{La prerenderización:} Dada la capacidad de cómputo con la que solían contar las máquinas, era imposible hacer todos los cálculos físicos en tiempo real, por lo que las interacciones físicas podían diseñarse previamente para parecer realistas \cite{templet2021game}. 
-\item \textbf{La implementación forzada de cada elemento:} El comportamiento de cada elemento podía ser implementado únicamente para él, en vez de seguir unas normas físicas generales. Por ejemplo, en el caso de un proyectil, podía codificarse calculando su trayectoria y velocidad en pocas líneas de código.  \newline
-\end{itemize}
+No obstante, en el inicio del desarollo de videojuegos las técnicas para representar comportamientos físicos eran todavía rudimentarias: se diseñaban las interacciones físicas previamente para parecer realistas, ya que dada la capacidad de cómputo con la que solían contar las máquinas, era imposible hacer todos los cálculos físicos en tiempo real. Se realizaban detecciones de colisiones simple, sin uso de fuerzas y descripciones de movimientos o respuestas de cada elemento del juego en lugar de sistemas de física. \newline
 
 Estos métodos eran claramente limitados en la precisión que ofrecían, y quedaba clara la necesidad de una solución más general y reproducible. El mismo Ian Millingtong nos introduce en su libro \textit{Game Physics Engine Development} \cite{millington2007game} el juego Exile, creado por Peter Irvin y Jeremy Smith; si bien este juego fue publicado en 1988, ya contaba con conservación del momento en colisiones, gravedad, y fuerzas como el viento o explosiones. Lo resaltamos como uno de los primeros juegos que cuenta con un motor de físicas completo. \newline
 
+Actualmente encontramos juegos con simulaciones físicas muy realistas como x o y donde más alla de satisfacer necesidades de gamplay, se consiguen mundos creíbles en su conjunto.
 \subsection{Motores de videojuegos}
 Los motores físicos, sumados a otros elementos análogos como los motores de renderizado y sonido, crean el software al que nos referimos como motores de videojuegos. En el mercado encontramos establecidos motores como Unity o Unreal Engine, motores propios de grandes estudios y aquellos pequeños indies como Godot. Los motores con más presencia en el desarollo indie son: \newline
 

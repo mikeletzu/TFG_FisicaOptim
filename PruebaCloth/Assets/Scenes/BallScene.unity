@@ -1640,7 +1640,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1872676680
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1779,10 +1779,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClothMLPosVelRec
   ball: {fileID: 339546644}
   ballCollider: {fileID: 339546646}
-  modelAsset: {fileID: 5022602860645237092, guid: e3f0dcc8d9971c64b90e2da3e3e51414, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 94b3b589b9d39764c849542f4059b1a7, type: 3}
   clothMeshFilter: {fileID: 1872676682}
   seqLen: 8
-  jsonFile: {fileID: 4900000, guid: a92997e8e43e11544899b835032c0158, type: 3}
+  jsonFile: {fileID: 4900000, guid: 46101f1009f56d64f92587b56414c89a, type: 3}
   numFeatures: 7
   normData:
     mean: []
@@ -4596,7 +4596,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &5195805995224845084
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4614,7 +4614,8 @@ MonoBehaviour:
   recordTime: 100
   recordTimeLeft: 0
   totalFramesRecorded: 0
-  sphereColliders: []
+  sphereColliders:
+  - {fileID: 339546646}
   capsuleColliders: []
   collidersUnionSmoothness: 0
   fileName: cloth_dataset.csv
