@@ -1,2 +1,44 @@
 \section{SimulacionUnity}
 \label{sec:SimulacionUnity}
+
+Como se ha explicado en el último apartado, el entrenamiento genera dos archivos indispensables para la ejecución del modelo en Unity. El archivo ONNX que contiene el modelo entrenado, y el archivo JSON con los datos de normalización de los inputs y outputs del modelo. Estos archivos serán recogidos por los componentes de tipo SentisModel que se han generado para remplazar el componente Cloth de la malla en Unity. en este apartado se explica este proceso y sus elementos con detalle.
+
+\subsection{Alteraciones en la escena}
+Al inicio del capitulo se describe este pipeline como circular, las escenas son iguales pero claro, cambios cloth
+
+- MeshFilter tal explicar un poco q implica skined y q ahora necesitamos este 
+
+- sentis model
+
+- algo más?
+
+\subsection{Componente SentisModel}
+
+\subsubsection{Funcionamento de sentis}
+
+Contextualizar un poco como se guardan los modelos onnx (figura de unity txula) y como funciona sentis por dentro para explicarr q necesita y q t da.
+
+\subsubsection{Estructura}
+
+- Parámetros de input (json, onnx sí pero aparte la bola la malla ...)
+\begin{itemize}
+    \item 
+\end{itemize}
+
+- Tensor, movimiento de malla dinámico, procesado del input y output en el FixedUpdate, replicación final…
+Por q fixed update, decir
+
+\subsubsection{Variaciones}
+Diferencias entre rnn o no (history buffer), tipos de telas (n vertex), n features, pca?
+
+\subsection{Resultados visuales de la inferencia}
+Como se ha mencionado en la sección anterior...
+
+Mostrar problemas de error acumulado? O solo mostrar cosas txulas?
+
+\subsection{Estrategias de post-procesamiento}
+Podemos hablar d estrategias de post-procesamiento? 
+…dado el objetivo de nuestro proyecto hemos querido afinar la predicción de la simulación de la manera más precisa posible fuera del motor de videojuegos. En el estado del arte vemos que si bien su objetivo es hacer el cómputo de la simulación más ligero, optan por utilizar métodos de post-procesamiento para perfeccionar el resultado.
+Clampeo de los desplazamientos
+Evitar el colapso con los colisionadores (d hecho podriamos usar nuestro script del sdf para esto)
+Algo más?
