@@ -1,37 +1,89 @@
 
 \section{El dataset}
 \label{sec:Dataset}
-Para poder entrenar nuestro modelo de Inteligencia Artificial y recrear el movimiento de una tela necesitaremos un dataset que represente el  comportamiento de esta.% alguna especificacion a declarar? tipo necesitamos que nuestros datos sean de tal forma %
+Para poder entrenar un modelo de Inteligencia Artificial que recree el movimiento de una tela se necesita un dataset que represente el comportamiento de esta.% alguna especificacion a declarar? tipo necesitamos que nuestros datos sean de tal forma %
 \subsection{La simulación}
-Generaremos los datasets de forma interna, creándolos a partir de simulaciones de telas grabadas por nosotros en Unity.  \newline
+Los datasets son generados de forma interna, creándose a partir de simulaciones de telas grabadas en Unity.  \newline
 
-Nuestra simulación base se lleva a cabo en un escenario formado por un plano-tela de 25 vértices con la parte superior fija en el espacio, y una esfera que colisiona con la tela para generar el movimiento.  \newline
+La simulación base que se emplea para entrenar y ajustar los modelos se lleva a cabo en un escenario formado por un plano-tela de 25 vértices con la parte superior fija en el espacio, y una esfera que colisiona con la tela para generar el movimiento.  \newline
 
 \begin{figure}[htbp]
     \centering
-    \includegraphics[width=0.8\textwidth]{Imagenes/Bmap/maxDistance.png}
+    \includegraphics[width=0.6\textwidth]{Imagenes/Bmap/maxDistance.png}
     \caption{Malla de 25 vértices con parte superior fija.}
     \label{fig:maxDistance}
 \end{figure}
 
-Para desarollar el modelo y poder identificar errores con más facilidad, hemos reducido el tamaño de la malla a un plano simple de 6 vértices. \newline
+Durante parte del desarollo del modelo, para poder identificar los motivos de inestibilidades e identificar otros errores con más facilidad, se redujo el tamaño de la malla a 6 vértices. \newline
 
-La bola tiene dos movimientos descritos: uno lineal y horizontal, que oscila entre dos posiciones calculadas al comenzar la simulación, y otro aleatorio, que genera caminos en tres dimensiones gracias a splines. Adicionalmente, veremos más adelante que también desactivamos el movimiento y alejamos la bola durante periodos de tiempo en la ejecución para intentar limitar la dependencia entre la tela y su distancia a la esfera. \newline 
-
-No obstante, también hemos realizado pruebas con simulaciones más complejas como un torso con piernas simplificadas y una falda y una camiseta, con objeto de probar la efectividad de nuestro método y diferencias entre simulaciones más dinámicas y estáticas, más frecuentadas en PBD. EXTENDER O MOVER SI LO USAMOS PARA LAS PRUEBAS.
-
-\subsection{Los parámetros}
-Las telas que usamos para generar las simulaciones en las que se basarán nuestros modelos son mallas que tienen un componente Cloth (y su correspondiente Skinned Mesh Renderer) y un componente de grabación ClothDatasetRecorder, encargado de guardar los datos de la simulación. Pleanteamos recoger diferentes parámetros que representan las características más importantes de la tela durante la simulación:  \newline
+El movimiento de la bola que colisiona con la tela está descrito por un componente \textit{BallMovement}. Este puede ser automático o generado a través de entrada con el teclado. El movimiento automático tiene dos movimientos descritos: 
 
 \begin{itemize}
-    \item \textbf{Posición}: las posiciones de los vértices de la tela son los parámetros básicos de las investiaciones en este campo.
-    \item \textbf{SDF}: los \textit{Signed Distance Field} representan la distancia entre un punto y la superficie más cercana de un objeto  o conjunto de coordenadas. Son frecuentemente usados en la informática gráfica y generalmente conllevan la distancia ortogonal a un espacio métrico REVISAR DEFINICION (no sé cómo de técnica ser). En nuestro caso, representará la distancia de cada vértice al objeto colisionador, llegando a ser 0 si toca la superfície, y un valor negativo si alcanzará a traspasar. Por el momento no usamos el gradiente del SDF.
-    \item \textbf{Velocidad}: planteamos que las velocidades de los vértices pueden ayudarnos a que el modelo sea capaz de replicar el dinamismo del movimiento. 
-    \item \textbf{Normales}: las normales de los vértices de la tela. REVISAR
-    \item \textbf{UVs}: conservar la geometría de la tela se plantea como uno de los mayores retos para nuestra simulación. Necesitamos que el modelo comprenda cómo están relacionados los vértices espacialmente para que no se lleven a cabo deformaciones érroneas. Ya que no comenzamos con geometrías complejas en tela o cuerpos blandos, usaremos las coordenadas de textura bidimensionales, \textit{UVs}, para representar la superfície.
-    \item \textbf{Máxima Distancia}: cada vértice tiene una distancia máxima a la que un vértice se puede mover desde su posición en la malla skinned. Queremos que los vértices no se pasen de su rango hábil de movimiento. Esto podemos corregirlo también en post-procesamiento.
+    \item \textbf{Movimiento lineal:} ideado para provocar un movimiento sencillo que entienda el modelo fácilmente, sin deformaciones extremas o erráticas, y utilizado para poder llevar a cabo overfitting. Se consigue estabilizar el modelo sobre un movimiento simple. El movimiento consiste en oscilar entre dos posiciones fijas en el espacio a lo largo del eje x.
+    \item \textbf{Movimiento aleatorio:} pretende facilitar la generación de un dataset con diversidad de movimientos de forma automática, así como introducir a la tela más dinamismo y movimientos erráticos. Este desplazamiento en tres ejes aleatorio se consigue a través del uso de splines. En la escena se encuentra un objeto con el componente creado \textit{PathGenerator} que delimita una zona de generación y aporta la creación de splines en SplineContainers a partir de una posición concreta. El componente de Unity \textit{SplineAnimate} se encargará de mover la esfera por el camino hasta llegar al final del mismo; en ese instante se generará un nuevo camino aleatorio para continuar con su recorrido.
+\end{itemize}
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Imagenes/Bmap/spline.png}
+    \caption{Movimiento aleatorio basado en splines.}
+    \label{fig:spline}
+\end{figure}
+
+Adicionalmente, introducimos modificaciones sobre este comportamiento: se deja el colisionador estático en distintas posiciones tanto dentro como fuera del alcande de la tela durante periodos de tiempo en la ejecución para intentar limitar la dependencia entre la tela y su distancia a la esfera. \newline 
+
+\subsection{Otras simulaciones}
+También se han realizado pruebas con simulaciones más complejas con objeto de probar la efectividad de nuestro método y diferencias entre simulaciones más dinámicas y estáticas, más frecuentadas en PBD. \newline 
+
+Para probar el enfoque más estático y pegado al cuerpo se creó una simulación de un personaje con una camiseta. Tras múltiples pruebas tomando diferente número de iteraciones en el solver de Cloth, valores en las propiedades de la tela y extendido el tamaño hasta 4000 vértices, la simulación fue finalmente descartada debido a la inestabilidad de la tela y difícil generación de animaciones visualemente viables. Realizar animaciones de tela complejas en Unity sin combinar otras técnicas, implementar soluciones híbridas (como el Weight Mapping) o incorporar paquetes de pago de la Unity Asset Store como Magica u Obi Cloth no es trivial. Otras investigaciones, como \cite{holden_subspace_2019} producen su material de entrenamiento en herramientas especializadas como Maya o Blender para conseguir simulaciones de prendas complejas. Pese a que esto limita el alcance de las simulaciones a generar en esta investigación, el nivel de complejidad potencial sigue siendo más que sufiente para probar nuestra implementación a pequeña escala, manteniendo el proyecto alienado a los objetivos previamente declarado y siguiendo la tendencia de juegos implementados en Unity.  \newline 
+
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Imagenes/Bmap/prubacamiseta.jpeg}
+    \caption{Simulación de una camiseta con componente Cloth.}
+    \label{fig:camiseta}
+\end{figure}
+
+La otra simulación llevada a cabo consiste en un personaje andando con una falda. El personaje, simplificado, está formado por tres cápsulas: un torso y dos piernas; y la falda es un malla en forma de cilindro compuesta por 288 vértices, para habilitar un movimiento más dinámico. Una vez ajustados los colliders de las cápsulas para ser más grandes que las mallas de las piernas, esta simulación genera un buen resultado a nivel visual. Lo emplearemos más adelante para representar animaciones más complejas y realizar  comparaciones y mediciones adicionales al plano de 25 vértices.
+\begin{figure}[htbp]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Imagenes/Bmap/skirt.png}
+    \caption{Simulación de una falda con componente Cloth.}
+    \label{fig:skirt}
+\end{figure}
+
+\subsection{Los parámetros}
+Las telas que usamos para generar las simulaciones en las que se basarán nuestros modelos son objetos formados por mallas con un componente Cloth (y su correspondiente \textit{Skinned Mesh Renderer}) y un componente de grabación  \textit{ClothDatasetRecorder}, encargado de guardar los datos de la simulación. Se plantea recoger diferentes parámetros que representen las características más importantes de la tela durante la simulación:  \newline
+
+\begin{itemize}
+    \item \textbf{Posición}: Las posiciones de los vértices de la tela son los parámetros básicos de las investiaciones en este campo. Estas posiciones, se verá más tarde, pueden darse en espacio local del objeto o global.
+    \item \textbf{SDF}: Los \textit{Signed Distance Field} representan la distancia entre un punto y la superficie más cercana de un objeto o conjunto de coordenadas. Son frecuentemente usados en la informática gráfica y generalmente se calculan como la distancia ortogonal a un espacio métrico. En el caso de esta investigación, representará la distancia de cada vértice al objeto colisionador, llegando a ser 0 si toca la superfície, y un valor negativo si alcanza a traspasar. 
+    \item \textbf{Velocidad}: Planteamos que las velocidades de los vértices pueden ayudarnos a que el modelo sea capaz de replicar el dinamismo del movimiento. 
+    \item \textbf{Normales}: Refiriéndose a las normales de la superficie del objeto colisionador, es decir, el gradiente del SDF. Este se puede usar para complementar la magnitud del SDF, ya que apunta en la dirección en la que la distancia aumenta más rápido, cómo alejarse de la colisión.
+    \item \textbf{UVs}: Conservar la geometría de la tela se plantea como uno de los mayores retos para nuestra simulación. Se necesita que el modelo comprenda cómo están relacionados los vértices espacialmente para que no se lleven a cabo deformaciones érroneas. Ya que no comenzamos con geometrías complejas en tela o cuerpos blandos, se usan las coordenadas de textura bidimensionales, \textit{UVs}, para representar la superfície.
+    \item \textbf{Máxima Distancia}: Cada vértice tiene una distancia máxima a la que un vértice se puede mover desde su posición en la malla `skinned'. Se quiere conseguir que los vértices no se pasen de su rango hábil de movimiento. Si no se toma como parámetro, esto puede corregirse también en post-procesamiento.
 \end{itemize}
 
 \subsection{Generación del dataset}
-A través del \textit{ClothDatasetRecorder} realizamos ``snapshots'' cada intervalo de tiempo recordTime, que declaramos en un inicio como 3.5f. Estos datos del frame de guardan en una estructura SnapInfo que representa una captura del momento de tiempo de los vértices de la tela, que se añade a una lista de capturas de la simulación. 
-Todas estas capturas se transforman en texto que se vuelca en un CSV, en el que cada línea está compuesta por la información de un frame capturado.
+A través del componente \textit{ClothDatasetRecorder} realizamos un ``snapshot'' o captura de la tela cada intervalo de tiempo \textit{recordTime}, que se declara en el inicio del desarollo como 3.5 segundos. Estos datos del frame se guardan en una estructura SnapInfo, que representa la información de los vértices de la tela en un instante de tiempo determinado, y se añade a una lista de capturas de la simulación. 
+Al final de la ejecución todas estas capturas se transforman en texto y se vuelcan en un CSV, por lo que cada línea del archivo corresponde a un frame capturado. \newline
+
+
+\begin{algorithm}[H]
+\caption{Struct SnapInfo}
+\SetKwData{SnapInfo}{SnapInfo}
+\SetKwComment{Comment}{$\triangleright$\ }{}
+
+\KwData{
+  \SnapInfo\ \{\\
+  \quad $\mathbf{pos}$: array de Vector3 \Comment*[r]{posiciones}\\
+  \quad $\mathbf{vel}$: array de Vector3 \Comment*[r]{velocidades}\\
+  \quad $\mathbf{normal}$: array de Vector3 \Comment*[r]{normales}\\
+  \quad $\mathbf{sdf}$: array de float \Comment*[r]{signed distance field}\\
+  \quad $\mathbf{maxDist}$: array de float \Comment*[r]{distancia máxima}\\
+  \quad $\mathbf{uv}$: array de Vector2 \Comment*[r]{coordenadas UV}\\
+  \}
+}
+\end{algorithm}
+
+Durante el transcurso de las pruebas se probaron distintas frecuencias de muestreo (0.1f, 0.02f, la frecuencia por defecto del \textit{FixedUpdate()} en Unity); más tarde se llegaría a la conclusión de que la frecuencia de muestreo debe ser la misma en la etapa de guardado de datos y ejecución del modelo para no obtener un efecto de aceleración o ralentización. De la misma forma, el número de snapshots debe ser el máximo posible para garantizar la estabilidad de la simulación.
