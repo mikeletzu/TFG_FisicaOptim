@@ -1,11 +1,11 @@
-\section{EntrenamientoPython}
+\section{Entrenamiento}
 \label{sec:EntrenamientoPython}
 
-En este apartado se describen las fases de entrenamiento de los modelos, así como la evolución de los mismos y la serie de decisiones tomadas para esas adaptaciones. El código al que se hace referencia puede encontrarse en el drectorio /Entrenamiento del repositorio de GitHub del proyecto. \newline
+En este apartado se describen las fases de entrenamiento de los modelos, así como la evolución de los mismos y la serie de decisiones tomadas para conseguir esas adaptaciones. El código al que se hace referencia puede encontrarse en el directorio /Entrenamiento del repositorio de GitHub del proyecto \footnote{Enlace a la carpeta de entrenamiento: \url{https://github.com/mikeletzu/TFG_FisicaOptim/tree/23105b6733cacae9c708593f2d77a12faa2eb884/Entrenamiento}}. \newline
 
 \subsection{El entorno de trabajo}
 
-Para crear un entorno de trabajo adaptable, y asegurar la consistencia entre los distintos equipos utilizados por las integrantes, se ha decidido crear en el repositorio un archivo YAML en el que concretar las dependencias del proyecto y las versiones de estas librerias. Este es un tipo de archivo de configuración que permite, entre otras muchas cosas, crear fácilmente Conda Environments, estos entornos virtuales se generan en un directorio con todas las dependencias especificadas. Se ha cogido como base el entorno propocionado por la Universidad de Amsterdam en sus cursos introductorios de Deep Learning con Pytorch.
+Para crear un entorno de trabajo adaptable, y asegurar la consistencia entre los distintos equipos utilizados por las integrantes de este proyecto, se ha decidido crear en el repositorio un archivo \textit{dl2024\_gpu.yml} en el que concretar las dependencias del proyecto y las versiones a utilizar de estas librerías. Este es un tipo de archivo de configuración que permite, entre otras cosas, crear fácilmente Conda Environments. Estos entornos virtuales se generan en un directorio con todas las dependencias especificadas. Se ha cogido como base el entorno propocionado por la Universidad de Amsterdam en sus cursos introductorios de Deep Learning con Pytorch.
 \begin{table}[H]
     \begin{center}
         \begin{tabular}{ | m{4cm} | m{2cm} | }
@@ -29,28 +29,27 @@ Para crear un entorno de trabajo adaptable, y asegurar la consistencia entre los
 
 \subsection{Apartados de la ejecución}
 
-Dada su flexibilidad para interactuar con la ejecución y la capacidad de visualicar los resultados claramente, se ha elegido IPython Notebook (.ipynb) como formato de código en el que trabajar con los modelos. Cada tipo de modelo se ha creado en un archivo distinto, si bien todos comparten la misma estructura.
+Dada su flexibilidad para segmentar la ejecución y su capacidad de visualizar los resultados claramente, se ha elegido IPython Notebook (.ipynb) como formato de código en el que trabajar con los modelos. Si bien cada tipo de modelo se ha creado en un archivo distinto, todos comparten la misma estructura. Pese a la inevitable repetición de código y potencial optimización, la utilización de diferentes notebooks ha resultado clave para el desarollo e investigación paralela de los diferentes modelos. La estructura tiene la siguiente forma:
 
 \begin{enumerate}
 
     \item \textbf{Carga y procesamiento de datos}: 
-    Los datos se leen del archivo .csv utilizando la librería pandas. Esta permite llevar a cabo la limpieza de estas fácilmente. 
+    Los datos se leen del archivo .csv utilizando la librería pandas, que permite llevar a cabo la limpieza fácilmente. Aunque es el dataset del modelo quien gestiona detalles como la coherencia de frames otorgados, intentar acceder al predecesor de un primer frame, se realiza una limpieza común previa del csv:
     \begin{itemize}
-        \item Se eliminan el primer y el último frame registrados;el primero no tiene un antecesor apartir del cual deducir el movimiento y el último no tiene el siguiente frame necesario para confirmar su posterior predicción.
-        \item Se elimina la columna "frame"  de la tabla ya que no aporta información pertinente para el aprendizaje. Su función es meramente auxiliar para debugear.
-        \item asímismo, en los casos que se explicarán más adelante, en los que muchos de los parámetros registrados no son necesarios, se filtran esas columnas para no sobrecargar innecesariamente el dataset.
+        \item Se elimina la columna "frame" de la tabla, ya que no aporta información pertinente para el aprendizaje. Su función es meramente auxiliar para debuggear.
+        \item Asímismo, en los casos que se explicarán más adelante, muchos de los parámetros registrados no son necesarios, se filtran esas columnas para no sobrecargar innecesariamente el dataset.
     \end{itemize}
     Tras hacer la limpieza de los datos estos se transforman al formato de tensores de Pytorch. 
 
-    \item \textbf{Dataset de Pytorch}: Pytorch ofrece dos clases base con las que ordenar y gestionar los datos que requiere el modelo. \textit{torch.utils.data.Dataset} almacena las muestras y sus etiquetas correspondientes, y \textit{torch.utils.data.DataLoader} permite un fácil acceso a las muestras. En este bloque se definen las carácteristicas del Dataset en base a las necesidades del modelo; este recibe en su constructora el tensor con la información filtrada y el tamaño de los lotes en los que dividirlo.
+    \item \textbf{Dataset de Pytorch}: Pytorch ofrece dos clases base con las que ordenar y gestionar los datos que requiere el modelo. \textit{Torch.utils.data.Dataset} almacena las muestras y sus etiquetas correspondientes, y \textit{torch.utils.data.DataLoader} permite un fácil acceso a las muestras. En este bloque se definen las carácteristicas del Dataset en base a las necesidades del modelo; este recibe en su constructora el tensor con la información filtrada y el tamaño de los lotes en los que dividirlo.
 
-    \item \textbf{Estadísticas de normalización}: Se dividen los datos entre el entrenamiento y las pruebas, generalmente en un ratio de 80/20 respectivamente. Se itera sobre los datos de entrenamiento para calcular los deltas (movimientos de cada punto en cada frame) y se normaliza tanto el input completo como los deltas generados. La normal y la desviación típica tanto del input como del target se guardan el un archivo de formato JSON, para utilizarlo posteriormente en la integración en Unity.
+    \item \textbf{Normalización}: Se dividen los datos entre el entrenamiento y las pruebas, generalmente en un ratio de 80/20 respectivamente. Se itera sobre los datos de entrenamiento para calcular los deltas (desplazamiento de movimiento de cada vértice en un frame) y se normaliza tanto el input completo como los deltas generados. La normal y la desviación típica tanto del input como del target se guardan el un archivo de formato JSON \textit{cloth\_norm\_params.json}, para utilizarlo posteriormente en la ejecución en Unity.
 
-    \item \textbf{Modelo de Pytorch}: Pytorch ofrece también una clase base apartir de la que implementar sus modelos de redes neuronales, \textit{torch.nn.Module}. En este apartado se extiende esta clase a las especificaciones deseadas y se genera utilizando el DataLoader mencionado un primer batch de prueba.
+    \item \textbf{Modelo de Pytorch}: Pytorch ofrece también una clase base a partir de la cual implementar modelos de redes neuronales, \textit{torch.nn.Module}. En este apartado se extiende esta clase a las especificaciones deseadas y se genera utilizando el DataLoader mencionado un primer batch de prueba.
     
-    \item \textbf{Entrenamiento}: En este apartado se determinan los parámetros de ruido que añadir al dataset o las iteraciones que hacer sobre él. El entrenamiento consiste en una fase de train y otra de test, en la que se observa el aprendizaje del modelo através de la caida del error medio de la posición de cada vértice.
+    \item \textbf{Entrenamiento}: En este apartado se determinan los parámetros de ruido que añadir al dataset y las iteraciones que hacer sobre él. El entrenamiento consiste en una fase de entrenamiento y otra de testing, en la que se observa el aprendizaje del modelo através de la caída del error medio de la posición de cada vértice.
     
-    \item \textbf{Visualización de resultados}: Al trabajar con una simulación físisca en un entorno 3D, la visualización por gráficos de las predicciones de los modelos han resultado muy útiles. En las figuras pueden apreciarse los gráficos más destacados que han podido ser de ayuda.        
+    \item \textbf{Visualización de resultados}: Al trabajar con una simulación físca en un entorno 3D, la visualización en gráficos de las predicciones de los modelos han resultado notablemente útil. En las figuras siguientes pueden apreciarse los gráficos más destacados que más han contribuido al desarollo.        
         \begin{figure}[H]
             \centering
             \includegraphics[width=0.91\textwidth]{Imagenes/ejemploVisualA.png}
@@ -69,39 +68,40 @@ Dada su flexibilidad para interactuar con la ejecución y la capacidad de visual
             \end{minipage}
         \end{figure}
     
-    \item \textbf{Exportación}: Por último, tras confirmar los buenos resultados con ayuda de los apartados anteriores se procede a exportar el archivo ONNX de la red neuronal.
+    \item \textbf{Exportación}: Por último, tras considerar los resultados generados como adecuados con la guía de los valores y gráficas generadas, se procede a exportar la red neuronal a formato ONNX.
 
 \end{enumerate}
 
 \subsection{Los modelos}
-Como se ha mencionado previamente, hay dos nociones principales que han guiado el desarrollo de este proyecto; por un lado, seguir el ejemplo de las investigaciones citadas en el estado del arte, combinando las técnicas más óptimas y por otro, el objetivo de priorizar la simplicidad y accesibilidad de nuestro modelo. Por lo tanto, a la hora de empezar con el entrenamiento, se optó por empezar por una red neuronal muy sencilla y apartir de ahí ir aumentando la complejidad en base a los resultados, problemas y limitaciones que fueran surgiendo. \newline
+Como se ha mencionado previamente, hay dos nociones principales que han guiado el desarrollo de este proyecto. Por un lado, seguir el ejemplo de las investigaciones citadas en el estado del arte, combinando las técnicas óptimas o prometedoras; y por otro, el objetivo de priorizar la simplicidad y accesibilidad de nuestro modelo. En virtud de ello se optó por empezar el entrenamiento con una red neuronal muy sencilla y aumentar progresivamente la complejidad de la red en base a los resultados, problemas y limitaciones que fueran surgiendo. \newline
 
-El modelo inicial es un perceptrón multicapa (MLP) sencillo con una sola capa oculta, este infiere la diferencia de desplazamiento entre un frame y el siguiente. Utilizando un dataset que genera lotes que contienen pares de [frameInfo, frameInfo + 1], se pasa el frame normalizado al modelo y este predice el delta de desplazamiento para cada vértice, desnormalizando este delta se calcula la posición inferida por el modelo y la diferencia entre esta y la posición real recibida en el frameInfo + 1 se utilizan como pérdida para el entrenamiento. La función de pérdida elegida inicialmente, MSELoss, se utiliza generalmente en problemas de regresión ya que penaliza fuertemente las diferencias grandes entre la predicción y el valor real, alineandose con nuestro objetivo. Las dimensiones del modelo son 13 de input (los parámetros de cada punto), el número de neuronas en la capa oculta (inicialmente entre 64 y 128) y 3 de output (el delta de desplazamiento en cada eje). \newline
+El modelo inicial es un perceptrón multicapa (MLP) sencillo con una sola capa oculta. Este infiere la diferencia de desplazamiento entre un frame y el siguiente. Utilizando un dataset que genera lotes que contienen pares de [frameInfo, frameInfo + 1], se pasa el frame normalizado al modelo y este predice el delta de desplazamiento para cada vértice. Desnormalizando este delta se calcula la posición inferida por el modelo.  La diferencia entre esta posición predicha y la posición real recibida en el frameInfo + 1 se utiliza como pérdida para el entrenamiento. La función de pérdida elegida inicialmente, MSELoss, se utiliza generalmente en problemas de regresión pues penaliza fuertemente las diferencias grandes entre la predicción y el valor real, alineandose con nuestro objetivo. El modelo está compuesto por dos capas lineales y una RELU; y sus dimensiones son 13 de input (los parámetros de cada punto), el número de neuronas en la capa oculta (inicialmente entre 64 y 128) y 3 de output (el delta de desplazamiento en cada eje). \newline
 
-El entrenamiento de este modelo recalca ciertos factores, algunos muy obvios como ampliar el tamaño de la red neuronal y otros menos evidentes que se recogen a continuación.
+El entrenamiento de este modelo recalca ciertas necesidades, algunas más obvias como ampliar el tamaño de la red neuronal y otros menos evidentes que se recogen a continuación:
 
 \begin{itemize}
     %    Dejar caer?? Como función de activación utiliza una unidad lineal exponencial, comunmente conocida como ELU, esta se caracteriza por funcionar cn numeros negativos, Eva tu has visto esto para no usar relu? o es un invent?
-    \item \textbf{Sistema de coordenadas:} El registro de las posiciones al generar el dataset puede hacerse tanto de manera local respecto al pivote de la tela, como de manera global respecto al espacio 3D. Al registrar los elementos como las posiciones de los vertices o el sdf se hace de manera consistente, manteniendo un origen común para las coordenadas, por lo que ambos métodos son funcionales. Sin embargo, tras evaluar el desempeño del modelo con datasets relativos a ambos sistemas de coordenadas, se decide trabajar en espacio local, utilizando como origen la propia tela; de esa manera, las posiciones son más coherentes para el modelo y el resultado no es dependiente de la traslacion en el espacio 3D.
+    \item \textbf{Sistema de coordenadas:} El registro de las posiciones al generar el dataset puede hacerse tanto de manera local respecto al pivote de la tela, como de manera global respecto al espacio 3D de la escena. Al registrar los elementos como las posiciones de los vértices o el sdf se hace de manera consistente, manteniendo un origen común para las coordenadas, por lo que ambos métodos son funcionales. Sin embargo, tras evaluar el desempeño del modelo con datasets relativos a ambos sistemas de coordenadas, se decide trabajar en espacio local, utilizando como origen la propia tela. De esa manera, las posiciones son más coherentes para el modelo y el resultado no es dependiente de la traslación en el espacio.
 
-    \item \textbf{Frecuencia de muestreo:} Inicialmete el dataset se entrena con una serie de frames que se registran en intervalos predefinidos a la hora de hacer la simulación base. Este método agiliza la tarea de generación del dataset y podría pensarse que simplifica la simulación para el modelo. Al contrario, al disminuir el tiempo de intervalo del registro de frames se aprecia una mejora en el entrenamiento del modelo. Se concluye que el modelo aprende idóneamente con la máxima cantidad de frames posibles. Esta afirmación es respaldada por estudios como \cite{santesteban2022snug} en los que se utilizan grandes datasets con secuencias de animaciones completas.
+    \item \textbf{Frecuencia de muestreo:} Inicialmete el dataset se entrena con una serie de frames que se registran en intervalos predefinidos \textit{recordTime} a la hora de hacer la simulación base. Este método agiliza la tarea de generación del dataset y podría pensarse que simplifica la simulación para el modelo. Al contrario, al disminuir el tiempo entre capturas de frames se aprecia una mejora significativa en el entrenamiento del modelo. Se concluye que el modelo aprende idóneamente con la máxima cantidad de frames posibles. Esta afirmación es respaldada por estudios como \cite{santesteban2022snug} en los que se utilizan grandes datasets con secuencias de animaciones completas.
     
-    \item \textbf{Recurrencia:} Varias de las investigaciones del estado del arte mencionan como limitación las telas más dinámicas, ya que, al tener muchas menos restricciones, las mallas que no van pegadas a un cuerpo de colisión son mucho más susceptibles a la inercia. Naturalmente, el aprendizaje de estas propiedades físicas requiere del conocimiento de atributos como la velocidad o la aceleración de las particulas. Si bien valores como la velocidad eran parte del input, la recurrencia le permite al modelo tener una memoria a corto plazo del movimiento de cada vértice, haciendo su entrenamiento mucho más eficaz. En este caso se implementa una red neuronal recurrente (RNN) que sigue la arquitectura de tipo "many to one", es decir, una cantidad determinada de frames se utilizan como input para general el delta de desplazamiento entre el último frame de la secuencia y el que sería el siguiente.   
+    \item \textbf{Recurrencia:} Varias de las investigaciones del estado del arte mencionan como limitación las telas más dinámicas, ya que, al tener muchas menos restricciones, las mallas que no van pegadas a un cuerpo de colisión son mucho más susceptibles a la inercia. Naturalmente, el aprendizaje de estas propiedades físicas requiere del conocimiento de atributos como la velocidad o la aceleración de las partículas. Si bien se tomaba la velocidad como input, la recurrencia permite al modelo tener una memoria a corto plazo del movimiento en cada vértice, haciendo su entrenamiento mucho más eficaz. En este caso se presenta como opción una red neuronal recurrente (RNN) que sigue la arquitectura de tipo "many to one", es decir, una cantidad determinada de frames se utilizan como input para general el delta de desplazamiento entre el último frame de la secuencia y el que sería el siguiente.   % no se si esta frase me gusta%
 \end{itemize}
     
-\subsection{Parametricación}
-En el apartado del Dataset se han enumerado todas las caracteristicas de la tela que se guardan en la simulación. Si bien se registran todas para poder tener un margen de acción a la hora de entrenar los modelos, a lo largo del proyecto se han utilizado distintas técnicas para reducirlas y determinar cuales de ellas son esenciales.
+\subsection{Parametrización}
+En el apartado del Dataset se han enumerado todas las características de la tela que se guardan en la simulación. Aunque se registran todas para poder disponer de un margen de acción en el entrenamiento, a lo largo del proyecto se han utilizado distintas técnicas para reducirlas y determinar cuales de ellas son esenciales.
 
 \begin{itemize}
-    \item Siguiendo la linea de la simplicidad, se reduce la cantidad de features utilizados al mínimo: la posición de cada vertice y el sdf. Se observa que en modelos sencillos, como la geometría de 6 vertices con el movimiento linear del colisionador esto resulta ser un método conveniente. La poca cantidad de parámetros reduce la duración del entrenamiento y optimiza su incorporación a Unity, de la que se hablará más en la próxima sección.
+    \item Con objeto de simplificar y reducir errores, se reduce la cantidad de features utilizados al mínimo: la posición de cada vértice y el sdf. Se observa que para mallas sencillas (por ejemplo la anteriormente mencionada malla reducida a seis vértices) y movimientos limitados es un método con bajo error. Además, la poca cantidad de parámetros reduce la duración del entrenamiento y optimiza su incorporación a Unity, de la que se hablará más en la próxima sección.
 
-    \item Tras confirmar que la reducción de features puede ser interesante, se implementa un modelo random forest para ver cuales son los parametros más importantes para la inferencia. Como se ve en la figura, los parámetros U, V y MD resultan no ser importantes para generar la predicción. Sin embargo, se aprecia la importancia de los parámetros de velocidad. En este caso es más notable en el eje x, esto se debe a la configuración de la simulación con la que se ha generado el dataset analizado para el gráfico.
+    \item Tras confirmar que la reducción de features puede ser interesante, se implementa un modelo random forest para ver cuales son los parámetros más importantes para la inferencia. Como se ve en la figura, los parámetros U, V y MD resultan no ser importantes para generar la predicción. Sin embargo, se aprecia la importancia de los parámetros de velocidad. En este caso es más notable en el eje x, debido a la configuración de la simulación con la que se ha generado el dataset analizado para el gráfico.
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.91\textwidth]{Imagenes/resultRndFrst.png}
         \caption{Parámetros valorados por el random forest}
     \end{figure}
-    Con esta prueba se incluye la velocidad como parámetro, manteniendo los que se han mencionado como básicos. De forma que la red neuronal óptima recibe como parametros la posición de los vértices, la velocidad y el sdf. Aunque esto mejora el aprendizaje del modelo, en el proximo apartado se valorará si el coste adicional de utilizar la velocidad en Unity lo compensa.
+
+    Con esta prueba se decide incluir la velocidad como parámetro, manteniendo los que se han mencionado como básicos. De forma que la red neuronal óptima recibe como parametros la posición de los vértices, la velocidad y el sdf. Aunque esto mejora el aprendizaje del modelo, en el proximo apartado se valorará si el coste adicional de utilizar la velocidad en Unity lo compensa.
         
     \item A la hora de escalar el proyecto, aumentando tanto la geometría como los tipos de movimiento, resulta interesante introducir un modelo que se valga de un PCA para reducir la dimensión de los parámetros de entrada. Utilizando el método del umbral de varianza, se calcula el mínimo de características necesarias para alcanzar un gran porcentaje de la variabilidad de los datos. En el caso de la figura por ejemplo, partiendo de un dataset con 25 vértices y 13 features por cada uno, que resultaría en 325 elementos de input, con un umbral de varianza del 95\% consigue reducirse a 45.
     \begin{figure}[H]
@@ -135,7 +135,7 @@ En este punto del desarrolo, los resultados de accuracy del modelo son adecuados
     }
 \end{itemize}
 
-subsection{Resultado e hiperparámetros}
+\subsection{Resultado e hiperparámetros}
 
 Aki describimos el modelo optimo y sus hiperparámetros o en el capitulo Modelos funcionales?? o ese ya que no exista?
 
