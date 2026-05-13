@@ -84,12 +84,9 @@ El entrenamiento de este modelo recalca ciertos factores, algunos muy obvios com
     %    Dejar caer?? Como función de activación utiliza una unidad lineal exponencial, comunmente conocida como ELU, esta se caracteriza por funcionar cn numeros negativos, Eva tu has visto esto para no usar relu? o es un invent?
     \item \textbf{Sistema de coordenadas:} El registro de las posiciones al generar el dataset puede hacerse tanto de manera local respecto al pivote de la tela, como de manera global respecto al espacio 3D. Al registrar los elementos como las posiciones de los vertices o el sdf se hace de manera consistente, manteniendo un origen común para las coordenadas, por lo que ambos métodos son funcionales. Sin embargo, tras evaluar el desempeño del modelo con datasets relativos a ambos sistemas de coordenadas, se decide trabajar en espacio local, utilizando como origen la propia tela; de esa manera, las posiciones son más coherentes para el modelo y el resultado no es dependiente de la traslacion en el espacio 3D.
 
-    \item \textbf{Frecuencia de muestreo:} Inicialmete el dataset se entrena con una serie de frames que se registran en intervalos predefinidos a la hora de hacer la simulación base. Este método agiliza la tarea de generación del dataset y podría pensarse que simplifica la simulación para el modelo. Al contrario, al disminuir el tiempo de intervalo del registro de frames se aprecia una mejora en el entrenamiento del modelo. Se concluye que el modelo aprende idóneamente con la máxima cantidad de frames posibles. Esta afirmación es respaldada por estudios como \cite{santesteban2022snug} en los que se utilizan grandes datasets con secuencias de animaciones.
+    \item \textbf{Frecuencia de muestreo:} Inicialmete el dataset se entrena con una serie de frames que se registran en intervalos predefinidos a la hora de hacer la simulación base. Este método agiliza la tarea de generación del dataset y podría pensarse que simplifica la simulación para el modelo. Al contrario, al disminuir el tiempo de intervalo del registro de frames se aprecia una mejora en el entrenamiento del modelo. Se concluye que el modelo aprende idóneamente con la máxima cantidad de frames posibles. Esta afirmación es respaldada por estudios como \cite{santesteban2022snug} en los que se utilizan grandes datasets con secuencias de animaciones completas.
     
-    \item \textbf{Recurrencia:} Varias de las investigaciones del estado del arte mencionan como limitación las telas más dinámicas, ya que, al tener muchas menos restricciones, las mallas que no van pegadas a un cuerpo de colisión son mucho más susceptibles a la inercia. Naturalmente, el aprendizaje de estas propiedades físicas requiere del conocimiento de atributos como la velocidad o la aceleración de las particulas. Si bien valores como la velocidad eran parte del input, la recurrencia le permite al modelo tener una memoria a corto plazo del movimiento de cada vértice, haciendo su entrenamiento mucho más eficaz. En este caso se implementa una red neuronal recurrente (RNN) que sigue la arquitectura de tipo "many to one", es decir, una cantidad determinada de frames se utilizan como input para general el delta de desplazamiento entre el último frame de la secuencia y el que sería el siguiente.\newline
-    
-    ¿Explicamos más especificamente? ¿Diagrama? En el siguiente apartado se explica en profundidad.
-    
+    \item \textbf{Recurrencia:} Varias de las investigaciones del estado del arte mencionan como limitación las telas más dinámicas, ya que, al tener muchas menos restricciones, las mallas que no van pegadas a un cuerpo de colisión son mucho más susceptibles a la inercia. Naturalmente, el aprendizaje de estas propiedades físicas requiere del conocimiento de atributos como la velocidad o la aceleración de las particulas. Si bien valores como la velocidad eran parte del input, la recurrencia le permite al modelo tener una memoria a corto plazo del movimiento de cada vértice, haciendo su entrenamiento mucho más eficaz. En este caso se implementa una red neuronal recurrente (RNN) que sigue la arquitectura de tipo "many to one", es decir, una cantidad determinada de frames se utilizan como input para general el delta de desplazamiento entre el último frame de la secuencia y el que sería el siguiente.   
 \end{itemize}
     
 \subsection{Parametricación}
@@ -98,45 +95,56 @@ En el apartado del Dataset se han enumerado todas las caracteristicas de la tela
 \begin{itemize}
     \item Siguiendo la linea de la simplicidad, se reduce la cantidad de features utilizados al mínimo: la posición de cada vertice y el sdf. Se observa que en modelos sencillos, como la geometría de 6 vertices con el movimiento linear del colisionador esto resulta ser un método conveniente. La poca cantidad de parámetros reduce la duración del entrenamiento y optimiza su incorporación a Unity, de la que se hablará más en la próxima sección.
 
-    \item Tras confirmar que la reducción de features puede ser interesante, se implementa un modelo random forest para ver cuales son los parametros más importantes para la inferencia. Como se ve en la figura, los parámetros U, V y MD resultan no ser importantes para generar la predicción. Sin embargo, se aprecia la importancia de los parámetros de velocidad. En este caso es más notable en el eje X, esto se debe a la configuración de la simulación con la que se ha generado el dataset analizado para el gráfico.
-        \begin{figure}[H]
-            \centering
-            \includegraphics[width=0.91\textwidth]{Imagenes/resultRndFrst.png}
-            \caption{Parámetros valorados por el random forest}
-        \end{figure}
+    \item Tras confirmar que la reducción de features puede ser interesante, se implementa un modelo random forest para ver cuales son los parametros más importantes para la inferencia. Como se ve en la figura, los parámetros U, V y MD resultan no ser importantes para generar la predicción. Sin embargo, se aprecia la importancia de los parámetros de velocidad. En este caso es más notable en el eje x, esto se debe a la configuración de la simulación con la que se ha generado el dataset analizado para el gráfico.
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.91\textwidth]{Imagenes/resultRndFrst.png}
+        \caption{Parámetros valorados por el random forest}
+    \end{figure}
     Con esta prueba se incluye la velocidad como parámetro, manteniendo los que se han mencionado como básicos. De forma que la red neuronal óptima recibe como parametros la posición de los vértices, la velocidad y el sdf. Aunque esto mejora el aprendizaje del modelo, en el proximo apartado se valorará si el coste adicional de utilizar la velocidad en Unity lo compensa.
         
     \item A la hora de escalar el proyecto, aumentando tanto la geometría como los tipos de movimiento, resulta interesante introducir un modelo que se valga de un PCA para reducir la dimensión de los parámetros de entrada. Utilizando el método del umbral de varianza, se calcula el mínimo de características necesarias para alcanzar un gran porcentaje de la variabilidad de los datos. En el caso de la figura por ejemplo, partiendo de un dataset con 25 vértices y 13 features por cada uno, que resultaría en 325 elementos de input, con un umbral de varianza del 95\% consigue reducirse a 45.
-        \begin{figure}[H]
-            \centering
-            \includegraphics[width=0.91\textwidth]{Imagenes/resultPCA.png}
-            \caption{Reducción de características}
-        \end{figure}
+    \begin{figure}[H]
+        \centering
+        \includegraphics[width=0.91\textwidth]{Imagenes/resultPCA.png}
+        \caption{Reducción de características}
+    \end{figure}
 \end{itemize}
 
 \subsection{Gestión del error acumulado}
-En este punto del desarrolo, los resultados de accuracy del modelo son top pero al pasarlo a sentis se aprecia que el error acumulado se va. Ante eso opciones d que el aprendizaje tenga en cuenta estas cosas.
+En este punto del desarrolo, los resultados de accuracy del modelo son adecuados, se alcanzan entrenamientos con un error medio por vertice de hasta 0.001m, lo que en un contexto estático sería imperceptible. Sin embargo, nuestro modelo ha de mantenerse consistente a lo largo del tiempo. A 60 fotogramas por segundo, un error tan bajo puede convertirse en una geometría completamente dañada al cabo de pocos segundos. Ante este problema, se plantean varias opciones para que el aprendizaje pueda ser capaz de autocorregirse.
 
-figure ejemplos
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.91\textwidth_]{Imagenes/errorAcumulado.png}
+    \caption{Ejemplos de error acumulado en espacio 3D}
+\end{figure}
 
 \begin{itemize}
-    \item \textbf{Ruido en el input:} Una de las técnicas mas sencillas para mejorar la capacidad del modelo de corregir sus errores es entrenarlo creando esos pequeños errores artificialmente, es decir, añadiendole ruido a los datos de entrada. De esta manera, el modelo aprende a corregir estos errores y depaso los suyos propios. Las magnitudes en las que nos movemos son entre un 2 y un 5 por ciento.
-    \item \textbf{Anchored training:} Esto claramente mejoró el accuracy del modelo en las pruebas de python, pero al trasladarlo a unity seguimos con "explosiones" de la malla. Y nos dimos cuenta de que necesitabamos ir más allá (wow somos tan visionarias) eliminar el problema de base (radicales wow), cuando el error que se genera en un frame pasa a ser la base del siguiente, aunque el error estuviera en muchos casos por debajo de 0.005metros, a una velocidad de 60FPS basta con unos segundos para que la tela deje de actuar correctamente.\newline
-    \item 
+    \item \textbf{Ruido en el input:} Una de las técnicas mas sencillas para mejorar la capacidad del modelo de corregir sus errores es entrenarlo creando esos pequeños errores artificialmente, esto se consigue añadiendole ruido a los datos de entrada. De esta manera, el modelo aprende a corregir estos errores y depaso los suyos propios. Las magnitudes en las que nos movemos son entre un 2 y un 5 por ciento.
+
+    \item \textbf{Anchored training:} Esto claramente mejoró el accuracy del modelo en las pruebas de python, pero al trasladarlo a unity seguimos con "explosiones" de la malla. Y nos dimos cuenta de que necesitabamos ir más allá (wow somos tan visionarias) eliminar el problema de base (radicales wow).
+    \newline
     La respuesta más intuitiva, y basada en varios papers (TODO: CITAR) consiste en coger un punto de referencia del que medir los desplazamientos. Al pensar en simulaciones de cloth, ya sea una bandera con su mastil o una prenda con su personaje, todas cuentan con unos puntos, es decir, algo a lo que anclarse. Por lo que podemos asegurarnos que la simulación se mantendrá dentro de un espacio concreto.
         Guardando la posición inicial d la tela estática, calculamos las posiciones como el movimiento de la tela desde ese estado base. 
     
-    \item \textbf{Unfolded training:}         Otra
-         de las técnicas que probamos, que nos resultó mucho más exitosa fue esto \cite{holden_subspace_2019}
-        TODO: Sabemos si es un RNN ? Q ostias es un RNN ?
-            {    
-                pero el modelo es un RNN de 5 frames que para cada batch predice con esos 5 de input 1 frame, cn 4 del input mas el pred otro frame, 3in + 2pred otro mas... y así saca hasta 5. Calcula el loss haciendo la media del real - los 5 pred  y así aprende a sacar no solo un frame correcto sino un frame correcto y q sea bueno para los siguientes
-            }
+    \item \textbf{Unfolded training:} Otra de las técnicas que probamos, que nos resultó mucho más exitosa fue esto \cite{holden_subspace_2019}
+    TODO: Sabemos si es un RNN ? Q ostias es un RNN ?
+    {    
+        pero el modelo es un RNN de 5 frames que para cada batch predice con esos 5 de input 1 frame, cn 4 del input mas el pred otro frame, 3in + 2pred otro mas... y así saca hasta 5. Calcula el loss haciendo la media del real - los 5 pred  y así aprende a sacar no solo un frame correcto sino un frame correcto y q sea bueno para los siguientes
+    }
 \end{itemize}
 
 subsection{Resultado e hiperparámetros}
 
 Aki describimos el modelo optimo y sus hiperparámetros o en el capitulo Modelos funcionales?? o ese ya que no exista?
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=0.91\textwidth]{Imagenes/ModeloOpt.png}
+\caption{Vesualización del modelo completo}
+\end{figure}
+
 Frente a un modelo base del RNN optimizamos parámetros:
 \begin{itemize}
     \item Windows size (pasado)
