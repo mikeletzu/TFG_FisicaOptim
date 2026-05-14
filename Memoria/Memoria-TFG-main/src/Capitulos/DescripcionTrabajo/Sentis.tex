@@ -1,46 +1,54 @@
 \section{SimulacionUnity}
 \label{sec:SimulacionUnity}
 
-VERSIÓN ESQUEMÁTICA DEL 
-
-Como se ha explicado en el último apartado, el entrenamiento genera dos archivos indispensables para la ejecución del modelo en Unity. El archivo ONNX que contiene el modelo entrenado, y el archivo JSON con los datos de normalización de los inputs y outputs del modelo. Estos archivos serán recogidos por los componentes de tipo SentisModel que se han generado para remplazar el componente Cloth de la malla en Unity. en este apartado se explica este proceso y sus elementos con detalle.
+Como se ha explicado en el último apartado, el entrenamiento genera dos archivos indispensables para la ejecución del modelo en Unity. El archivo ONNX que contiene el modelo entrenado, y el archivo JSON con los datos de normalización de los inputs y outputs del modelo. Estos archivos serán recogidos por los componentes de tipo SentisModel que se han generado para remplazar el componente Cloth de la malla en Unity. En este apartado se explica este proceso y sus elementos con detalle.
 
 \subsection{Alteraciones en la escena}
-Al inicio del capitulo se describe este pipeline como circular, las escenas son iguales pero claro, cambios cloth
+Al inicio del capitulo se describe este pipeline como circular, es decir, se utiliza la misma escena de la simulación en Unity para probar el funcionamiento del modelo entrenado. Esto requiere de ciertos cambios de configuración descritos a continuación.
 
-- MeshFilter tal explicar un poco q implica skined y q ahora necesitamos este 
-
-- sentis model
-
-- algo más?
+\begin{itemize}
+    \item Se marcan los vertices del \textit{Mesh Filter} como dinámicos. Por defecto Unity guarda las mallas en buffers estáticos, este cambio activa una flag interna de Unity para obligar a la GPU a utilizar una estrategia de guardado más óptima para el acceso en cada frame.
+    \item Se reemplaza el componente de simulación Cloth por el componente Sentis Model apto para el modelo a probar.
+    \item Como se ha descrito en el estado de la cuestión, las geometrias simuladas por Cloth utilizan el \textit{Skinned Mesh Renderer} para su renderizado. Al reemplazarlo la malla no puede ser renderizada con esta técnica, por lo que se añade un componente \textit{Mesh Renderer} sencillo.
+\end{itemize}
 
 \subsection{Componente SentisModel}
 
 \subsubsection{Funcionamento de sentis}
+Sentis es una biblioteca de inferencia de redes neuronales para Unity. Permite importar modelos de redes neuronales entrenados a Unity y ejecutarlos en tiempo real, y es capaz de ejecutarse tanto en CPU como en GPU. Para utilizar Sentis se crea un motor o \textit{worker} que se encarga de planear las operaciones del tensor de forma paralela. Además procesa cada capa del modelo de manera secuencial, obteniendo con los datos aportados la salida del modelo.
 
-Contextualizar un poco como se guardan los modelos onnx (figura de unity txula) y como funciona sentis por dentro para explicar q necesita y q t da.
+\subsubsection{Estructura del componente}
+Habiendo descrito el funcionamiento interno de la herramienta, en este apartado se explica el uso que se le ha dado para adaptarla a las necesidades del proyecto. Los componentes Sentis Model han sido generados a partir del \textit{Mono Behaviour} de Unity, esta clase engloba los comportamientos de un \textit{Game Object}. Proporciona métodos como \textit{Start} o \textit{FixedUpdate} que representan el ciclo de vida del objeto.\newline
 
-\subsubsection{Estructura}
-
-- Parámetros de input (json, onnx sí pero aparte la bola la malla ...)
+\textit{Start} se ejecuta una sola vez al inicio del programa, por lo que se utiliza para crear el worker e inicializar los parámetros necesarios. Los parámetros que el componente recibe son los siguientes.
 \begin{itemize}
-    \item 
+    \item \textbf{JSON:}
+    \item \textbf{ONNX:}
+    \item \textbf{\textit{MeshFilter:}}
+    \item \textbf{Collisionador/es:}
 \end{itemize}
 
-- Tensor, movimiento de malla dinámico, procesado del input y output en el FixedUpdate, replicación final…
-Por q fixed update, decir
+\textit{FixedUpdate} es el método que unity utiliza por defecto para la ejecución de las físicas. En él iteramos sobre los puntos de la geometría para inferir las nuevas posiciones. EXPLICAR MÁS
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Imagenes/SentisUpdate.png}
+    \caption{Esquema del FixedUpdate de Sentis Model.}
+\end{figure}
 
 \subsubsection{Variaciones}
 Diferencias entre rnn o no (history buffer), tipos de telas (n vertex), n features, pca?
 
 \subsection{Resultados visuales de la inferencia}
-Como se ha mencionado en la sección anterior...
+En este apartado se muestran ejemplos comparando la tela simulada por Unity a la izquierda y la inferencia que el modelo consigue a la derecha.
 
-Mostrar problemas de error acumulado? O solo mostrar cosas txulas?
+%TODO: HACER FIGURES
 
-\subsection{Estrategias de post-procesamiento}
-Podemos hablar d estrategias de post-procesamiento? 
-…dado el objetivo de nuestro proyecto hemos querido afinar la predicción de la simulación de la manera más precisa posible fuera del motor de videojuegos. En el estado del arte vemos que si bien su objetivo es hacer el cómputo de la simulación más ligero, optan por utilizar métodos de post-procesamiento para perfeccionar el resultado.
-Clampeo de los desplazamientos
-Evitar el colapso con los colisionadores (d hecho podriamos usar nuestro script del sdf para esto)
-Algo más?
+\subsection{Post-procesamiento}
+En las investigaciones más visualmente convincentes del estado del arte, se consigue llegar a ese nivel de credibilidad gracias a estrategias de post-procesamiento que refinan la apariencia de la geometría tras ser inferida.
+En nuestro caso utilizamos maxdistance. EXPLICAR MÁS
+
+% Podemos hablar d estrategias de post-procesamiento? 
+% …dado el objetivo de nuestro proyecto hemos querido afinar la predicción de la simulación de la manera más precisa posible fuera del motor de videojuegos. En el estado del arte vemos que si bien su objetivo es hacer el cómputo de la simulación más ligero, optan por utilizar métodos de post-procesamiento para perfeccionar el resultado.
+% Clampeo de los desplazamientos
+%Evitar el colapso con los colisionadores (d hecho podriamos usar nuestro script del sdf para esto)
+%Algo más?
