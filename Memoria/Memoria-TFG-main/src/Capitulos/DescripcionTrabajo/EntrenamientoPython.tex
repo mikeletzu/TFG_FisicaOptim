@@ -100,25 +100,28 @@ En el apartado del Dataset se han enumerado todas las características de la tel
         \includegraphics[width=0.91\textwidth]{Imagenes/resultRndFrst.png}
         \caption{Parámetros valorados por el random forest}
     \end{figure}
+\end{itemize}
 
-    Con esta prueba se decide incluir la velocidad como parámetro, manteniendo los que se han mencionado como básicos. De forma que la red neuronal óptima recibe como parametros la posición de los vértices, la velocidad y el sdf. Aunque esto mejora el aprendizaje del modelo, en el proximo apartado se valorará si el coste adicional de utilizar la velocidad en Unity lo compensa.
-        
+Con esta prueba se decide incluir la velocidad como parámetro, manteniendo los que se han mencionado como básicos. De forma que la red neuronal óptima recibe como parametros la posición de los vértices, la velocidad y el sdf. Aunque esto mejora el aprendizaje del modelo, en el proximo apartado se valorará si el coste adicional de utilizar la velocidad en Unity lo compensa.
+
+\begin{itemize}
     \item A la hora de escalar el proyecto, aumentando tanto la geometría como los tipos de movimiento, resulta interesante introducir un modelo que se valga de un PCA para reducir la dimensión de los parámetros de entrada. Utilizando el método del umbral de varianza, se calcula el mínimo de características necesarias para alcanzar un gran porcentaje de la variabilidad de los datos. En el caso de la figura por ejemplo, partiendo de un dataset con 25 vértices y 13 features por cada uno, que resultaría en 325 elementos de input, con un umbral de varianza del 95\% consigue reducirse a 45.
+\end{itemize}
+
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.91\textwidth]{Imagenes/resultPCA.png}
         \caption{Reducción de características}
     \end{figure}
-\end{itemize}
 
 \subsection{Gestión del error acumulado}
 En este punto del desarrolo, los resultados de accuracy del modelo son adecuados, se alcanzan entrenamientos con un error medio por vertice de hasta 0.001m, lo que en un contexto estático sería imperceptible. Sin embargo, nuestro modelo ha de mantenerse consistente a lo largo del tiempo. A 60 fotogramas por segundo, un error tan bajo puede convertirse en una geometría completamente dañada al cabo de pocos segundos. Ante este problema, se plantean varias opciones para que el aprendizaje pueda ser capaz de autocorregirse.
 
 \begin{figure}[H]
-    \centering
-    \includegraphics[width=0.91\textwidth_]{Imagenes/errorAcumulado.png}
-    \caption{Ejemplos de error acumulado en espacio 3D}
-\end{figure}
+        \centering
+        \includegraphics[width=0.91\textwidth]{Imagenes/errorAcumulado.png}
+        \caption{Reducción de características}
+    \end{figure}
 
 \begin{itemize}
     \item \textbf{Ruido en el input:} Una de las técnicas mas sencillas para mejorar la capacidad del modelo de corregir sus errores es entrenarlo creando esos pequeños errores artificialmente, esto se consigue añadiendole ruido a los datos de entrada. De esta manera, el modelo aprende a corregir estos errores y depaso los suyos propios. Las magnitudes en las que nos movemos son entre un 2 y un 5 por ciento.
@@ -128,30 +131,35 @@ En este punto del desarrolo, los resultados de accuracy del modelo son adecuados
     La respuesta más intuitiva, y basada en varios papers (TODO: CITAR) consiste en coger un punto de referencia del que medir los desplazamientos. Al pensar en simulaciones de cloth, ya sea una bandera con su mastil o una prenda con su personaje, todas cuentan con unos puntos, es decir, algo a lo que anclarse. Por lo que podemos asegurarnos que la simulación se mantendrá dentro de un espacio concreto.
         Guardando la posición inicial d la tela estática, calculamos las posiciones como el movimiento de la tela desde ese estado base. 
     
-    \item \textbf{Unfolded training:} Otra de las técnicas que probamos, que nos resultó mucho más exitosa fue esto \cite{holden_subspace_2019}
-    TODO: Sabemos si es un RNN ? Q ostias es un RNN ?
-    {    
-        pero el modelo es un RNN de 5 frames que para cada batch predice con esos 5 de input 1 frame, cn 4 del input mas el pred otro frame, 3in + 2pred otro mas... y así saca hasta 5. Calcula el loss haciendo la media del real - los 5 pred  y así aprende a sacar no solo un frame correcto sino un frame correcto y q sea bueno para los siguientes
-    }
+    \item \textbf{Unfolded training:} En las investigaciones mencionadas en el estado del arte aparece la idea de dividir el entrenamiento en distintos modelos; ya sea con una red que de resultados más generales y un seguna segunda que consigue refinar los detalles (arrugas, intersecciones con el colisionador, etc.) como en TailorNet \cite{patel2020tailornet}, o con modelos que actuan como predictor-corrector siendo el segundo normalmente en post-procesado. Sin embargo, en este proyecto se propone incluir esta idea en el propio entrenamiendo del modelo, con la función de pérdida. El caso de \cite{chen2025learning} por ejemplo, propone una función de pérdida \textit{force-inpulse} que penaliza tanto el error en la fuerza predicha como el inpulso que esta genera para las siguientes inferencias. De manera similar, en este proyecto se genera una secuencia de predicciones, la cadena de deltas generados sucesivamente permiten al modelo tener una noción sobre el cambio de velocidad y aceleración provocados. \newline
+    
+    Esta implementación nace de la investigación de \cite{holden_subspace_2019}, en la que se lleva acabo un proceso similar. Además de realimentar los frames generados a la secuencia de input, se propaga el error utilizando la técnica BPTT (\textit{Backpropagation Through Time}). Esta técnica consiste en retropropagar el error a lo largo de la secuencia temporal y permite a la red aprender dependencias temporales.
+    
+    \begin{itemize}
+        \item \textbf{Ventana inicial:} $V_0 = [y_{t-n+1}, \dots, y_t]$
+        \item \textbf{Bucle de predicción:} Para $i = 1, 2, \dots, W$:
+        \begin{enumerate}
+            \item Calcular predicción: $\hat{y}_{t+i} = f(V_{i-1})$
+            \item Actualizar ventana: $V_i = [V_{i-1} \setminus \{y_{primero}\}] \cup \{\hat{y}_{t+i}\}$
+        \end{enumerate}
+        \item \textbf{Función de pérdida (Loss):} 
+        $$\mathcal{L} = \frac{1}{W} \sum_{i=1}^{W} (y_{t+i} - \hat{y}_{t+i})^2$$
+    \end{itemize}
+
 \end{itemize}
 
 \subsection{Resultado e hiperparámetros}
 
-Aki describimos el modelo optimo y sus hiperparámetros o en el capitulo Modelos funcionales?? o ese ya que no exista?
+Tras el proceso de iteraciones descrito, se concluye que la red neuronal más óptima es una RNN con \textit{unfolding}, utilizando como loss la suma entre L1Loss y el loss de velocidad. El input se construye con el sdf, la posición y velocidad de los vértices normalizados con inyección de ruido y como output se obtienen los deltas de desplazamiento normalizados.
 
-\begin{figure}[H]
-\centering
-\includegraphics[width=0.91\textwidth]{Imagenes/ModeloOpt.png}
-\caption{Vesualización del modelo completo}
-\end{figure}
+\textit{       Aquí describimos más a fondo el modelo resultante? O sería redundante.?} \newline
 
-Frente a un modelo base del RNN optimizamos parámetros:
+Para acabar de ajustar el modelo se itera sobre los mismos datasets modificando los parámetros variables.
 \begin{itemize}
-    \item Windows size (pasado)
-    \item Rollout steps (futuro)
-    \item Noise
-    \item Batch size
-    \item Learning rate, tal…?
-    \item Epochs
-    \item Mínimo dataset size para resultado visual bueno
+    \item \textbf{Windows size:} Cantidad de frames de la sequencia de input, esta actuará como ventana deslizante conforme se añadan los frames predichos.
+    \item \textbf{Rollout steps:} Cantidad de frames que el modelo produce en el unfold.
+    \item \textbf{Noise:} Se varia en la cantidad proporcional de ruido en el input normalizado (entre un 2 y un 5 por ciento) y este se aplica a los últimos n frames de la ventana del input.
+    \item \textbf{Learning rate:} Se reduce la tasa de aprendizaje cuando este se estanca.
+    \item \textbf{Tamaño dataset:} Se varia entre datasets desde 5000 a 25000 frames para determinar el tamaño mínimo con el que se consigue un resultado apropiado.
+    \item \textbf{Batch size:} Este depende del tamaño del dataset y el detalle que se esté dispuesto a sacrificar para reducir el tiempo de entreamiento.
 \end{itemize}
