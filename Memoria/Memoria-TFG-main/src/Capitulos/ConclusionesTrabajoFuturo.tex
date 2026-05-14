@@ -2,28 +2,37 @@
 \label{cap:conclusiones}
 
 \section{Conclusiones}
+El objetivo de esta investigación era conseguir replicar el movimiento de una tela en Unity a una tasa más baja de frames, haciéndolo accesible para desarrolladores indies y pudiéndole ejecutarse en equipos de rendimiento menor como portátiles poco potentes o móviles. \newline
 
-Las conclusiones de cada una de las partes del trabajo se presentan en las siguientes secciones de manera más detalladas.
+Se crearon simulaciones de telas con geometrías simples y movimientos dinámicos provocados por un objeto colisionador en Unity. De estas se extrajeron datos relevantes de la tela durante la ejecución y se convirtieron a formato CSV. A partir de estos datasets se configuró un modelo que sea capaz de aprender el comportamiento de la tela. Tras entrenar el modelo, se exportó el modelo a formato ONNX y se cargó de nuevo en Unity, a través del paquete Sentis. La tela ClothML en la simulación consiguió replicar un movimiento fiel al de una tela convencional a través del modelo cargado.\newline
 
-\subsection{Conclusiones de la búsqueda de datasets}
-Bla.
+Tras iterar sobre diferentes ténicas y modelos en el entrenamiento, se llegó a la conclusión de que el mejor modelo alcanzable consistía en una red neuronal recurrente RNN unfoldeada. Se afirma que el modelo alcanza resultados visuales fiables a la simulación de la tela y posee un error pequeño, de 0.0004m. Se consigue una tasa de frames en un ordenador de x características de 50fps, mientras que la tela original deja la ejecucion en 2 fps.
 
-\subsection{Conclusiones de la blablabla}
-Bla.
+Resumiendo, las características que han sido más relevantes para el desarollo del modelo han sido:
+\begin{itemize}
+    \item Recurrencia
+    \item Unfolding
+    \item Noise
+    \item Grandes datasets
+\end{itemize}
 
 \subsection{Limitaciones}
-
-Este estudio ha tenido una serie de limitaciones, desde blablabla
-Los modelos de redes neuronales no han dado los resultados esperados, esto puede ser por la falta de datos, que aunque haya un número que a simple vista parece suficiente no lo es para entrenar redes neuronales, por las limitaciones de hardware para entrenar modelos más complejos y por los tiempos requeridos para la realización de este estudio no ser lo suficientemente largos como para llevar a cabo entrenamientos más extensos y con mayor búsqueda de hiperparámetros.
-
-Todas estas limitaciones, han llevado al siguiente plan de trabajo a futuro.
+El estudio resultante queda con las siguientes limitaciones:
+\begin{itemize}
+    \item \textbf{Dataset pequeño} en comparación con el estado del arte. Pese a que para el nivel de simplicidad de la tela empleado en la simulación el dataset generado ha sido suficiente para generar un comportamiento fiable a nivel visual, se podrían producir resultados mejores, así como menos dependencia con el objeto colisionador, con más diversidad de movimiento y número de frames totales. Por limitaciones de tiempo, en esta investigación se han usado una media de 5000 frames por entrenamiento, mientras que en otras investigaciones que emplean bancos de simulaciones para entrenar sus modelos llegan a usar hasta $10^{6}$ frames.
+    \item \textbf{Topología y generalización}. El modelo puede generar buenos resultados si lo empleado en la simulación corresponde con el entrenamiento. No es capaz de generalizar a otras topologías o mallas dinámicas.
+    \item \textbf{Complejidad}. El modelo no ha sido probado con telas más complejas o pegadas al cuerpo como camisetas o globos con formas. Podría no resultar óptimo e incluso no producir resultados aceptables en la simulación en Unity. 
+    \item \textbf{Optimización}. Con objeto de producir los mejores resultados posibles, no se ha enfocado toda la fuerza de trabajo en optimizar la parte de simulación en Unity (como sería por ejemplo hacer boxings para el cálculo al objeto colisionador mediante a SDFs).  
+\end{itemize}
+Todas estas limitaciones conducen a las siguientes propuestas de trabajo futuro.
 
 
 \section{Trabajo Futuro}
 
 El trabajo a futuro de este estudio se puede centrar en varios esfuerzos:
 \begin{itemize}
-    \item bla
-    \item bla
-    \item bla
+    \item Realizar pruebas de usuario para comprobar si los resultados obtenidos se perciben como naturales.
+    \item Extender los datasets con más situaciones y  y probar otros modelos más complejos
+    \item Probar con otros tipos de tela más complejas, estáticas pegadas al cuerpo, y potencialmente aplicar técnicas híbridas de animación, simulación e inteligencia artificial para conseguir mejores resultados.
+    \item Añadir la posibilidad de extraer datasets de software especializado como Maya o Blender, e incluso de bancos externos de interés.
 \end{itemize}
