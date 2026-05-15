@@ -148,7 +148,7 @@ En este punto del desarrollo, los resultados de accuracy del modelo son adecuado
 
 \subsection{Resultado e hiperparámetros}
 
-Tras el proceso de iteraciones descrito, se concluye que la red neuronal más óptima es una RNN con \textit{unfolding}, utilizando como loss la suma entre L1Loss y el loss de velocidad. El input se construye con el sdf, la posición y velocidad de los vértices normalizados con inyección de ruido y como output se obtienen los deltas de desplazamiento normalizados.
+Tras el proceso de iteraciones descrito, se concluye que la red neuronal más óptima es una RNN con \textit{unfolding}, utilizando como loss la suma entre L1Loss y el loss de velocidad. El input se construye con el SDF, la posición y velocidad de los vértices normalizados con inyección de ruido y como output se obtienen los deltas de desplazamiento normalizados.
 
 \textit{       Aquí describimos más a fondo el modelo resultante? O sería redundante.?} \newline
 
@@ -156,8 +156,8 @@ Para acabar de ajustar el modelo se itera sobre los mismos datasets modificando 
 \begin{itemize}
     \item \textbf{Windows size:} Cantidad de frames de la sequencia de input, esta actuará como ventana deslizante conforme se añadan los frames predichos.
     \item \textbf{Rollout steps:} Cantidad de frames que el modelo produce en el unfold.
-    \item \textbf{Noise:} Se varía en la cantidad proporcional de ruido en el input normalizado (entre un 2 y un 5 por ciento) y este se aplica a los últimos n frames de la ventana del input.
+    \item \textbf{Noise:} Se varía en la cantidad proporcional de ruido en el input normalizado (entre un 2 y un 5\%) y este se aplica a los últimos n frames de la ventana del input.
     \item \textbf{Learning rate:} Se reduce la tasa de aprendizaje cuando este se estanca.
     \item \textbf{Tamaño dataset:} Se varía entre datasets desde 5000 a 25000 frames para determinar el tamaño mínimo con el que se consigue un resultado apropiado.
-    \item \textbf{Batch size:} Este depende del tamaño del dataset y el detalle que se esté dispuesto a sacrificar para reducir el tiempo de entreamiento.
+    \item \textbf{Batch size:} Este depende del tamaño del dataset y el detalle que se esté dispuesto a sacrificar para reducir el tiempo de entrenamiento.
 \end{itemize}

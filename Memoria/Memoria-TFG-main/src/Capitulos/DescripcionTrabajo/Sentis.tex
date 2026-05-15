@@ -1,57 +1,57 @@
 \section{SimulacionUnity}
 \label{sec:SimulacionUnity}
 
-Como se ha explicado en el último apartado, el entrenamiento genera dos archivos indispensables para la ejecución del modelo en Unity. El archivo ONNX que contiene el modelo entrenado, y el archivo JSON con los datos de normalización de los inputs y outputs del modelo. Estos archivos serán recogidos por los componentes de tipo SentisModel que se han generado para remplazar el componente Cloth de la malla en Unity. En este apartado se explica este proceso y sus elementos con detalle.
+Como se ha explicado en el último apartado, el entrenamiento genera dos archivos indispensables para la ejecución del modelo en Unity. El archivo ONNX que contiene el modelo entrenado, y el archivo JSON con los datos de normalización de los inputs y outputs del modelo. Estos archivos serán recogidos por los componentes de tipo ClothML que se han generado para remplazar el componente Cloth del objeto-tela en Unity. En este apartado se explica este proceso y sus elementos con detalle.
 
 \subsection{Alteraciones en la escena}
-Al inicio del capitulo se describe este pipeline como circular, es decir, se utiliza la misma escena de la simulación en Unity para probar el funcionamiento del modelo entrenado. Esto requiere de ciertos cambios de configuración descritos a continuación.
+Al inicio del capítulo se describe este pipeline como circular, pues se utiliza la misma escena de la simulación en Unity para recoger datos y probar posteriormente el funcionamiento del modelo entrenado. Esto requiere de ciertos cambios de configuración descritos a continuación.
 
 \begin{itemize}
-    \item Se marcan los vertices del \textit{Mesh Filter} como dinámicos. Por defecto Unity guarda las mallas en buffers estáticos, este cambio activa una flag interna de Unity para obligar a la GPU a utilizar una estrategia de guardado más óptima para el acceso en cada frame.
-    \item Se reemplaza el componente de simulación Cloth por el componente Sentis Model apto para el modelo a probar.
-    \item Como se ha descrito en el estado de la cuestión, las geometrias simuladas por Cloth utilizan el \textit{Skinned Mesh Renderer} para su renderizado. Al reemplazarlo la malla no puede ser renderizada con esta técnica, por lo que se añade un componente \textit{Mesh Renderer} sencillo.
+    \item Se marcan los vértices del \textit{Mesh Filter} como dinámicos, ya que por defecto Unity guarda las mallas en buffers estáticos. Este cambio activa una flag interna de Unity para obligar a la GPU a utilizar una estrategia de guardado más óptima para el acceso en cada frame.
+    \item Se reemplaza el componente de simulación Cloth por el componente creado ClothML que recreará el movimiento a través del modelo cargado.
+    \item Como se ha descrito en el estado de la cuestión, las geometrías simuladas por Cloth utilizan el \textit{Skinned Mesh Renderer} para su renderizado. Al reemplazarlo la malla no puede ser renderizada con esta técnica, por lo que se añade un componente \textit{Mesh Renderer} general.
 \end{itemize}
 
-\subsection{Componente SentisModel}
+\subsection{Componente ClothML}
 
-En este apartado se profundiza en el componente mencionado. Aparece también como anexo de la memoria.
+En este apartado se profundiza en el componente mencionado. Se añade en el anexo de esta memoria. % incluir 
 
 \subsubsection{Funcionamento de sentis}
-Sentis es una biblioteca de inferencia de redes neuronales para Unity. Permite importar modelos de redes neuronales entrenados a Unity y ejecutarlos en tiempo real, y es capaz de ejecutarse tanto en CPU como en GPU. Para utilizar Sentis se crea un motor o \textit{worker} que se encarga de planear las operaciones del tensor de forma paralela. Además procesa cada capa del modelo de manera secuencial, obteniendo con los datos aportados la salida del modelo.
+Sentis permite importar modelos de redes neuronales entrenados a Unity y ejecutarlos en tiempo real tanto en CPU como en GPU. Para utilizar Sentis se crea un motor o \textit{worker} que se encarga de planear las operaciones del tensor de forma paralela. Además procesa cada capa del modelo de manera secuencial, obteniendo con los datos aportados la salida del modelo.
 
 \subsubsection{Estructura del componente}
-Habiendo descrito el funcionamiento interno de la herramienta, en este apartado se explica el uso que se le ha dado para adaptarla a las necesidades del proyecto. Los componentes Sentis Model han sido generados a partir del \textit{Mono Behaviour} de Unity, esta clase engloba los comportamientos de un \textit{Game Object}. Proporciona métodos como \textit{Start} o \textit{FixedUpdate} que representan el ciclo de vida del objeto.\newline
+Habiendo descrito el funcionamiento interno de la herramienta, en este apartado se explica el uso que se le ha dado para adaptarla a las necesidades del proyecto. Los componentes ClothML han sido generados a partir del \textit{Mono Behaviour} de Unity, esta clase engloba los comportamientos de un \textit{Game Object}. Proporciona métodos como \textit{Start()} o \textit{FixedUpdate()} que representan el ciclo de vida del objeto.\newline
 
-\textit{Start} se ejecuta una sola vez al inicio del programa, por lo que se utiliza para crear el worker e inicializar los parámetros necesarios. Los parámetros que el componente recibe son los siguientes.
+\textit{Start()} se ejecuta una sola vez al inicio del programa, por lo que se utiliza para crear el worker e inicializar los parámetros necesarios. Los parámetros que el componente recibe son los siguientes:
 \begin{itemize}
-    \item \textbf{JSON:} Recibe los parámetros de normalización. Estos se utilizarán para normalizar los datos de entrada del tensor y desnormalizar los deltas resultantes.
+    \item \textbf{JSON:} Contiene los parámetros de normalización. Estos se utilizarán para normalizar los datos de entrada del tensor y desnormalizar los deltas resultantes.
     \item \textbf{ONNX:} El modelo entrenado en formato ONNX se utiliza para inicializar el modelo de Sentis.
     \item \textbf{Procesador:} Se elige si el modelo va a ser ejecutado en CPU o GPU. El worker de Sentis será creado con un \textit{BackendType} del tipo seleccionado. Se utiliza esta opción para hacer medidas de rendimiento.
     \item \textbf{\textit{MeshFilter:}} Se accede a la malla a través de este componente.
-    \item \textbf{Collisionador/es:} El objeto que la tela debe tener en cuenta para su colisión. Al igual que en el componente de Cloth de Unity, puede ser formado por uno o más esferas o capsulas.
+    \item \textbf{Collisionador/es:} Los colliders que representan el objeto que la tela debe tener en cuenta para su colisión. Al igual que en el componente de Cloth de Unity, puede estar formado por una o más esferas y cápsulas.
 \end{itemize}
 
-Asímismo, se determinan los constraints de los putos. Se establece el parámetro max distance para la lista de vértices. También se llena el history buffer con el estado de la tela quieta en su posición inicial.
+Asimismo, se determinan los constraints de los puntos. Se establece el parámetro \textit{max distance} para la lista de vértices. También se llena el history buffer con el estado de la tela quieta en su posición inicial.
 
-\textit{FixedUpdate} es el método que Unity utiliza por defecto para la ejecución de las físicas. En él iteramos sobre los puntos de la geometría para inferir las nuevas posiciones. En la siguiente figura se visualiza una iteración para un modelo recurrente. Se accede a la malla para calcular los parámetros del frame de input, como la posición local o el sdf. Estos parámetros son normalizados con la media y la desviación típica recibida en el JSON. Se introducen al historial de estados, que previamente habrá liberado su primera posición, manteniendo así un tamaño constante. Se crea el tensor de las dimensiones necesarias (1 x secuencia de frames del historial x cantidad de vértices x cantidad de características) y se vuelca el contenido del historial de estados. Se ejecuta el modelo y se desnormalizan los resultados, también con los parámetros del JSON. Estos resultadosFinalmente se suman a la posición de los vértices en el estado del input, estableciendo así la nueva posición.
+\textit{FixedUpdate()} es el método que Unity utiliza por defecto para la ejecución de las físicas. En él iteramos sobre los puntos de la geometría para inferir las nuevas posiciones. En la siguiente figura se visualiza una iteración para un modelo recurrente. Se accede a la malla para calcular los parámetros del frame de input, como la posición local o el SDF. Estos parámetros son normalizados con la media y la desviación típicas recibidas en el JSON. Se introducen al historial de estados, que previamente habrá liberado su primera posición, manteniendo así un tamaño constante. Se crea el tensor de las dimensiones necesarias (1 x secuencia de frames del historial x cantidad de vértices x cantidad de características) y se vuelca el contenido del historial de estados. Se ejecuta el modelo y se desnormalizan los resultados, también con los parámetros del JSON. Estos resultados finalmente se suman a la posición de los vértices en el estado del input, estableciendo así la nueva posición.
 
 \begin{figure}[H]
     \centering
     \includegraphics[width=1\textwidth]{Imagenes/SentisUpdate.png}
-    \caption{Esquema del FixedUpdate de Sentis Model.}
+    \caption{Esquema del contenido de FixedUpdate() de ClothML.}
 \end{figure}
 
-Al igual que en el caso de los notebooks del entrenamiento, existen distintas versiones de este componente en función de el modelo entrenado y las carácterísticas de la tela. 
+Al igual que en el caso de los notebooks del entrenamiento, se trabajó de forma paralela y existen distintas versiones de este componente en función de el modelo entrenado y las características de la tela. 
 
 \begin{itemize}
     \item Se adapta la generación del input para ajustarse a las características que el modelo necesita.
     \item Los modelos MLP no requieren de historial de eventos, por lo que los datos de estado se normalizan y se transforman directamente en el tensor de input para el modelo.
-    \item Del mismo modo, los modelos PCA que se implementaron requieren de un procesamiento específico para generar los componentes con los que se entrenó el modelo. En este caso, se aplana el vector de entrada para estandarizarlo y proyectar los datos en el espacio de componentes que se generó al entrenar el dataset.
+    \item Del mismo modo, los modelos PCA que se implementaron requieren de un procesamiento específico para generar los componentes con los que se entrenó el modelo. En este caso, se aplana el vector de entrada para estandarizarlo y proyectar los datos en el espacio de componentes que se generó al entrenar el dataset, como se puede observar en el siguiente pseudocódigo:
 \end{itemize}
 
 \begin{algorithm}[H]
+    \caption{My Algorithm Caption Below}
     \DontPrintSemicolon
-    \caption{ComputePCAFrame}
     \BlankLine
     \SetKwInOut{Input}{Entrada}\SetKwInOut{Output}{Salida}
     \SetKwData{Raw}{raw}\SetKwData{Scaled}{scaled}\SetKwData{Centered}
@@ -87,15 +87,13 @@ Al igual que en el caso de los notebooks del entrenamiento, existen distintas ve
 \end{itemize}
 
 \subsection{Resultados visuales de la inferencia}
-En este apartado se muestran ejemplos comparando la tela simulada por Unity a la izquierda y la inferencia que el modelo consigue a la derecha.
+En este apartado se muestran ejemplos comparando la tela simulada por Unity y la inferencia que el modelo consigue.
 
-AÑADIR PRUEBAS
-
-Pese a que la linea de investigación del PCA está respaldada por varias de las investigaciones afines mencionadas en el estado del arte, es este caso no se obtubieros resultados adecuados, por lo que fue descartada.
+AÑADIR PRUEBAS % izquierda Unity y inferencia dch
 
 %TODO: HACER FIGURES
 
 \subsection{Post-procesamiento}
-En las investigaciones más visualmente convincentes del estado del arte, se consigue llegar a ese nivel de credibilidad gracias a estrategias de post-procesamiento que refinan la apariencia de la geometría tras ser inferida. Entre ellas destacan la corrección de intercolisiones o intersecciones con los objetos colisionadores, la reconstrucción de las normales de los vértices, la conservación de la integridad física de la tela mediante medidas de separación entre vertices o el suavizado de temblores. Dado el objetivo de este proyecto: comparar resultados de la inferencia y observar la capacidad de los modelos de replicar estas simulaciones independientemente, se ha querido afinar la predicción de la simulación de la manera más precisa posible fuera del motor de videojuegos. Esto supone resultados menos pulidos pero más significativos respecto a la capacidad de los modelos. \newline
+En las investigaciones más visualmente convincentes del estado del arte, se consigue llegar a ese nivel de credibilidad en la simulación gracias a estrategias de post-procesamiento que refinan la apariencia de la geometría tras ser inferida. Entre ellas destacan la corrección de intercolisiones o intersecciones con los objetos colisionadores, la reconstrucción de las normales de los vértices, la conservación de la integridad física de la tela mediante medidas de separación entre vértices o el suavizado de temblores. Al tener en este proyecto como objetivos comparar resultados de la inferencia y observar la capacidad de los modelos de replicar estas simulaciones por sí mismos, se ha querido afinar la predicción de la simulación de la manera más precisa posible fuera del motor de videojuegos. Es decir, se apreciaba medir visualmente el resultado directo del modelo sin correciones adicionales. Esto supone resultados menos pulidos pero más significativos respecto a la capacidad de los modelos. \newline
 
-La única técnica de post-procesado aplicada en este estudio es la conservación de los constraints de la tela, es decir, se tienen en cuenta los valores de max distance para fijar los vertices anclados y no aplicar sobre ellos ningún desplazamiento.
+La única técnica de post-procesado aplicada en este estudio es la conservación de los constraints de la tela, es decir, se tienen en cuenta los valores de \textit{max distance} para fijar los vértices anclados y no aplicar sobre ellos ningún desplazamiento.
