@@ -97,7 +97,7 @@ En el apartado del Dataset se han enumerado todas las características de la tel
     \item Tras confirmar que la reducción de features puede ser interesante, se implementa un modelo random forest para ver cuales son los parámetros más importantes para la inferencia. Como se ve en la figura, los parámetros U, V y MD resultan no ser importantes para generar la predicción. Sin embargo, se aprecia la importancia de los parámetros de velocidad. En este caso es más notable en el eje x, debido a la configuración de la simulación con la que se ha generado el dataset analizado para el gráfico.
     \begin{figure}[H]
         \centering
-        \includegraphics[width=0.91\textwidth]{Imagenes/resultRndFrst.png}
+        \includegraphics[width=0.6\textwidth]{Imagenes/resultRndFrst.png}
         \caption{Parámetros valorados por el random forest}
     \end{figure}
 \end{itemize}
@@ -105,7 +105,7 @@ En el apartado del Dataset se han enumerado todas las características de la tel
 Con esta prueba se decide incluir la velocidad como parámetro, manteniendo los que se han mencionado como básicos. De forma que la red neuronal óptima recibe como parametros la posición de los vértices, la velocidad y el sdf. Aunque esto mejora el aprendizaje del modelo, en el proximo apartado se valorará si el coste adicional de utilizar la velocidad en Unity lo compensa.
 
 \begin{itemize}
-    \item A la hora de escalar el proyecto, aumentando tanto la geometría como los tipos de movimiento, resulta interesante introducir un modelo que se valga de un PCA para reducir la dimensión de los parámetros de entrada. Utilizando el método del umbral de varianza, se calcula el mínimo de características necesarias para alcanzar un gran porcentaje de la variabilidad de los datos. En el caso de la figura por ejemplo, partiendo de un dataset con 25 vértices y 13 features por cada uno, que resultaría en 325 elementos de input, con un umbral de varianza del 95\% consigue reducirse a 45.
+    \item A la hora de escalar el proyecto, aumentando tanto la geometría como los tipos de movimiento, resulta interesante introducir un modelo que se valga de un PCA para reducir la dimensión de los parámetros de entrada. Utilizando el método del umbral de varianza, se calcula el mínimo de características necesarias para alcanzar un gran porcentaje de la variabilidad de los datos. En el caso de la figura por ejemplo, partiendo de un dataset con 25 vértices y 13 features por cada uno, que resultaría en 325 elementos de input, con un umbral de varianza del 95\% consigue reducirse a 45. 
 \end{itemize}
 
     \begin{figure}[H]
