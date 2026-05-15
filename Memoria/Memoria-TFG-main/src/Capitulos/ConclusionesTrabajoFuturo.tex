@@ -2,27 +2,28 @@
 \label{cap:conclusiones}
 
 \section{Conclusiones}
-El objetivo de esta investigación era conseguir replicar el movimiento de una tela en Unity a una tasa más baja de frames, haciéndolo accesible para desarrolladores indies y pudiéndole ejecutarse en equipos de rendimiento menor como portátiles poco potentes o móviles. \newline
+El objetivo de esta investigación era conseguir replicar el movimiento de una tela en un motor de videojuegos a tiempo real con baja latencia, haciéndolo accesible para desarrolladores indies y pudiéndose ejecutarse en equipos de rendimiento menor como portátiles de potencia reducida o móviles. \newline
 
-Se crearon simulaciones de telas con geometrías simples y movimientos dinámicos provocados por un objeto colisionador en Unity. De estas se extrajeron datos relevantes de la tela durante la ejecución y se convirtieron a formato CSV. A partir de estos datasets se configuró un modelo que sea capaz de aprender el comportamiento de la tela. Tras entrenar el modelo, se exportó el modelo a formato ONNX y se cargó de nuevo en Unity, a través del paquete Sentis. La tela ClothML en la simulación consiguió replicar un movimiento fiel al de una tela convencional a través del modelo cargado.\newline
-
-Tras iterar sobre diferentes ténicas y modelos en el entrenamiento, se llegó a la conclusión de que el mejor modelo alcanzable consistía en una red neuronal recurrente RNN unfoldeada. Se afirma que el modelo alcanza resultados visuales fiables a la simulación de la tela y posee un error pequeño, de 0.0004m. Se consigue una tasa de frames en un ordenador de x características de 50fps, mientras que la tela original deja la ejecucion en 2 fps.
-
-Resumiendo, las características que han sido más relevantes para el desarollo del modelo han sido:
+Se crearon simulaciones de telas con geometrías simples y movimientos dinámicos provocados por un objeto colisionador en Unity. Durante la ejecución se extrajeron los datos de interés de la tela y se convirtieron a formato CSV. A partir de estos datasets se configuró un modelo que fuera capaz de aprender el comportamiento de la tela, adoptando poses de reposo y deformaciones realizadas por el colisionador sin colapsar. En el comienzo del modelo se plantearon seis características (que conformarían 13 features) sobre los vértices que podían ser relevantes para capturar la esencia de la tela en la simulación: la posición, el SDF (distancia a superficie colisionadora más cercana), la velocidad, el gradiente de SDF o normales respecto al colisionador, las UVs y la máxima distancia de movimiento desde su origen en la malla de cada vértice. De estas, las tres características que sirvieron para recrear el movimiento y permanecieron para optimizar el modelo fueron la posición, SDF y velocidad. Finalmente, se resaltan las siguientes características como la clave para alcanzar el resultado:
 \begin{itemize}
-    \item Recurrencia
-    \item Unfolding
-    \item Noise
-    \item Grandes datasets
+    \item \textbf{Recurrencia:} el modelo óptimo resultó ser una RNN, red neuronal recurrente. El contexto histórico de las simulaciones es el primer paso para conseguir la coherencia de la simulación. 
+    \item \textbf{Unfolding:} a esta RNN se aplicó una ténica de ``unfolding'', que permite al modelo saber el daño que ocasionará sobre el desplazamiento de los frames siguientes. 
+    \item \textbf{Noise:} el ruido mola. 
+    \item \textbf{Grandes datasets:} grandes cantidades de datos ayudan al modelo a alucinar menos.
 \end{itemize}
+
+El modelo entrenado se exportó a formato ONNX y se cargó de nuevo en Unity, a través del paquete Sentis. El componente de tela resultante ClothML consiguió replicar en la simulación un movimiento fiel al de una tela convencional a través del modelo cargado. Ya no sólo se puede afirmar que el modelo alcanza resultados satisfactorios a través de su ``vertex error'' o distancia entre posiciones predichas y reales en el testing, sino que se confirma el resultado obtenido a efecto visual: se alcanza una simulación natural y fiable a al comportamiento de la tela original. \newline
+
+Con respecto a la reducción de latencia y tasa de frames alcanzada, se consigue llegar a doblar la tasa de frames en un ordenador de x características. ClothML, el componente generado en esta investigación permite conducir la simulación a 50fps, mientras que la tela original la limita a quedarse en 25fps. \newline
+
 
 \subsection{Limitaciones}
 El estudio resultante queda con las siguientes limitaciones:
 \begin{itemize}
-    \item \textbf{Dataset pequeño} en comparación con el estado del arte. Pese a que para el nivel de simplicidad de la tela empleado en la simulación el dataset generado ha sido suficiente para generar un comportamiento fiable a nivel visual, se podrían producir resultados mejores, así como menos dependencia con el objeto colisionador, con más diversidad de movimiento y número de frames totales. Por limitaciones de tiempo, en esta investigación se han usado una media de 5000 frames por entrenamiento, mientras que en otras investigaciones que emplean bancos de simulaciones para entrenar sus modelos llegan a usar hasta $10^{6}$ frames.
-    \item \textbf{Topología y generalización}. El modelo puede generar buenos resultados si lo empleado en la simulación corresponde con el entrenamiento. No es capaz de generalizar a otras topologías o mallas dinámicas.
-    \item \textbf{Complejidad}. El modelo no ha sido probado con telas más complejas o pegadas al cuerpo como camisetas o globos con formas. Podría no resultar óptimo e incluso no producir resultados aceptables en la simulación en Unity. 
-    \item \textbf{Optimización}. Con objeto de producir los mejores resultados posibles, no se ha enfocado toda la fuerza de trabajo en optimizar la parte de simulación en Unity (como sería por ejemplo hacer boxings para el cálculo al objeto colisionador mediante a SDFs).  
+    \item \textbf{Dataset pequeño} en comparación con el estado del arte. Pese a que para el nivel de simplicidad de la tela empleado en la simulación el dataset generado ha sido suficiente para generar un comportamiento fiable a nivel visual, se podrían producir resultados mejores, así como menos dependencia con el objeto colisionador, introduciendo más diversidad de movimiento y número de frames totales. Por limitaciones de tiempo, en esta investigación se han usado una media de 5000 frames por entrenamiento, mientras que en otras investigaciones que emplean bancos de simulaciones para entrenar sus modelos llegan a usar hasta $10^{6}$ frames \cite{holden_subspace_2019}.
+    \item \textbf{Topología y generalización}. El modelo puede generar buenos resultados cuando la tela empleada en el entreamiento y simulación final coinciden. No es capaz de generalizar a otras topologías o mallas dinámicas.
+    \item \textbf{Complejidad}. El modelo no ha sido probado con telas más complejas o pegadas al cuerpo como camisetas o globos con forma. Podría no resultar óptimo e incluso no producir resultados aceptables en la simulación posterior en Unity. 
+    \item \textbf{Optimización}. Con objeto de producir los mejores resultados posibles en el modelo y en el aspecto visual, se ha enfocado la fuerza de trabajo en el entrenamiento y no se ha llevado a cabo una optimización exhaustiva de la simulación en Unity. Detalles como podría ser reducir el cálculo de distancias a los colisionadores no han entrado dentro del plazo de desarollo disponible.
 \end{itemize}
 Todas estas limitaciones conducen a las siguientes propuestas de trabajo futuro.
 
@@ -31,8 +32,8 @@ Todas estas limitaciones conducen a las siguientes propuestas de trabajo futuro.
 
 El trabajo a futuro de este estudio se puede centrar en varios esfuerzos:
 \begin{itemize}
-    \item Realizar pruebas de usuario para comprobar si los resultados obtenidos se perciben como naturales.
-    \item Extender los datasets con más situaciones y  y probar otros modelos más complejos
-    \item Probar con otros tipos de tela más complejas, estáticas pegadas al cuerpo, y potencialmente aplicar técnicas híbridas de animación, simulación e inteligencia artificial para conseguir mejores resultados.
-    \item Añadir la posibilidad de extraer datasets de software especializado como Maya o Blender, e incluso de bancos externos de interés.
+    \item Realizar \textbf{pruebas de usuario} para comprobar si los resultados obtenidos se perciben como naturales. La obtención de feedback por parte de usuarios de videojuegos podría confirmarnos qué aspectos de la tela hemos conseguido replicar y dónde se deberían producir mejoras.
+    \item \textbf{Extender los datasets} con más situaciones y probar otros \textbf{modelos más complejos}. Han quedado por probar modelos de interés como las CNNs, GNNS y redes encoder-decoder.
+    \item Probar con \textbf{otros tipos de tela} más complejas, estáticas pegadas al cuerpo, y potencialmente aplicar \textbf{técnicas híbridas} de animación, simulación e inteligencia artificial para conseguir mejores resultados. Un ejemplo sería combinar técnicas de skinning con ML, atando la tela a huesos y dejando la inercia y arrugas a la inteligencia artificial.
+    \item Añadir la posibilidad de \textbf{extraer datasets de software especializado} como Maya o Blender, e incluso de bancos externos de interés. La obtención de mejores referencias habilitaría la prueba de geometrías más complejas y mayor calidad.
 \end{itemize}
