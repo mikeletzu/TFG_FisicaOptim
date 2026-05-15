@@ -8,7 +8,7 @@ Empresas pioneras en hardware y software han desarrollado tecnologías para mejo
 En el campo de la simulación física, con el incremento de la capacidad de cálculo de los sistemas actuales, se busca una mayor fidelidad en la recreación de las interacciones entre los diferentes elementos. Así por ejemplo, elementos como el cabello, los fluidos o las telas, elementos que hace poco más de una década estaban muy simplificados, en la actualidad se busca cada vez más con comportamiento realista en sus interacciones. Esta simulación física de sus comportamientos resulta en una carga computacional significativa, lo que afecta negativamente al rendimiento de los videojuegos, en especial en términos de tasa de fotogramas. La industria se encuentra en un momento de auge en investigación y aplicación de Machine Learning para solucionarlo.\newline
 
 \section{Motivación}
-En la misma línea de otras tecnologías ya utilizadas en el desarrollo de videojuegos como el mencionado Ray Reconstruction de NVDIA, donde se aplican modelos de redes neuronales profundas para reducir la carga computacional de los juegos en el renderizado, se conducen estudios y empiezan a aplicar cosas similares en la industria en simulación física, otro de los elementos más demandantes de cómputo en un videojuego. Nace en un contexto dónde los juegos tienden a ser distribuidos ya no solo en consolas con hardware y gráficas dedicadas, sino en múltiples plataformas con el objeto de maximizar ingresos, donde no todas tienen las mismas capacidades de cómputo.  El uso de estas técnicas de optimización puede permitir recrear estas simulaciones con un grado de fidelidad aceptable, en dispositivos de menor potencia como puede ser Nintendo Switch, Handle pcs o dispositivos móviles. \newline
+En la misma línea de otras tecnologías ya utilizadas en el desarrollo de videojuegos como el mencionado Ray Reconstruction de NVDIA, donde se aplican modelos de redes neuronales profundas para reducir la carga computacional de los juegos en el renderizado, se conducen estudios y empiezan a aplicar técnicas similares en la industria en simulación física, otro de los elementos más demandantes de cómputo en un videojuego. Nace en un contexto donde los juegos tienden a ser distribuidos ya no solo en consolas con hardware y gráficas dedicadas, sino en múltiples plataformas con el objeto de maximizar ingresos, donde no todas tienen las mismas capacidades de cómputo.  El uso de estas técnicas de optimización puede permitir recrear estas simulaciones con un grado de fidelidad aceptable, en dispositivos de menor potencia como pueden ser Nintendo Switch, Handle pcs o dispositivos móviles. \newline
 
 Este enfoque implica una carga elevada al inicio de entrenamiento de modelos, compensado con una ejecución eficiente en tiempo real. Cabe destacar que, si bien utilizar la IA supone sacrificar la precisión absoluta de las físicas, no queremos caer en la falacia de la inmersión \cite{salenc2004rules}. Nuestro objetivo es lograr simulaciones visualmente verosímiles que mantengan una percepción fiel de realismo, adoptando así una perspectiva cercana al diseño de videojuegos.
 Por ello, se ha escogido Cloth para la simulación de telas como caso de estudio debido a que representa un equilibrio adecuado entre accesibilidad tecnológica, complejidad física e impacto visual. De esta manera, realizaremos un análisis tanto técnico como perceptivo.
@@ -33,7 +33,7 @@ El desarrollo del proyecto se llevará a cabo en el perido lectivo del curso 202
 
 \item \textbf{Iteración 1:} Etapa de preparación, donde se cumplirán los siguientes subobjetivos para implementar un sistema de simulación adecuado para ser procesado por los modelos en un futuro.
 	\begin{itemize}
-        \item \textbf{Iteración 1.1:} Se realizará una investigación de trabajaos relacionados con nuestro tópico, relevante para dirigir el desarrollo de nuestros experimentos. Se analizarán distintas alternativas y se decidirá cuales resultarán más interesantes de replicar, se definirán qué tipo de datos deberemos recopilar para el entrenamiento y qué tipo de redes podrán llevarlo a cabo.
+        \item \textbf{Iteración 1.1:} Se realizará una investigación de trabajos relacionados a este, relevante para dirigir el desarrollo de los experimentos. Se analizarán distintas alternativas y se decidirá cuales resultarán más interesantes de replicar, se definirán qué tipo de datos deberemos recopilar para el entrenamiento y qué tipo de redes podrán llevarlo a cabo.
    		\item \textbf{Iteración 1.2:} Se creará una simulación básica en Unity y un sistema de registro de datos relevantes a la tela.
    	\end{itemize}
 \item \textbf{Iteración 2:} Se establecerá un entorno de trabajo para el entrenamiento de los datos recopilados. Se generará un pipeline claro en el que se integre la simulación de recogida de datos, su limpieza y posterior uso para entrenar el modelo y, finalmente, la incorporación de este al entorno de simulación. Para poder asegurar del correcto funcionamiento de este sistema se generará un modelo simple y se comprobará que el pipeline es correcto. En esta fase se comenzarán a redactar los primeros capítulos de la memoria.
@@ -47,7 +47,7 @@ El desarrollo de las tareas y su planificación se puede ver en la figura \ref{f
 \begin{figure}[H]
 	\centering
 	\includegraphics[width=0.91\textwidth]{Imagenes/GanntChart.png}
-	\caption{Diagrama de Gantt del proyecto}
+	\caption{Diagrama de Gantt del proyecto. Representa la organización de las tareas en el tiempo de desarrollo del proyecto.}
 	\label{fig:diagrama-gantt}
 \end{figure}
 
@@ -56,4 +56,4 @@ Para el desarrollo de esta investigación se emplearán herramientas de libre ac
 
 Para la gestión del código fuente y el trabajo colaborativo se utilizará GitHub, basado en el sistema de control de versiones Git. Asimismo, se empleará la herramienta GitHub Projects para la planificación, asignación y seguimiento de tareas. Como herramientas adicionales, se utilizará Google Drive para el almacenamiento de documentación, apuntes de reuniones y materiales de trabajo puntuales, y Discord para la coordinación del equipo mediante reuniones online, además de encuentros presenciales semanales.
 
-\section{Estructura de la memoria (propuesta)}
+%\section{Estructura de la memoria (propuesta)}
