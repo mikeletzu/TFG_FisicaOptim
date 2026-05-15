@@ -30,6 +30,7 @@ Habiendo descrito el funcionamiento interno de la herramienta, en este apartado 
     \item \textbf{\textit{MeshFilter:}} Se accede a la malla a través de este componente.
     \item \textbf{Collisionador/es:} El objeto que la tela debe tener en cuenta para su colisión. Al igual que en el componente de Cloth de Unity, puede ser formado por uno o más esferas o capsulas.
 \end{itemize}
+
 Asímismo, se determinan los constraints de los putos. Se establece el parámetro max distance para la lista de vértices. También se llena el history buffer con el estado de la tela quieta en su posición inicial.
 
 \textit{FixedUpdate} es el método que Unity utiliza por defecto para la ejecución de las físicas. En él iteramos sobre los puntos de la geometría para inferir las nuevas posiciones. En la siguiente figura se visualiza una iteración para un modelo recurrente. Se accede a la malla para calcular los parámetros del frame de input, como la posición local o el sdf. Estos parámetros son normalizados con la media y la desviación típica recibida en el JSON. Se introducen al historial de estados, que previamente habrá liberado su primera posición, manteniendo así un tamaño constante. Se crea el tensor de las dimensiones necesarias (1 x secuencia de frames del historial x cantidad de vértices x cantidad de características) y se vuelca el contenido del historial de estados. Se ejecuta el modelo y se desnormalizan los resultados, también con los parámetros del JSON. Estos resultadosFinalmente se suman a la posición de los vértices en el estado del input, estableciendo así la nueva posición.
@@ -41,43 +42,47 @@ Asímismo, se determinan los constraints de los putos. Se establece el parámetr
 \end{figure}
 
 Al igual que en el caso de los notebooks del entrenamiento, existen distintas versiones de este componente en función de el modelo entrenado y las carácterísticas de la tela. 
+
 \begin{itemize}
     \item Se adapta la generación del input para ajustarse a las características que el modelo necesita.
     \item Los modelos MLP no requieren de historial de eventos, por lo que los datos de estado se normalizan y se transforman directamente en el tensor de input para el modelo.
-    \item Del mismo modo, los modelos PCA que se implementaron requieren de un procesamiento específico para generar los componentes con los que se entrenó el modelo. En este caso, se aplana el vector de entrada para estandarizarlo y proyectar los datos en el espacio de componentes que se generó al entrenar el dataset. 
-    \newline \newline
-    \begin{algorithm}[H]
-        \DontPrintSemicolon
-        \caption{ComputePCAFrame}
-        \BlankLine
-        \SetKwInOut{Input}{Entrada}\SetKwInOut{Output}{Salida}
-        \SetKwData{Raw}{raw}\SetKwData{Scaled}{scaled}\SetKwData{Centered}
-        {centered}\SetKwData{PCA}{pca}
-        \SetKwComment{Comment}{$\triangleright$\ }{}
-        \Input{Vértices actuales $\mathbf{V}$, Vértices anteriores $\mathbf{V}_{last}$, Parámetros de normalización $\theta$, Matriz de componentes $\mathbf{W}$}
-        \Output{Vector proyectado}
-        \BlankLine
-        \Comment*[l]{Paso 1: Construcción del vector crudo $\mathbf{X} \in \mathbb{R}^{78}$}
-        \For{$v \leftarrow 0$ \KwTo $\mathbf{V}$.length}{
-            $\mathbf{pos} \leftarrow \mathbf{V}_v$\;
-            $\mathbf{vel} \leftarrow (\mathbf{pos} - \mathbf{V}_{last, v}) / \Delta t$\;
-            $\mathbf{sdf} \leftarrow \|\mathbf{pos} - \mathbf{pos}_{ball}\| - r_{ball}$\;
-            $\mathbf{n}, \mathbf{uv} \leftarrow \text{obtener de la malla}$\;
-            Llenar bloque $\mathbf{X}_{v}$ con $\{\mathbf{pos}, \mathbf{vel}, \mathbf{sdf}, \mathbf{n}, $\mathbf{maxDist_v}, \mathbf{uv}\}$\;
-            }
-        \BlankLine
-        \Comment*[l]{Paso 2: StandardScaler}
-        \For{$f \leftarrow 0$ \KwTo $77$}{$\Scaled[f] \leftarrow \frac{\Raw[f] - \mu_{\text{input}, f}}{\sigma_{\text{input}, f}}$}
-        \BlankLine
-        \Comment*[l]{Paso 3: Centrado PCA}
-        \For{$f \leftarrow 0$ \KwTo $77$}{$\Centered[f] \leftarrow \Scaled[f] - \mu_{\text{pca}, f}$}
-        \BlankLine\Comment*[l]{Paso 4: Proyección Lineal}
-        \For{$c \leftarrow 0$ \KwTo $optimalN - 1$}{$dot \leftarrow 0$;
-        \For{$f \leftarrow 0$ \KwTo $77$}{$dot \leftarrow dot + \mathbf{W}_{c, f} \cdot \Centered[f]$
-        $\PCA[c] \leftarrow dot$;}
-        \Return{\PCA};
-    \end{algorithm}
+    \item Del mismo modo, los modelos PCA que se implementaron requieren de un procesamiento específico para generar los componentes con los que se entrenó el modelo. En este caso, se aplana el vector de entrada para estandarizarlo y proyectar los datos en el espacio de componentes que se generó al entrenar el dataset.
+\end{itemize}
 
+\begin{algorithm}[H]
+    \DontPrintSemicolon
+    \caption{ComputePCAFrame}
+    \BlankLine
+    \SetKwInOut{Input}{Entrada}\SetKwInOut{Output}{Salida}
+    \SetKwData{Raw}{raw}\SetKwData{Scaled}{scaled}\SetKwData{Centered}
+    {centered}\SetKwData{PCA}{pca}
+    \SetKwComment{Comment}{$\triangleright$\ }{}
+    \Input{Vértices actuales $\mathbf{V}$, Vértices anteriores $\mathbf{V}_{last}$, Parámetros de normalización $\theta$, Matriz de componentes $\mathbf{W}$}
+    \Output{Vector proyectado}
+    \BlankLine
+    \Comment*[l]{Paso 1: Construcción del vector crudo $\mathbf{X} \in \mathbb{R}^{78}$}
+    \For{$v \leftarrow 0$ \KwTo $\mathbf{V}$.length}{
+        $\mathbf{pos} \leftarrow \mathbf{V}_v$\;
+        $\mathbf{vel} \leftarrow (\mathbf{pos} - \mathbf{V}_{last, v}) / \Delta t$\;
+        $\mathbf{sdf} \leftarrow \|\mathbf{pos} - \mathbf{pos}_{ball}\| - r_{ball}$\;
+        $\mathbf{n}, \mathbf{uv} \leftarrow \text{obtener de la malla}$\;
+        Llenar bloque $\mathbf{X}_{v}$ con $\{\mathbf{pos}, \mathbf{vel}, \mathbf{sdf}, \mathbf{n}, \mathbf{maxDist}, \mathbf{uv}\}$}
+    \BlankLine
+    \Comment*[l]{Paso 2: StandardScaler}
+    \For{$f \leftarrow 0$ \KwTo $77$}
+    {$\Scaled[f] \leftarrow \frac{\Raw[f] - \mu_{\text{input}, f}}{\sigma_{\text{input}, f}}$}
+    \BlankLine
+    \Comment*[l]{Paso 3: Centrado PCA}
+    \For{$f \leftarrow 0$ \KwTo $77$}
+    {$\Centered[f] \leftarrow \Scaled[f] - \mu_{\text{pca}, f}$}
+    \BlankLine\Comment*[l]{Paso 4: Proyección Lineal}
+    \For{$c \leftarrow 0$ \KwTo $optimalN - 1$}{$dot \leftarrow 0$;}
+    \For{$f \leftarrow 0$ \KwTo $77$}{$dot \leftarrow dot + \mathbf{W}_{c, f} \cdot \Centered[f]$
+    $\PCA[c] \leftarrow dot$;}
+    \Return{\PCA};
+\end{algorithm}
+
+\begin{itemize}
     \item El script se adapta automáticamente al resto de variaciones como número de frames de input o cantidad de vértices.
 \end{itemize}
 
