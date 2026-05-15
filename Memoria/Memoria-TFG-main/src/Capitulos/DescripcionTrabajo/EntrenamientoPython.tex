@@ -1,11 +1,11 @@
 \section{Entrenamiento}
 \label{sec:EntrenamientoPython}
 
-En este apartado se describen las fases de entrenamiento de los modelos, así como la evolución de los mismos y la serie de decisiones tomadas para conseguir esas adaptaciones. El código al que se hace referencia puede encontrarse en el directorio /Entrenamiento del repositorio de GitHub del proyecto \footnote{Enlace a la carpeta de entrenamiento: \url{https://github.com/mikeletzu/TFG_FisicaOptim/tree/23105b6733cacae9c708593f2d77a12faa2eb884/Entrenamiento}}. \newline
+En este apartado se describen las fases de entrenamiento de los modelos, así como la evolución de los mismos y la serie de decisiones tomadas para conseguir esas adaptaciones. El código al que se hace referencia puede encontrarse en el directorio /Entrenamiento del repositorio de GitHub del proyecto \footnote{Enlace a la carpeta de entrenamiento: \url{https://github.com/mikeletzu/TFG_FisicaOptim/tree/23105b6733cacae9c708593f2d77a12faa2eb884/Entrenamiento}}. 
 
 \subsection{El entorno de trabajo}
 
-Para crear un entorno de trabajo adaptable, y asegurar la consistencia entre los distintos equipos utilizados por las integrantes de este proyecto, se ha decidido crear en el repositorio un archivo \textit{dl2024\_gpu.yml} en el que concretar las dependencias del proyecto y las versiones a utilizar de estas librerías. Este es un tipo de archivo de configuración que permite, entre otras cosas, crear fácilmente Conda Environments. Estos entornos virtuales se generan en un directorio con todas las dependencias especificadas. Se ha cogido como base el entorno propocionado por la Universidad de Amsterdam en sus cursos introductorios de Deep Learning con Pytorch.
+Para crear un entorno de trabajo adaptable, y asegurar la consistencia entre los distintos equipos utilizados por las integrantes de este proyecto, se ha decidido crear en el repositorio un archivo \textit{dl2024\_gpu.yml} en el que concretar las dependencias del proyecto y las versiones a utilizar de estas librerías. Este es un tipo de archivo de configuración que permite, entre otras cosas, crear fácilmente Conda Environments. Estos entornos virtuales se generan en un directorio con todas las dependencias especificadas. Se ha utilizado como base el entorno propocionado por la Universidad de Amsterdam en sus cursos introductorios de Deep Learning con Pytorch.
 \begin{table}[H]
     \begin{center}
         \begin{tabular}{ | m{4cm} | m{2cm} | }
@@ -36,7 +36,7 @@ Dada su flexibilidad para segmentar la ejecución y su capacidad de visualizar l
     \item \textbf{Carga y procesamiento de datos}: 
     Los datos se leen del archivo .csv utilizando la librería pandas, que permite llevar a cabo la limpieza fácilmente. Aunque es el dataset del modelo quien gestiona detalles como la coherencia de frames otorgados, intentar acceder al predecesor de un primer frame, se realiza una limpieza común previa del csv:
     \begin{itemize}
-        \item Se elimina la columna "frame" de la tabla, ya que no aporta información pertinente para el aprendizaje. Su función es meramente auxiliar para debuggear.
+        \item Se elimina la columna "frame" de la tabla, ya que no aporta información pertinente para el aprendizaje. Su función es meramente auxiliar para depurar.
         \item Asímismo, en los casos que se explicarán más adelante, muchos de los parámetros registrados no son necesarios, se filtran esas columnas para no sobrecargar innecesariamente el dataset.
     \end{itemize}
     Tras hacer la limpieza de los datos estos se transforman al formato de tensores de Pytorch. 
@@ -49,7 +49,7 @@ Dada su flexibilidad para segmentar la ejecución y su capacidad de visualizar l
     
     \item \textbf{Entrenamiento}: En este apartado se determinan los parámetros de ruido que añadir al dataset y las iteraciones que hacer sobre él. El entrenamiento consiste en una fase de entrenamiento y otra de testing, en la que se observa el aprendizaje del modelo através de la caída del error medio de la posición de cada vértice.
     
-    \item \textbf{Visualización de resultados}: Al trabajar con una simulación físca en un entorno 3D, la visualización en gráficos de las predicciones de los modelos han resultado notablemente útil. En las figuras siguientes pueden apreciarse los gráficos más destacados que más han contribuido al desarollo.        
+    \item \textbf{Visualización de resultados}: Al trabajar con una simulación físca en un entorno 3D, la visualización en gráficos de las predicciones de los modelos ha resultado notablemente útil. En las figuras siguientes 3.6, 3,7, 3,8 pueden apreciarse los gráficos más destacados que más han contribuido al desarollo.        
         \begin{figure}[H]
             \centering
             \includegraphics[width=0.91\textwidth]{Imagenes/ejemploVisualA.png}
@@ -71,6 +71,7 @@ Dada su flexibilidad para segmentar la ejecución y su capacidad de visualizar l
     \item \textbf{Exportación}: Por último, tras considerar los resultados generados como adecuados con la guía de los valores y gráficas generadas, se procede a exportar la red neuronal a formato ONNX.
 
 \end{enumerate}
+
 
 \subsection{Los modelos}
 Como se ha mencionado previamente, hay dos nociones principales que han guiado el desarrollo de este proyecto. Por un lado, seguir el ejemplo de las investigaciones citadas en el estado del arte, combinando las técnicas óptimas o prometedoras; y por otro, el objetivo de priorizar la simplicidad y accesibilidad de nuestro modelo. En virtud de ello se optó por empezar el entrenamiento con una red neuronal muy sencilla y aumentar progresivamente la complejidad de la red en base a los resultados, problemas y limitaciones que fueran surgiendo. \newline
