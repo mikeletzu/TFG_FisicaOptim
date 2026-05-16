@@ -1640,7 +1640,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &1872676680
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1648,25 +1648,24 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1872676679}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b27fdda5777c10408704b7029997502, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClothMLPosRec
-  ball: {fileID: 339546644}
-  ballCollider: {fileID: 339546646}
   sphereColliders: []
   capsuleColliders: []
   modelAsset: {fileID: 5022602860645237092, guid: e998065b75cfd8f4a86fec6364a1af69, type: 3}
   clothMeshFilter: {fileID: 1872676682}
   collidersUnionSmoothness: 0
-  contador: 0
   jsonFile: {fileID: 4900000, guid: db82c8a00f39f2a42a0783b0d5cd4aa8, type: 3}
   normData:
     mean: []
     std: []
     target_mean: []
     target_std: []
+  procActive: 256
+  seqLen: 8
 --- !u!23 &1872676681
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1772,7 +1771,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1872676679}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d57d527bda9b7504295c6280f7219125, type: 3}
   m_Name: 
@@ -1789,6 +1788,7 @@ MonoBehaviour:
     std: []
     target_mean: []
     target_std: []
+  procActive: 0
 --- !u!23 &1934972511
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1838,28 +1838,6 @@ MeshRenderer:
   m_SortingOrder: 0
   m_MaskInteraction: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &1934972512
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 919132149000712295}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c40bc56cb6ff9a440b006d6c9e694f0c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ClothML
-  ball: {fileID: 339546644}
-  ballCollider: {fileID: 339546646}
-  modelAsset: {fileID: 5022602860645237092, guid: 1a789bf4b6790ed41b3fcb75c0973686, type: 3}
-  clothMeshFilter: {fileID: 3469287836638471544}
-  jsonFile: {fileID: 4900000, guid: e04d700704390e04198a25371a782432, type: 3}
-  normData:
-    mean: []
-    std: []
-    target_mean: []
-    target_std: []
 --- !u!114 &1934972515
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1872,20 +1850,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b27fdda5777c10408704b7029997502, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClothMLPosRec
-  ball: {fileID: 339546644}
-  ballCollider: {fileID: 339546646}
   sphereColliders: []
   capsuleColliders: []
   modelAsset: {fileID: 5022602860645237092, guid: 6437934ca6b8d104880c106f03eef542, type: 3}
   clothMeshFilter: {fileID: 3469287836638471544}
   collidersUnionSmoothness: 0
-  contador: 0
   jsonFile: {fileID: 4900000, guid: ce8f6586be71cf1439337007b4566db4, type: 3}
   normData:
     mean: []
     std: []
     target_mean: []
     target_std: []
+  procActive: 0
+  seqLen: 8
 --- !u!183 &2065484710
 Cloth:
   m_ObjectHideFlags: 0
@@ -4513,7 +4490,6 @@ GameObject:
   m_Component:
   - component: {fileID: 543450652653939421}
   - component: {fileID: 3469287836638471544}
-  - component: {fileID: 1934972512}
   - component: {fileID: 1934972511}
   - component: {fileID: 1934972515}
   m_Layer: 0
@@ -4596,7 +4572,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &5195805995224845084
 MonoBehaviour:
   m_ObjectHideFlags: 0
