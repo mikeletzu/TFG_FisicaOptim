@@ -35,7 +35,7 @@ Adicionalmente, introducimos modificaciones sobre este comportamiento: se deja e
 \subsection{Otras simulaciones}
 También se han realizado pruebas con simulaciones más complejas con objeto de probar la efectividad de nuestro método y diferencias entre simulaciones más dinámicas y estáticas, más frecuentadas en PBD. \newline 
 
-Para probar el enfoque más estático y pegado al cuerpo se creó una simulación de un personaje con una camiseta. Tras múltiples pruebas tomando diferente número de iteraciones en el solver de Cloth, valores en las propiedades de la tela y extendido el tamaño hasta 4000 vértices, la simulación fue finalmente descartada debido a la inestabilidad de la tela y difícil generación de animaciones visualemente coherentes. Realizar animaciones de tela complejas en Unity sin combinar otras técnicas, implementar soluciones híbridas (como el Weight Mapping\footnote{Técnica de animación 3D y rigging que permite controlar cómo se deforman los vértices de una malla o prenda al mover las articulaciones de un esqueleto. }) o incorporar paquetes de pago de la Unity Asset Store como Magica Cloth \footnote{Paquete de Magica Cloth en el Asset Store de Unity:  \url{https://assetstore.unity.com/packages/tools/physics/magica-cloth-2-242307}} u Obi Cloth no es trivial. Otras investigaciones, como \cite{holden_subspace_2019} producen su material de entrenamiento en herramientas especializadas como Maya \footnote{Autodesk Maya es un software profesional de animación y efectos visuales 3D \url{https://www.autodesk.com/es/products/maya/overview}} o Blender \footnote{Blender es un software de código abierto de animación y efectos visuales 3D  \url{https://www.blender.org/}} para conseguir simulaciones de prendas complejas. Pese a que esto limita el alcance de las simulaciones a generar en esta investigación, el nivel de complejidad potencial sigue siendo más que sufiente para probar nuestra implementación a pequeña escala, manteniendo el proyecto alienado a los objetivos previamente declarado y siguiendo la tendencia de juegos implementados en Unity.  \newline 
+Para probar el enfoque más estático y pegado al cuerpo se creó una simulación de un personaje con una \textbf{camiseta}. Tras múltiples pruebas tomando diferente número de iteraciones en el solver de Cloth, valores en las propiedades de la tela y extendido el tamaño hasta 4000 vértices, la simulación fue finalmente descartada debido a la inestabilidad de la tela y difícil generación de animaciones visualemente coherentes. Realizar animaciones de tela complejas en Unity sin combinar otras técnicas, implementar soluciones híbridas (como el Weight Mapping\footnote{Técnica de animación 3D y rigging que permite controlar cómo se deforman los vértices de una malla o prenda al mover las articulaciones de un esqueleto. }) o incorporar paquetes de pago de la Unity Asset Store como Magica Cloth \footnote{Paquete de Magica Cloth en el Asset Store de Unity:  \url{https://assetstore.unity.com/packages/tools/physics/magica-cloth-2-242307}} u Obi Cloth no es trivial. Otras investigaciones, como \cite{holden_subspace_2019} producen su material de entrenamiento en herramientas especializadas como Maya \footnote{Autodesk Maya es un software profesional de animación y efectos visuales 3D \url{https://www.autodesk.com/es/products/maya/overview}} o Blender \footnote{Blender es un software de código abierto de animación y efectos visuales 3D  \url{https://www.blender.org/}} para conseguir simulaciones de prendas complejas. Pese a que esto limita el alcance de las simulaciones a generar en esta investigación, el nivel de complejidad potencial sigue siendo más que sufiente para probar nuestra implementación a pequeña escala, manteniendo el proyecto alienado a los objetivos previamente declarado y siguiendo la tendencia de juegos implementados en Unity.  \newline 
 
 \begin{figure}[htbp]
     \centering
@@ -44,7 +44,7 @@ Para probar el enfoque más estático y pegado al cuerpo se creó una simulació
     \label{fig:camiseta}
 \end{figure}
 
-La otra simulación llevada a cabo consiste en un personaje andando con una falda. El personaje, simplificado, está formado por tres cápsulas: un torso y dos piernas; y la falda es un malla en forma de cilindro compuesta por 288 vértices, para habilitar un movimiento más dinámico. Una vez ajustados los colliders de las cápsulas para ser más grandes que las mallas de las piernas, esta simulación genera un buen resultado a nivel visual. Lo emplearemos más adelante para representar animaciones más complejas y realizar  comparaciones y mediciones adicionales al plano de 25 vértices.
+La otra simulación llevada a cabo consiste en un personaje andando con una \textbf{falda}. El personaje, simplificado, está formado por tres cápsulas: un torso y dos piernas; y la falda es un malla en forma de cilindro compuesta por 288 vértices, para habilitar un movimiento más dinámico. Una vez ajustados los colliders de las cápsulas para ser más grandes que las mallas de las piernas, esta simulación genera un buen resultado a nivel visual. Lo emplearemos más adelante para representar animaciones más complejas y realizar  comparaciones y mediciones adicionales al plano de 25 vértices.
 \begin{figure}[htbp]
     \centering
     \includegraphics[width=0.6\textwidth]{Imagenes/Bmap/skirt.png}
@@ -57,7 +57,10 @@ Las telas que usamos para generar las simulaciones en las que se basarán nuestr
 
 \begin{itemize}
     \item \textbf{Posición}: Las posiciones de los vértices de la tela son los parámetros básicos de las investigaciones en este campo. Estas posiciones, se verá más adelante, pueden darse en espacio local del objeto o global.
-    \item \textbf{SDF}: El Signed Distance Field es una magnitud que representará la distancia de cada vértice al objeto colisionador, llegando a ser 0 si toca la superfície, y un valor negativo si alcanza a traspasar. 
+    \item \textbf{SDF}: El Signed Distance Field es una magnitud que representará la distancia de cada vértice al objeto colisionador, llegando a ser 0 si toca la superfície, y un valor negativo si alcanza a traspasar. Se ha creado la clase estática \textit{SDFUtil} para habilitar los cálculos del SDF para conjuntos de \textit{colliders}. El script \textit{SDFUtil} contiene métodos que proporcionan el SDF de un punto a una esfera, una cápsula o dos listas de los dos tipos. También acepta un \textit{Transform} de un objeto de referencia si la posición del punto de origen no es global.
+
+    Las fórmulas de SDF, así como la obtención de un único SDF respecto a varios objetos, que se ha decidido representar con el \textit{Smooth Mininum} (\textit{smin}), se han adquirido del blog de Inigo Quilez\footnote{Apartado del blog de Inigo Quilez sobre SDFs para objetos 3Ds: \url{https://iquilezles.org/articles/distfunctions/}} y adaptado para el funcionamiento esperado en Unity. La función \textit{smin} permite fusionar dos objetos de geométricamente con una transición que puede ser suave o limitarse al espacio real ocupado por los objetos.
+
     \item \textbf{Velocidad}: Planteamos que las velocidades de los vértices pueden ayudar a que el modelo sea capaz de replicar el dinamismo del movimiento. 
     \item \textbf{Normales}: Refiriéndose a las normales de la superficie del objeto colisionador, es decir, el gradiente del SDF. Este se puede usar para complementar la magnitud del SDF, ya que apunta en la dirección en la que la distancia aumenta más rápido, cómo alejarse de la colisión.
     \item \textbf{UVs}: Conservar la geometría de la tela se plantea como uno de los mayores retos para nuestra simulación. Se necesita que el modelo comprenda cómo están relacionados los vértices espacialmente para que no se lleven a cabo deformaciones érroneas. Ya que no comenzamos con geometrías complejas en tela o cuerpos blandos, se usan las coordenadas de textura bidimensionales, \textit{UVs}, para representar la superfície.
@@ -87,3 +90,13 @@ Al final de la ejecución todas estas capturas se transforman en texto y se vuel
 \end{algorithm}
 
 Durante el transcurso de las pruebas se probaron distintas frecuencias de muestreo (0.1f, 0.02f, la frecuencia por defecto del \textit{FixedUpdate()} en Unity); más tarde se llegaría a la conclusión de que la frecuencia de muestreo debe ser la misma en la etapa de guardado de datos y ejecución del modelo para no obtener un efecto de aceleración o ralentización. De la misma forma, el número de snapshots debe ser el máximo posible para garantizar la estabilidad de la simulación.
+
+
+
+
+
+
+
+
+
+
