@@ -44,6 +44,9 @@ public class ClothMLPosVelRec : MonoBehaviour
     }
     public NormalizationData normData;
 
+    [SerializeField]
+    private BackendType procActive;
+
     void Awake()
     {
         if (jsonFile != null)
@@ -55,7 +58,7 @@ public class ClothMLPosVelRec : MonoBehaviour
     void Start()
     {
         var model = ModelLoader.Load(modelAsset);
-        worker = new Worker(model, BackendType.GPUCompute);
+        worker = new Worker(model, procActive);
 
         clothMeshFilter.mesh.MarkDynamic();
         vertexCount = clothMeshFilter.mesh.vertexCount;

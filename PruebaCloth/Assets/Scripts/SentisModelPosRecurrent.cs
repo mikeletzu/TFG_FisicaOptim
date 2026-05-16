@@ -5,9 +5,6 @@ using UnityEngine;
 
 public class ClothMLPosRec : MonoBehaviour
 {
-    [SerializeField]
-    public GameObject ball;
-    public SphereCollider ballCollider;
 	[SerializeField]
 	public SphereCollider[] sphereColliders;
 	[SerializeField]
@@ -42,7 +39,10 @@ public class ClothMLPosRec : MonoBehaviour
     }
     public NormalizationData normData;
 
-    void Awake()
+	[SerializeField]
+	private BackendType procActive;
+
+	void Awake()
     {
         if (jsonFile != null)
         {
@@ -53,7 +53,7 @@ public class ClothMLPosRec : MonoBehaviour
     void Start()
     {
         var model = ModelLoader.Load(modelAsset);
-        worker = new Worker(model, BackendType.GPUCompute);
+        worker = new Worker(model, procActive);
 
         clothMeshFilter.mesh.MarkDynamic();
         vertexCount = clothMeshFilter.mesh.vertexCount;
@@ -106,10 +106,10 @@ public class ClothMLPosRec : MonoBehaviour
                 Debug.Log("vertex: " + v + ", pos: " + pos);
 
                 float sdf;
-                if (ball != null)
-                    sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
-                else
-                    sdf = SDFUtil.getSDFOfSet(pos, capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
+                //if (ball != null)
+                //    sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
+                //else
+                sdf = SDFUtil.getSDFOfSet(pos, capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
     
                 historyBuffer[t, v, 0] = (pos.x - normData.mean[0]) / normData.std[0];
                 historyBuffer[t, v, 1] = (pos.y - normData.mean[1]) / normData.std[1];
@@ -143,10 +143,8 @@ public class ClothMLPosRec : MonoBehaviour
             // pos = transform.TransformPoint(pos); //CONFIRMAR QUE ESTO HACE FALTA LOL
 
             float sdf;
-            if(ball!=null)
-               sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
-            else
-				sdf = SDFUtil.getSDFOfSet(pos, capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
+           
+		    sdf = SDFUtil.getSDFOfSet(pos, capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
 
 			historyBuffer[seqLen - 1, i, 0] = (pos.x - normData.mean[0]) / normData.std[0];
             historyBuffer[seqLen - 1, i, 1] = (pos.y - normData.mean[1]) / normData.std[1];

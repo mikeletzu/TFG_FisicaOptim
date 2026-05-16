@@ -30,8 +30,9 @@ public static class SDFUtil
 	/// <returns></returns>
 	public static float SDFSphere(Vector3 point, Vector3 center, float radius, Transform tr = null)
 	{
-		if (tr != null) tr.InverseTransformPoint(center);
-		float a = Vector3.Distance(point, center) - radius;
+		Vector3 centerAux = center;
+		if (tr != null) centerAux = tr.InverseTransformPoint(centerAux);
+		float a = Vector3.Distance(point, centerAux) - radius;
 		return a;
 	}
 
@@ -154,7 +155,9 @@ public static class SDFUtil
 		{
 			for (int i = 0; i < spheres.Length; i++)
 			{
-				float currentDist = SDFSphere(p, spheres[i].center, spheres[i].radius, tr);
+				Vector3 colLossyScale = spheres[i].transform.lossyScale;
+				float sphereRadius = spheres[i].radius * Mathf.Max(colLossyScale.x, Mathf.Max(colLossyScale.y, colLossyScale.z));
+				float currentDist = SDFSphere(p, spheres[i].transform.TransformPoint(spheres[i].center), sphereRadius, tr);
 
 				if (isFirstShape)
 				{
