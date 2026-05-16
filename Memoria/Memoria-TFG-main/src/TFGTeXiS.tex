@@ -80,6 +80,8 @@ constantes,guionado,Cascaras/bibliografia,config%
 % Paquete de la plantilla
 \usepackage{TeXiS/TeXiS}
 \usepackage[ruled,vlined]{algorithm2e}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
 \usepackage{amssymb}
 \usepackage{amsmath}
 
@@ -190,8 +192,8 @@ constantes,guionado,Cascaras/bibliografia,config%
 % en TeXiS_pream.tex para más información.
 \ifx\generaindice\undefined
 \else
-  %\include{TeXiS/TeXiS_indice}
-\fi
+   %\include{TeXiS/TeXiS_indice}
+%\fi
 
 %
 % Lista de acrónimos
@@ -204,7 +206,7 @@ constantes,guionado,Cascaras/bibliografia,config%
 \ifx\generaacronimos\undefined
 \else
   \include{TeXiS/TeXiS_acron}
-\fi
+%\fi
 
 \include{Cascaras/license}
 

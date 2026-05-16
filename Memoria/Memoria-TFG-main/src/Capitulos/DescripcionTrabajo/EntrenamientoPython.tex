@@ -27,7 +27,7 @@ Para crear un entorno de trabajo adaptable, y asegurar la consistencia entre los
     \caption{Librerías y versiones del entorno de desarrollo.}
 \end{table}
 
-\subsection{Apartados de la ejecución}
+\subsection{Apartados de la ejecución del entrenamiento}
 
 Dada su flexibilidad para segmentar la ejecución y su capacidad de visualizar los resultados claramente, se ha elegido IPython Notebook (.ipynb) como formato de código en el que trabajar con los modelos. Si bien cada tipo de modelo se ha creado en un archivo distinto, todos comparten la misma estructura. Pese a la inevitable repetición de código y potencial optimización, la utilización de diferentes notebooks ha resultado clave para el desarollo e investigación paralela de los diferentes modelos. La estructura tiene la siguiente forma:
 
@@ -47,24 +47,28 @@ Dada su flexibilidad para segmentar la ejecución y su capacidad de visualizar l
 
     \item \textbf{Modelo de Pytorch}: Pytorch ofrece también una clase base a partir de la cual implementar modelos de redes neuronales, \textit{torch.nn.Module}. En este apartado se extiende esta clase a las especificaciones deseadas y se genera utilizando el DataLoader mencionado un primer batch de prueba.
     
-    \item \textbf{Entrenamiento}: En este apartado se determinan los parámetros de ruido que añadir al dataset y las iteraciones que hacer sobre él. El entrenamiento consiste en una fase de entrenamiento y otra de testing, en la que se observa el aprendizaje del modelo através de la caída del error medio de la posición de cada vértice.
+    \item \textbf{Entrenamiento}: En este apartado se determinan los parámetros del entrenamiento: \textit{learning rate}, iteraciones, porcentaje de ruido y etc. El entrenamiento consiste en una fase de entrenamiento y otra de testing, en la que se observa el aprendizaje del modelo através de la caída del error medio de la posición de cada vértice.
     
-    \item \textbf{Visualización de resultados}: Al trabajar con una simulación físca en un entorno 3D, la visualización en gráficos de las predicciones de los modelos ha resultado notablemente útil. En las figuras siguientes 3.6, 3,7, 3,8 pueden apreciarse los gráficos más destacados que más han contribuido al desarollo.        
+    \item \textbf{Visualización de resultados}: Al trabajar con una simulación físca en un entorno 3D, la visualización en gráficos de las predicciones de los modelos ha resultado notablemente útil. En las figuras \ref{fig:visualA}, \ref{fig:visualB} y \ref{fig:visualC} pueden apreciarse los gráficos más destacados que más han contribuido al desarollo.        
         \begin{figure}[H]
             \centering
             \includegraphics[width=0.91\textwidth]{Imagenes/ejemploVisualA.png}
             \caption{Visualización de los puntos de la tela simulada e inferida a lo largo del tiempo}
-            \vspace{0.3cm}
+            \label{fig:visualA}
+        \end{figure}
+        \begin{figure}[H]
             \begin{minipage}{0.48\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{Imagenes/ejemploVisualB.png}
                 \caption{Visualización del error medio a lo largo del tiempo}
+                \label{fig:visualB}
             \end{minipage}
             \hfill
             \begin{minipage}{0.48\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{Imagenes/ejemploVisualC.png}
                 \caption{Visualización de error de normalización}
+                \label{fig:visualC}
             \end{minipage}
         \end{figure}
     
@@ -74,19 +78,21 @@ Dada su flexibilidad para segmentar la ejecución y su capacidad de visualizar l
 
 
 \subsection{Los modelos}
-Como se ha mencionado previamente, hay dos nociones principales que han guiado el desarrollo de este proyecto. Por un lado, seguir el ejemplo de las investigaciones citadas en el estado del arte, combinando las técnicas óptimas o prometedoras; y por otro, el objetivo de priorizar la simplicidad y accesibilidad de nuestro modelo. En virtud de ello se optó por empezar el entrenamiento con una red neuronal muy sencilla y aumentar progresivamente la complejidad de la red en base a los resultados, problemas y limitaciones que fueran surgiendo. \newline
+Como se ha mencionado previamente, hay dos nociones principales que han guiado el desarrollo de este proyecto. Por un lado, combinanar las técnicas óptimas o prometedoras de las investigaciones citadas en el estado del arte. Y por otro, el objetivo de priorizar la simplicidad y accesibilidad de nuestro modelo. En virtud de ello se optó por empezar el entrenamiento con una red neuronal muy sencilla y aumentar progresivamente la complejidad de la red en base a los resultados, problemas y limitaciones que fueran surgiendo. \newline
 
-El modelo inicial es un perceptrón multicapa (MLP) sencillo con una sola capa oculta. Este infiere la diferencia de desplazamiento entre un frame y el siguiente. Utilizando un dataset que genera lotes que contienen pares de [frameInfo, frameInfo + 1], se pasa el frame normalizado al modelo y este predice el delta de desplazamiento para cada vértice. Desnormalizando este delta se calcula la posición inferida por el modelo.  La diferencia entre esta posición predicha y la posición real recibida en el frameInfo + 1 se utiliza como pérdida para el entrenamiento. La función de pérdida elegida inicialmente, MSELoss, se utiliza generalmente en problemas de regresión pues penaliza fuertemente las diferencias grandes entre la predicción y el valor real, alineandose con nuestro objetivo. El modelo está compuesto por dos capas lineales y una RELU; y sus dimensiones son 13 de input (los parámetros de cada punto), el número de neuronas en la capa oculta (inicialmente entre 64 y 128) y 3 de output (el delta de desplazamiento en cada eje). \newline
+\subsubsection{Modelo inicial}
+El modelo inicial es un perceptrón multicapa (MLP) sencillo con una sola capa oculta. Este infiere la diferencia de desplazamiento entre un frame y el siguiente. Utilizando un dataset que genera lotes que contienen pares de la información de un frame y su frame consecutivo, se pasa el frame normalizado al modelo y este predice el delta de desplazamiento para cada vértice. Desnormalizando este delta se calcula la posición inferida por el modelo.  La diferencia entre esta posición predicha y la posición real recibida en el frameInfo + 1 se utiliza como pérdida para el entrenamiento. La función de pérdida elegida inicialmente, MSELoss, se utiliza generalmente en problemas de regresión pues penaliza fuertemente las diferencias grandes entre la predicción y el valor real, alineandose con nuestro objetivo. El modelo está compuesto por dos capas lineales y una RELU; y sus dimensiones son: 13 de entrada (los parámetros de cada punto), el número de neuronas en la capa oculta (inicialmente entre 64 y 128) y 3 de salida (el delta de desplazamiento en cada eje). \newline
 
-El entrenamiento de este modelo recalca ciertas necesidades, algunas más obvias como ampliar el tamaño de la red neuronal y otros menos evidentes que se recogen a continuación:
+\subsubsection{Adaptaciones del modelo}
+El entrenamiento de este modelo recalca ciertas necesidades, algunas más obvias como ampliar el tamaño de la red neuronal y otras menos evidentes que se recogen a continuación:
 
 \begin{itemize}
     %    Dejar caer?? Como función de activación utiliza una unidad lineal exponencial, comunmente conocida como ELU, esta se caracteriza por funcionar cn numeros negativos, Eva tu has visto esto para no usar relu? o es un invent?
-    \item \textbf{Sistema de coordenadas:} El registro de las posiciones al generar el dataset puede hacerse tanto de manera local respecto al pivote de la tela, como de manera global respecto al espacio 3D de la escena. Al registrar los elementos como las posiciones de los vértices o el sdf se hace de manera consistente, manteniendo un origen común para las coordenadas, por lo que ambos métodos son funcionales. Sin embargo, tras evaluar el desempeño del modelo con datasets relativos a ambos sistemas de coordenadas, se decide trabajar en espacio local, utilizando como origen la propia tela. De esa manera, las posiciones son más coherentes para el modelo y el resultado no es dependiente de la traslación en el espacio.
+    \item \textbf{Sistema de coordenadas:} El registro de las posiciones al generar el dataset puede hacerse tanto de manera local respecto al pivote de la tela, como de manera global respecto al espacio 3D de la escena. Al registrar los elementos como las posiciones de los vértices o el SDF se hace de manera consistente, manteniendo un origen común para las coordenadas, por lo que ambos métodos son funcionales. Sin embargo, tras evaluar el desempeño del modelo con datasets relativos a ambos sistemas de coordenadas, se decide trabajar en espacio local, utilizando como origen la propia tela. De esa manera, las posiciones son más coherentes para el modelo y el resultado no es dependiente de la traslación en el espacio.
 
     \item \textbf{Frecuencia de muestreo:} Inicialmete el dataset se entrena con una serie de frames que se registran en intervalos predefinidos \textit{recordTime} a la hora de hacer la simulación base. Este método agiliza la tarea de generación del dataset y podría pensarse que simplifica la simulación para el modelo. Al contrario, al disminuir el tiempo entre capturas de frames se aprecia una mejora significativa en el entrenamiento del modelo. Se concluye que el modelo aprende idóneamente con la máxima cantidad de frames posibles. Esta afirmación es respaldada por estudios como \cite{santesteban2022snug} en los que se utilizan grandes datasets con secuencias de animaciones completas.
     
-    \item \textbf{Recurrencia:} Varias de las investigaciones del estado del arte mencionan como limitación las telas más dinámicas, ya que, al tener muchas menos restricciones, las mallas que no van pegadas a un cuerpo de colisión son mucho más susceptibles a la inercia. Naturalmente, el aprendizaje de estas propiedades físicas requiere del conocimiento de atributos como la velocidad o la aceleración de las partículas. Si bien se tomaba la velocidad como input, la recurrencia permite al modelo tener una memoria a corto plazo del movimiento en cada vértice, haciendo su entrenamiento mucho más eficaz. En este caso se presenta como opción una red neuronal recurrente (RNN) que sigue la arquitectura de tipo "many to one", es decir, una cantidad determinada de frames se utilizan como input para general el delta de desplazamiento entre el último frame de la secuencia y el que sería el siguiente.   % no se si esta frase me gusta%
+    \item \textbf{Recurrencia:} Varias de las investigaciones del estado del arte, como por ejemplo \cite{santesteban2022snug}, mencionan como limitación las telas más dinámicas, ya que, al tener muchas menos restricciones, las mallas que no van pegadas a un cuerpo de colisión son mucho más susceptibles a la inercia. Naturalmente, el aprendizaje de estas propiedades físicas requiere del conocimiento de atributos como la velocidad o la aceleración de las partículas. Si bien se tomaba la velocidad como input, la recurrencia permite al modelo tener una memoria a corto plazo del movimiento en cada vértice, haciendo su entrenamiento mucho más eficaz. En este caso se presenta como opción una red neuronal recurrente (RNN) que sigue la arquitectura de tipo "many to one", es decir, una cantidad determinada de frames se utilizan como input para general el delta de desplazamiento entre el último frame de la secuencia y el que sería el siguiente.   % no se si esta frase me gusta%
 \end{itemize}
     
 \subsection{Parametrización}
@@ -95,11 +101,12 @@ En el apartado del Dataset se han enumerado todas las características de la tel
 \begin{itemize}
     \item Con objeto de simplificar y reducir errores, se reduce la cantidad de features utilizados al mínimo: la posición de cada vértice y el sdf. Se observa que para mallas sencillas (por ejemplo la anteriormente mencionada malla reducida a seis vértices) y movimientos limitados es un método con bajo error. Además, la poca cantidad de parámetros reduce la duración del entrenamiento y optimiza su incorporación a Unity, de la que se hablará más en la próxima sección.
 
-    \item Tras confirmar que la reducción de features puede ser interesante, se implementa un modelo random forest para ver cuales son los parámetros más importantes para la inferencia. Como se ve en la figura, los parámetros U, V y MD resultan no ser importantes para generar la predicción. Sin embargo, se aprecia la importancia de los parámetros de velocidad. En este caso es más notable en el eje x, debido a la configuración de la simulación con la que se ha generado el dataset analizado para el gráfico.
+    \item Tras confirmar que la reducción de features puede ser interesante, se implementa un modelo \textit{Random Forest} para ver cuáles son los parámetros más importantes para la inferencia. Se mide la importancia de Gini, esta métrica mide la reducción media de la impureza (MDI por sus siglas en inglés: Mean Decrease in Impurity), es decir, cuánta varianza o error reduce cada variable a lo largo de las divisiones en los nodos de todos los árboles. Sumando la importancia acumulada sobre los ejes temporales y espaciales (vértices de la malla), se consigue obtener la importancia de cada una de las 13 propiedades del dataset. Como se ve en la figura, los parámetros U, V y MD resultan no ser importantes para generar la predicción. Sin embargo, se aprecia la importancia de los parámetros de velocidad. En este caso es más notable en el eje x, debido a la configuración de la simulación con la que se ha generado el dataset analizado para el gráfico (\ref{fig:random_forest}).
     \begin{figure}[H]
         \centering
         \includegraphics[width=0.6\textwidth]{Imagenes/resultRndFrst.png}
         \caption{Parámetros valorados por el random forest}
+        \label{fig:random_forest}
     \end{figure}
 \end{itemize}
 
@@ -125,12 +132,12 @@ En este punto del desarrollo, los resultados de accuracy del modelo son adecuado
     \end{figure}
 
 \begin{itemize}
-    \item \textbf{Ruido en el input:} Una de las técnicas más sencillas para mejorar la capacidad del modelo de corregir sus errores es entrenarlo creando esos pequeños errores artificialmente. Esto se consigue añadiéndole ruido a los datos de entrada. De esta manera, el modelo aprende a corregir estos errores para corregir los suyos propios en un futuro. Las magnitudes del ruido en las que nos movemos son entre un 2 y un 5\%.
+    \item \textbf{Ruido en el input:} Una de las técnicas más sencillas para mejorar la capacidad del modelo de corregir sus errores es entrenarlo creando esos pequeños errores artificialmente. Esto se consigue añadiéndole ruido a los datos de entrada, en este caso se añade un ruido gaussiano de entre un 2 y un 5\% de magnitud respecto a los datos de entrada antes de normalizar. De esta manera, el modelo aprende a corregir estos errores para corregir los suyos propios en un futuro.
 
-    \item \textbf{Anchored training:} Otra forma de intentar reducir el error consiste en inferir el desplazamiento de los vértices respecto a las posiciones originales de la malla en lugar de las posiciones en el último frame. Este es un planteamiento intuitivo que se presenta en distintos papers mencionados previamente: DeePSD, SNUG o Subspace Neural Physics. Al pensar en simulaciones de telas, ya sea una bandera con su mástil o una prenda con su personaje, todas cuentan con unos puntos, es decir, algo a lo que anclarse. Actuando sobre esos puntos se puede asegurar que la simulación se mantendrá dentro de un espacio concreto. En esta investigación aplicamos esta técnica guardando las posiciones de los vértices en su estado incial y aplicando los nuevos desplazamientos sobre estos.
-    Al coger un punto de referencia del que medir los desplazamientos y no basarse en posicines generadas, el accuracy del modelo en las pruebas de python mejora notablemente. No obstante, no se consigue alcanzar una simulación en Unity tan fiel como las producidas por la siguiente técnica.
+    \item \textbf{Anchored training:} Otra forma de intentar reducir el error consiste en inferir el desplazamiento de los vértices respecto a las posiciones originales de la malla en lugar de las posiciones en el último frame (\cite{bertiche_deepsd_2021}, \cite{santesteban2022snug}, \cite{holden_subspace_2019}). Este es un planteamiento intuitivo que se presenta en distintos papers mencionados previamente: DeePSD, SNUG o Subspace Neural Physics. Al pensar en simulaciones de telas, ya sea una bandera con su mástil o una prenda con su personaje, todas cuentan con unos puntos, es decir, algo a lo que anclarse. Actuando sobre esos puntos se puede asegurar que la simulación se mantendrá dentro de un espacio concreto. En esta investigación aplicamos esta técnica guardando las posiciones de los vértices en su estado incial y aplicando los nuevos desplazamientos sobre estos.
+    Al coger un punto de referencia del que medir los desplazamientos y no basarse en posicines generadas, el accuracy del modelo, calculado con la diferencia entre las posiciones reales y predichas, en las pruebas de python mejora notablemente. No obstante, no se consigue alcanzar una simulación en Unity tan fiel como las producidas por la siguiente técnica.
         
-    \item \textbf{Unrolling for training:} En las investigaciones mencionadas en el estado del arte aparece la idea de dividir el entrenamiento en distintos modelos; ya sea con una red que de resultados más generales y una segunda que consiga refinar los detalles (arrugas, intersecciones con el colisionador, etc.) como en TailorNet \cite{patel2020tailornet}, o con modelos que actúen como predictor-corrector siendo el segundo normalmente en post-procesado. Sin embargo, en este proyecto se propone incluir esta idea en el propio entrenamiendo del modelo, con la función de pérdida. El caso de \cite{chen2025learning}, por ejemplo, el concepto de una función de pérdida \textit{force-inpulse} que penaliza tanto el error en la fuerza predicha como el inpulso que esta genera para las siguientes inferencias. De manera similar, en este proyecto se genera una secuencia de predicciones; la cadena de deltas generados sucesivamente permiten al modelo tener una noción sobre el cambio de velocidad y aceleración provocados. \newline
+    \item \textbf{Unrolling for training:} La idea de dividir el entrenamiento en distintos modelos es habitual; ya sea con una red que dé resultados más generales y una segunda que consiga refinar los detalles (arrugas, intersecciones con el colisionador, etc.) como en TailorNet \cite{patel2020tailornet}, o con modelos que actúen como predictor-corrector siendo el segundo normalmente en post-procesado. Sin embargo, en este proyecto se propone incluir esta idea en el propio entrenamiendo del modelo, con la función de pérdida. El caso de \cite{chen2025learning}, por ejemplo, el concepto de una función de pérdida \textit{force-inpulse} que penaliza tanto el error en la fuerza predicha como el inpulso que esta genera para las siguientes inferencias. De manera similar, en este proyecto se genera una secuencia de predicciones; la cadena de deltas generados sucesivamente permiten al modelo tener una noción sobre el cambio de velocidad y aceleración provocados. \newline
     
     La implementación que se incorpora en este proyecto se inspira más en la investigación de \cite{holden_subspace_2019}, en la que se lleva acabo un proceso similar. Además de retroalimentar los frames generados a la secuencia de input, se propaga el error utilizando la técnica BPTT (\textit{Backpropagation Through Time}). Esta técnica consiste en retropropagar el error a lo largo de la secuencia temporal y permite a la red aprender dependencias temporales.
     
@@ -149,9 +156,100 @@ En este punto del desarrollo, los resultados de accuracy del modelo son adecuado
 
 \subsection{Resultado e hiperparámetros}
 
-Tras el proceso de iteraciones descrito, se concluye que la red neuronal más óptima es una RNN con \textit{unfolding}, utilizando como loss la suma entre L1Loss y el loss de velocidad. El input se construye con el SDF, la posición y velocidad de los vértices normalizados con inyección de ruido y como output se obtienen los deltas de desplazamiento normalizados.
+Tras el proceso de iteraciones descrito, se concluye que la red neuronal más óptima es una RNN con \textit{unfolding}, utilizando como función de pérdida la suma entre \textit{L1Loss} y el la pérdida de velocidad. El input se construye con el SDF, la posición y velocidad de los vértices normalizados con inyección de ruido y como output se obtienen los deltas de desplazamiento normalizados. Por simplicidad el modelo que sa ha decidido representar por pseudocódigo recoge únicamente la posición y sdf como parámetro de entrada.
 
-\textit{       Aquí describimos más a fondo el modelo resultante? O sería redundante.?} \newline
+\begin{algorithm}[H]
+\caption{Función de \textit{Unrolling}}
+\label{alg:run_rollout}
+\begin{algorithmic}[1]
+\Function{RunRollout}{$ batch\_seq, batch\_future$}
+    \State $B, W, V, F \gets \text{dimensiones de } batch\_future$
+    \State $window \gets \text{copia}(batch\_seq)$ \Comment{La copia permite no alterar el tensor original}
+    \BlankLine
+    \State \textbf{\textit{Inyección de ruido inicial}}
+    \State $noise \gets \mathcal{N}(0, \sigma_{\text{noise}}) \text{ del mismo tamaño que } window[:, -N:]$
+    \State $window[:, -N:] \gets window[:, -N:] + noise$
+    
+    \BlankLine
+    \State \textbf{\textit{Iteración sobre la secuencia}}
+    \State $total\_loss \gets 0$
+    \State $prev\_pred\_pos \gets window[:, -1, :, 0:3]$ \Comment{Posición en $t-1$}
+        
+    \BlankLine
+    \For{$k \gets 0$ \textbf{to} $W - 1$}
+        \State $window\_norm \gets \text{NormalizarEntrada}(window)$
+        \State $ pred\_delta\_norm \gets \text{Modelo}(window\_norm)$ \Comment{Inferencia de la red}        
+        \State $ last\_pos \gets window[:, -1, :, 0:3]$
+        \State $ pred\_delta\_real \gets \text{DesnormalizarDelta}(pred\_delta\_norm)$
+        \State $ pred\_pos \gets last\_pos + pred\_delta\_real$ \Comment{Nueva posición absoluta}
+        
+        \BlankLine
+        \State $real\_pos \gets batch\_future[:, k, :, 0:3]$
+        \State $real\_prev\_pos \gets (k > 0) \mathrel{?} batch\_future[:, k-1, :, 0:3] : batch\_seq[:, -1, :, 0:3]$
+        
+        \BlankLine
+        \State $real\_delta\_norm \gets \text{NormalizarDelta}(real\_pos - last\_pos)$
+        \State $loss\_pos \gets \mathcal{L}_{L1}(pred\_delta\_norm, real\_delta\_norm)$ \Comment{Cálculo del Loss de Posición}
+        
+        \BlankLine
+        \State $pred\_vel \gets pred\_pos - prev\_pred\_pos$
+        \State $real\_vel \gets real\_pos - real\_prev\_pos$
+        \State $loss\_vel \gets \mathcal{L}_{L1}(pred\_vel / \sigma_{target}, real\_vel / \sigma_{target})$ \Comment{Cálculo del Loss de Velocidad}
+        
+        \BlankLine
+        \State $total\_loss \gets total\_loss + loss\_pos + (\gamma_{vel} \times loss\_vel)$
+        
+        \BlankLine
+        \Comment{\textit{Feedback Loop}}
+        \State $new\_frame \gets \text{ConstruirFrame}(pred\_pos, \text{resto de propiedades reales})$
+        \State $window \gets [window[:, 1:], new\_frame]$ \Comment{Desplazar ventana temporal}
+        \State $prev\_pred\_pos \gets pred\_pos$
+    \EndFor 
+    \State \Return $total\_loss / W$
+\EndFunction
+\end{algorithmic}
+\end{algorithm}
+
+\begin{algorithm}[H]
+\caption{Bucle de Entrenamiento y Validación}
+\label{alg:training_loop}
+\begin{algorithmic}[1]
+\For{$epoch \gets 1$ \textbf{to} $\text{EPOCHS}$}
+    
+    \State\textbf{Fase de Entrenamiento (Train)}
+    \State Establecer modelo en modo entrenamiento
+    \State $train\_loss \gets 0.0$
+    \For{cada $(batch\_seq, batch\_future)$ en $train\_loader$}
+        \State $loss \gets \textsc{RunRollout}(batch\_seq, batch\_future)$
+        \State $\text{Optimizador.zero\_grad}()$
+        \State $loss.\text{backward}()$
+        \State $\text{RecortarGradientes}(model.parameters, \text{umbral}=1.0)$
+        \State $\text{Optimizador.step}()$
+        \State $train\_loss \gets train\_loss + loss.\text{item}()$
+    \EndFor
+
+    \State $\text{Planificador.step}()$ \Comment{Actualizar tasa de aprendizaje}
+    
+    \State\textbf{Fase de Evaluación (Test)}
+    \State Establecer modelo en modo evaluación y desactivar gradientes
+    \State $test\_loss \gets 0.0$, $total\_err \gets 0.0$, $total\_verts \gets 0$
+    \For{cada $(batch\_seq, batch\_future)$ en $test\_loader$}
+        \State $loss \gets \textsc{RunRollout}(batch\_seq, batch\_future)$
+        \State $test\_loss \gets test\_loss + loss.\text{item}()$
+        
+        \Comment{Métricas de error en el primer paso ($k=0$)}
+        \State $pred\_pos \gets \text{PredecirSiguientePaso}(batch\_seq)$
+        \State $target\_pos \gets batch\_future[:, 0, :, 0:3]$
+        \State $distancias \gets \|pred\_pos - target\_pos\|_2$
+        \State $total\_err \gets total\_err + \sum(distancias)$
+        \State $total\_verts \gets total\_verts + \text{NúmeroDeElementos}(distancias)$
+    \EndFor
+
+    \State Almacenar métricas medias del $epoch$ en el histórico
+    \State Imprimir en consola: $epoch$, $train\_loss$, $test\_loss$, $\text{ErrorVértice}$
+\EndFor
+\end{algorithmic}
+\end{algorithm}
 
 Para acabar de ajustar el modelo se itera sobre los mismos datasets modificando los parámetros variables.
 \begin{itemize}

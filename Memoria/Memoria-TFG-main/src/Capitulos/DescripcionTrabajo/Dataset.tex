@@ -30,18 +30,27 @@ El movimiento de la bola que colisiona con la tela está descrito por un compone
     \label{fig:spline}
 \end{figure}
 
-Adicionalmente, introducimos modificaciones sobre este comportamiento: se deja el colisionador estático en distintas posiciones tanto dentro como fuera del alcande de la tela durante periodos de tiempo en la ejecución para intentar limitar la dependencia entre la tela y su distancia a la esfera. \newline 
+Adicionalmente, introducimos modificaciones sobre este comportamiento: se deja el colisionador estático en distintas posiciones tanto dentro como fuera del alcande de la tela durante periodos de tiempo en la ejecución para intentar limitar la dependencia entre la tela y su distancia a la esfera.
 
 \subsection{Otras simulaciones}
 También se han realizado pruebas con simulaciones más complejas con objeto de probar la efectividad de nuestro método y diferencias entre simulaciones más dinámicas y estáticas, más frecuentadas en PBD. \newline 
 
 Para probar el enfoque más estático y pegado al cuerpo se creó una simulación de un personaje con una \textbf{camiseta}. Tras múltiples pruebas tomando diferente número de iteraciones en el solver de Cloth, valores en las propiedades de la tela y extendido el tamaño hasta 4000 vértices, la simulación fue finalmente descartada debido a la inestabilidad de la tela y difícil generación de animaciones visualemente coherentes. Realizar animaciones de tela complejas en Unity sin combinar otras técnicas, implementar soluciones híbridas (como el Weight Mapping\footnote{Técnica de animación 3D y rigging que permite controlar cómo se deforman los vértices de una malla o prenda al mover las articulaciones de un esqueleto. }) o incorporar paquetes de pago de la Unity Asset Store como Magica Cloth \footnote{Paquete de Magica Cloth en el Asset Store de Unity:  \url{https://assetstore.unity.com/packages/tools/physics/magica-cloth-2-242307}} u Obi Cloth no es trivial. Otras investigaciones, como \cite{holden_subspace_2019} producen su material de entrenamiento en herramientas especializadas como Maya \footnote{Autodesk Maya es un software profesional de animación y efectos visuales 3D \url{https://www.autodesk.com/es/products/maya/overview}} o Blender \footnote{Blender es un software de código abierto de animación y efectos visuales 3D  \url{https://www.blender.org/}} para conseguir simulaciones de prendas complejas. Pese a que esto limita el alcance de las simulaciones a generar en esta investigación, el nivel de complejidad potencial sigue siendo más que sufiente para probar nuestra implementación a pequeña escala, manteniendo el proyecto alienado a los objetivos previamente declarado y siguiendo la tendencia de juegos implementados en Unity.  \newline 
 
-\begin{figure}[htbp]
-    \centering
-    \includegraphics[width=0.6\textwidth]{Imagenes/Bmap/prubacamiseta.jpeg}
-    \caption{Simulación de una camiseta con componente Cloth.}
-    \label{fig:camiseta}
+\begin{figure}[H]
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{Imagenes/Bmap/prubacamiseta.jpeg}
+        \caption{Simulación de una camiseta con componente Cloth.}
+        \label{fig:camiseta}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{Imagenes/Bmap/skirt.png}
+        \caption{Simulación de una falda con componente Cloth.}
+        \label{fig:skirt}
+    \end{minipage}
 \end{figure}
 
 La otra simulación llevada a cabo consiste en un personaje andando con una \textbf{falda}. El personaje, simplificado, está formado por tres cápsulas: un torso y dos piernas; y la falda es un malla en forma de cilindro compuesta por 288 vértices, para habilitar un movimiento más dinámico. Una vez ajustados los colliders de las cápsulas para ser más grandes que las mallas de las piernas, esta simulación genera un buen resultado a nivel visual. Lo emplearemos más adelante para representar animaciones más complejas y realizar  comparaciones y mediciones adicionales al plano de 25 vértices.
