@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.UIElements;
 
 
-public class ClothML : MonoBehaviour
+public class ClothMLFullMLP : MonoBehaviour
 {
     [SerializeField]
     public GameObject ball;
@@ -182,7 +182,7 @@ public class ClothML : MonoBehaviour
 		result.Dispose();
 	}
 
-	void OnDestroy()
+    void OnDestroy()
     {
         worker?.Dispose();
     }
