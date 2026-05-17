@@ -489,7 +489,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a36df33f06b569b4498b3ee70bb1aabc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  isLineal: 1
+  isLineal: 0
   movementSpeed: 1
   isAuto: 1
 --- !u!135 &339546646
@@ -599,7 +599,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Splines::UnityEngine.Splines.SplineAnimate
   m_Target: {fileID: 0}
   m_PlayOnAwake: 1
-  m_LoopMode: 1
+  m_LoopMode: 0
   m_Method: 1
   m_Duration: 1
   m_MaxSpeed: 10
@@ -715,7 +715,7 @@ Transform:
   m_GameObject: {fileID: 635915742}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.14, y: 1.15, z: -0.16}
+  m_LocalPosition: {x: 0.14, y: -0.27, z: -0.16}
   m_LocalScale: {x: 2, y: 0.6, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -1634,6 +1634,7 @@ GameObject:
   - component: {fileID: 1872676680}
   - component: {fileID: 1872676684}
   - component: {fileID: 1872676685}
+  - component: {fileID: 1872676686}
   m_Layer: 0
   m_Name: MLRotPlane
   m_TagString: Untagged
@@ -1648,7 +1649,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1872676679}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b27fdda5777c10408704b7029997502, type: 3}
   m_Name: 
@@ -1783,6 +1784,32 @@ MonoBehaviour:
   seqLen: 8
   jsonFile: {fileID: 4900000, guid: 46101f1009f56d64f92587b56414c89a, type: 3}
   numFeatures: 7
+  normData:
+    mean: []
+    std: []
+    target_mean: []
+    target_std: []
+  procActive: 0
+--- !u!114 &1872676686
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1872676679}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 61d33e3f8203bb74f94b9489f03315b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ClothMLPosRec
+  sphereColliders:
+  - {fileID: 339546646}
+  capsuleColliders: []
+  modelAsset: {fileID: 5022602860645237092, guid: 32372f9610e35c948bae64c677478e85, type: 3}
+  clothMeshFilter: {fileID: 1872676682}
+  collidersUnionSmoothness: 0
+  contador: 0
+  jsonFile: {fileID: 4900000, guid: c0d02b2380cd0c94386c732108e86c05, type: 3}
   normData:
     mean: []
     std: []
