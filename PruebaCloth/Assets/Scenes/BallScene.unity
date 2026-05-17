@@ -490,7 +490,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   isLineal: 0
-  movementSpeed: 1
+  movementSpeed: 0.35
   isAuto: 1
 --- !u!135 &339546646
 SphereCollider:
@@ -511,7 +511,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 0.6
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &339546647
 MeshRenderer:
@@ -579,7 +579,7 @@ Transform:
   m_GameObject: {fileID: 339546644}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.81, y: -0.32, z: -0.16}
+  m_LocalPosition: {x: 0.81, y: -0.485, z: -0.16}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -647,8 +647,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
+  m_Size: {x: 1.4928968, y: 1.1271322, z: 2.0330458}
+  m_Center: {x: -0.07111347, y: -0.43096343, z: 0.19073272}
 --- !u!23 &635915744
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -715,7 +715,7 @@ Transform:
   m_GameObject: {fileID: 635915742}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.14, y: -0.27, z: -0.16}
+  m_LocalPosition: {x: 0.14, y: -0.23, z: -0.16}
   m_LocalScale: {x: 2, y: 0.6, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -733,8 +733,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1c67e85816898b54e9439f3e52b63444, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  pathPointMin: 3
-  pathPointMax: 6
+  pathPointMin: 2
+  pathPointMax: 2
+  simpleZmovement: 1
 --- !u!1 &705507993
 GameObject:
   m_ObjectHideFlags: 0
@@ -1413,7 +1414,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &1340473991
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1641,7 +1642,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1872676680
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1654,18 +1655,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9b27fdda5777c10408704b7029997502, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClothMLPosRec
-  sphereColliders: []
+  sphereColliders:
+  - {fileID: 339546646}
   capsuleColliders: []
-  modelAsset: {fileID: 5022602860645237092, guid: e998065b75cfd8f4a86fec6364a1af69, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 0d3046514cc6e2c449c6e34a81e56ca4, type: 3}
   clothMeshFilter: {fileID: 1872676682}
   collidersUnionSmoothness: 0
-  jsonFile: {fileID: 4900000, guid: db82c8a00f39f2a42a0783b0d5cd4aa8, type: 3}
+  jsonFile: {fileID: 4900000, guid: 0061208fc71c2f147962d3bb1790f4e0, type: 3}
   normData:
     mean: []
     std: []
     target_mean: []
     target_std: []
-  procActive: 256
+  procActive: 512
   seqLen: 8
 --- !u!23 &1872676681
 MeshRenderer:
@@ -1805,11 +1807,12 @@ MonoBehaviour:
   sphereColliders:
   - {fileID: 339546646}
   capsuleColliders: []
-  modelAsset: {fileID: 5022602860645237092, guid: 32372f9610e35c948bae64c677478e85, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: e998065b75cfd8f4a86fec6364a1af69, type: 3}
   clothMeshFilter: {fileID: 1872676682}
   collidersUnionSmoothness: 0
   contador: 0
-  jsonFile: {fileID: 4900000, guid: c0d02b2380cd0c94386c732108e86c05, type: 3}
+  seqLen: 8
+  jsonFile: {fileID: 4900000, guid: db82c8a00f39f2a42a0783b0d5cd4aa8, type: 3}
   normData:
     mean: []
     std: []
@@ -4599,7 +4602,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!114 &5195805995224845084
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -4663,18 +4666,6 @@ Cloth:
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 3.4028235e+38
     collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 3.4028235e+38
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0
-    collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0
-    collisionSphereDistance: 3.4028235e+38
   - maxDistance: 3.4028235e+38
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 3.4028235e+38
@@ -4691,11 +4682,23 @@ Cloth:
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 3.4028235e+38
     collisionSphereDistance: 3.4028235e+38
-  - maxDistance: 0
+  - maxDistance: 3.4028235e+38
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 3.4028235e+38
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 3.4028235e+38
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 0
     collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 3.4028235e+38
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 3.4028235e+38
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 3.4028235e+38
+    collisionSphereDistance: 3.4028235e+38
   - maxDistance: 0
+    collisionSphereDistance: 3.4028235e+38
+  - maxDistance: 3.4028235e+38
     collisionSphereDistance: 3.4028235e+38
   - maxDistance: 0
     collisionSphereDistance: 3.4028235e+38
