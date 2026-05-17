@@ -22,7 +22,7 @@ public class ClothMLPosRec : MonoBehaviour
     int vertexCount;
 
     // --- NUEVO: Par�metros de la Secuencia ---
-    private int seqLen = 8;
+    private int seqLen = 5;
     // Buffer para guardar el estado normalizado de los �ltimos 5 frames
     // [tiempo, vertice, feature]
     private float[,,] historyBuffer;
