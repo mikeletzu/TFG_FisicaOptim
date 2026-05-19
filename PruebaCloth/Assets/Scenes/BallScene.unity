@@ -249,7 +249,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &292682434
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -484,13 +484,13 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 339546644}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a36df33f06b569b4498b3ee70bb1aabc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  isLineal: 0
-  movementSpeed: 0.35
+  isLineal: 1
+  movementSpeed: 0.5
   isAuto: 1
 --- !u!135 &339546646
 SphereCollider:
@@ -511,7 +511,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.6
+  m_Radius: 0.7
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &339546647
 MeshRenderer:
@@ -579,7 +579,7 @@ Transform:
   m_GameObject: {fileID: 339546644}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.81, y: -0.485, z: -0.16}
+  m_LocalPosition: {x: 1.8, y: -0.485, z: 0}
   m_LocalScale: {x: 0.25, y: 0.25, z: 0.25}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -627,7 +627,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!65 &635915743
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -715,8 +715,8 @@ Transform:
   m_GameObject: {fileID: 635915742}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.14, y: -0.23, z: -0.16}
-  m_LocalScale: {x: 2, y: 0.6, z: 1}
+  m_LocalPosition: {x: 0.14, y: -0.23, z: -0.093244}
+  m_LocalScale: {x: 2, y: 0.6, z: 0.65}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -1301,7 +1301,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!64 &1222017395
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -1658,17 +1658,17 @@ MonoBehaviour:
   sphereColliders:
   - {fileID: 339546646}
   capsuleColliders: []
-  modelAsset: {fileID: 5022602860645237092, guid: 0d3046514cc6e2c449c6e34a81e56ca4, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 971eca0becb23194781a55da9fdb73c3, type: 3}
   clothMeshFilter: {fileID: 1872676682}
   collidersUnionSmoothness: 0
-  jsonFile: {fileID: 4900000, guid: 0061208fc71c2f147962d3bb1790f4e0, type: 3}
+  jsonFile: {fileID: 4900000, guid: 2286f3bbf41d13d4681b7c671f5c11ad, type: 3}
   normData:
     mean: []
     std: []
     target_mean: []
     target_std: []
   procActive: 512
-  seqLen: 8
+  seqLen: 16
 --- !u!23 &1872676681
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -1774,17 +1774,17 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1872676679}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: d57d527bda9b7504295c6280f7219125, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClothMLPosVelRec
   ball: {fileID: 339546644}
   ballCollider: {fileID: 339546646}
-  modelAsset: {fileID: 5022602860645237092, guid: 94b3b589b9d39764c849542f4059b1a7, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: ae85805debf6b8f4faa83424daeee228, type: 3}
   clothMeshFilter: {fileID: 1872676682}
   seqLen: 8
-  jsonFile: {fileID: 4900000, guid: 46101f1009f56d64f92587b56414c89a, type: 3}
+  jsonFile: {fileID: 4900000, guid: 15ca23144c248b54fbeb1ab702f9593f, type: 3}
   numFeatures: 7
   normData:
     mean: []
@@ -1799,7 +1799,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1872676679}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 61d33e3f8203bb74f94b9489f03315b6, type: 3}
   m_Name: 
@@ -1807,12 +1807,12 @@ MonoBehaviour:
   sphereColliders:
   - {fileID: 339546646}
   capsuleColliders: []
-  modelAsset: {fileID: 5022602860645237092, guid: e998065b75cfd8f4a86fec6364a1af69, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 971eca0becb23194781a55da9fdb73c3, type: 3}
   clothMeshFilter: {fileID: 1872676682}
   collidersUnionSmoothness: 0
   contador: 0
-  seqLen: 8
-  jsonFile: {fileID: 4900000, guid: db82c8a00f39f2a42a0783b0d5cd4aa8, type: 3}
+  seqLen: 16
+  jsonFile: {fileID: 4900000, guid: 2286f3bbf41d13d4681b7c671f5c11ad, type: 3}
   normData:
     mean: []
     std: []
@@ -4610,14 +4610,14 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5195805995224845083}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fa883dacb49e3474487078a70b9f7426, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ClothDatasetRecorder
   autoRecord: 1
   record: 0
-  recordTime: 100
+  recordTime: 250
   recordTimeLeft: 0
   totalFramesRecorded: 0
   sphereColliders:
@@ -4649,7 +4649,7 @@ Cloth:
   m_CollisionMassScale: 0
   m_UseContinuousCollision: 1
   m_UseVirtualParticles: 1
-  m_SolverFrequency: 120
+  m_SolverFrequency: 150
   m_SleepThreshold: 0.1
   m_Coefficients:
   - maxDistance: 3.4028235e+38

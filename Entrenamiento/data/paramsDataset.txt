@@ -1,5 +1,6 @@
-dataset num	vertex		fixedDT		frames		apuntes	
-	35	6		0.02		5000
-	36	6		0.1		1000
-	47	25		0.02?		5000
-	71	25		0.02		25000		rndmMov
+dataset 	num	vertex		fixedDT		frames		movmiento
+		35	6		0.02		5000		lineal
+		36	6		0.1		1000		lineal
+		47	25		0.02?		5000		lineal
+		71	25		0.02		25000		rndmMov
+		102	25		0.02		25000		rndmMov
