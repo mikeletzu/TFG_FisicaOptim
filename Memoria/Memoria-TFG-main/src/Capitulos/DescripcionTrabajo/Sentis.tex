@@ -52,14 +52,14 @@ Al igual que en el caso de los notebooks del entrenamiento, se trabajó de forma
 \begin{algorithm}[H]
     \caption{Procesamiento de los datos de entrada para modelos PCA}
     \DontPrintSemicolon
-    \BlankLine
+    %\BlankLine
     \SetKwInOut{Input}{Entrada}\SetKwInOut{Output}{Salida}
     \SetKwData{Raw}{raw}\SetKwData{Scaled}{scaled}\SetKwData{Centered}
     {centered}\SetKwData{PCA}{pca}
     \SetKwComment{Comment}{$\triangleright$\ }{}
     \Input{Vértices actuales $\mathbf{V}$, Vértices anteriores $\mathbf{V}_{last}$, Parámetros de normalización $\theta$, Matriz de componentes $\mathbf{W}$}
     \Output{Vector proyectado}
-    \BlankLine
+    %\BlankLine
     \Comment*[l]{Paso 1: Construcción del vector crudo $\mathbf{X} \in \mathbb{R}^{78}$}
     \For{$v \leftarrow 0$ \KwTo $\mathbf{V}$.length}{
         $\mathbf{pos} \leftarrow \mathbf{V}_v$\;
@@ -67,11 +67,11 @@ Al igual que en el caso de los notebooks del entrenamiento, se trabajó de forma
         $\mathbf{sdf} \leftarrow \|\mathbf{pos} - \mathbf{pos}_{ball}\| - r_{ball}$\;
         $\mathbf{n}, \mathbf{uv} \leftarrow \text{obtener de la malla}$\;
         Llenar bloque $\mathbf{X}_{v}$ con $\{\mathbf{pos}, \mathbf{vel}, \mathbf{sdf}, \mathbf{n}, \mathbf{maxDist}, \mathbf{uv}\}$}
-    \BlankLine
+    %\BlankLine
     \Comment*[l]{Paso 2: StandardScaler}
     \For{$f \leftarrow 0$ \KwTo $77$}
     {$\Scaled[f] \leftarrow \frac{\Raw[f] - \mu_{\text{input}, f}}{\sigma_{\text{input}, f}}$}
-    \BlankLine
+    %\BlankLine
     \Comment*[l]{Paso 3: Centrado PCA}
     \For{$f \leftarrow 0$ \KwTo $77$}
     {$\Centered[f] \leftarrow \Scaled[f] - \mu_{\text{pca}, f}$}
@@ -87,11 +87,41 @@ Al igual que en el caso de los notebooks del entrenamiento, se trabajó de forma
 \end{itemize}
 
 \subsection{Resultados visuales de la inferencia}
-En este apartado se muestran ejemplos comparando la tela simulada por Unity y la inferencia que el modelo consigue.
+En este apartado se muestran ejemplos comparando la tela simulada por Unity y la inferencia que el modelo consigue. \newline
+En el caso de los modelos entrenados con un movimiento lineal, la inferencia es casi perfecta con un entrenamiento muy sencillo.
+------------ej. \newline
+En el caso de los modelos entrenados con aleatoriedad en el movimiento del colisionador, puede conseguirse un resultado adecuado pero requiere de un entrenamiento mucho más costoso. En las siguientes tablas y figuras, \ref{tab:randomTraining}, \ref{fig:inferenciaRandom} y \ref{fig:realRandom}, se muestran estos resultados. Puede apreciarse que la bola atraviesa la tela en ocasiones, esto se debe a las limitaciones del entrenamiento pero también a las de la propia simulación de Cloth, ya que el solver de Unity comete errores de solapamiento igualmente.
 
-AÑADIR PRUEBAS % izquierda Unity y inferencia dch
 
-%TODO: HACER FIGURES
+
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{ | m{2.2cm} | m{2cm} | m{1.2cm} | m{2.1cm} | m{2.4cm} | m{2.2cm} | }
+        \hline \textbf{Windows size} & \textbf{Rollout steps} & \textbf{Noise} & \textbf{Learning rate} & \textbf{Tamaño dataset} & \textbf{Batch size} \\ \hline
+            16 & 24 & 3\% & 0.001 & 25000 & 32 \\ \hline
+        \end{tabular}
+        \BlankLine
+        \begin{tabular}{ | m{3cm} | m{3cm} | m{1.2cm} | }
+        \hline \textbf{Tiempo} & \textbf{Error medio por vertice} & \textbf{FPS} \\ \hline
+            18h & 0.0019 & 110 \\ \hline
+        \end{tabular}
+    \end{center}
+    \caption{Hiperparámetros, configuración y resultados del entrenamiento.}
+    \label{tab:randomTraining}
+\end{table}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Imagenes/inferenciaRandom.png}
+    \caption{Inferencia del modelo para una muestra aleatoria.}
+    \label{fig:inferenciaRandom}
+\end{figure}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.9\textwidth]{Imagenes/realRandom.png}
+    \caption{Simulación de Unity para una muestra aleatoria.}
+    \label{fig:realRandom}
+\end{figure}
 
 \subsection{Post-procesamiento}
 En las investigaciones más visualmente convincentes del estado del arte, se consigue llegar a ese nivel de credibilidad en la simulación gracias a estrategias de post-procesamiento que refinan la apariencia de la geometría tras ser inferida. Entre ellas destacan la corrección de intercolisiones o intersecciones con los objetos colisionadores, la reconstrucción de las normales de los vértices, la conservación de la integridad física de la tela mediante medidas de separación entre vértices o el suavizado de temblores. Al tener en este proyecto como objetivos comparar resultados de la inferencia y observar la capacidad de los modelos de replicar estas simulaciones por sí mismos, se ha querido afinar la predicción de la simulación de la manera más precisa posible fuera del motor de videojuegos. Es decir, se apreciaba medir visualmente el resultado directo del modelo sin correciones adicionales. Esto supone resultados menos pulidos pero más significativos respecto a la capacidad de los modelos. \newline

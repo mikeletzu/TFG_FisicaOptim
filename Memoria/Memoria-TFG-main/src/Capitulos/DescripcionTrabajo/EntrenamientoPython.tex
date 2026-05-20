@@ -165,17 +165,17 @@ Tras el proceso de iteraciones descrito, se concluye que la red neuronal más ó
 \Function{RunRollout}{$ batch\_seq, batch\_future$}
     \State $B, W, V, F \gets \text{dimensiones de } batch\_future$
     \State $window \gets \text{copia}(batch\_seq)$ \Comment{La copia permite no alterar el tensor original}
-    \BlankLine
+    %\BlankLine
     \State \textbf{\textit{Inyección de ruido inicial}}
     \State $noise \gets \mathcal{N}(0, \sigma_{\text{noise}}) \text{ del mismo tamaño que } window[:, -N:]$
     \State $window[:, -N:] \gets window[:, -N:] + noise$
     
-    \BlankLine
+    %\BlankLine
     \State \textbf{\textit{Iteración sobre la secuencia}}
     \State $total\_loss \gets 0$
     \State $prev\_pred\_pos \gets window[:, -1, :, 0:3]$ \Comment{Posición en $t-1$}
         
-    \BlankLine
+    %\BlankLine
     \For{$k \gets 0$ \textbf{to} $W - 1$}
         \State $window\_norm \gets \text{NormalizarEntrada}(window)$
         \State $ pred\_delta\_norm \gets \text{Modelo}(window\_norm)$ \Comment{Inferencia de la red}        
@@ -183,23 +183,23 @@ Tras el proceso de iteraciones descrito, se concluye que la red neuronal más ó
         \State $ pred\_delta\_real \gets \text{DesnormalizarDelta}(pred\_delta\_norm)$
         \State $ pred\_pos \gets last\_pos + pred\_delta\_real$ \Comment{Nueva posición absoluta}
         
-        \BlankLine
+        %\BlankLine
         \State $real\_pos \gets batch\_future[:, k, :, 0:3]$
         \State $real\_prev\_pos \gets (k > 0) \mathrel{?} batch\_future[:, k-1, :, 0:3] : batch\_seq[:, -1, :, 0:3]$
         
-        \BlankLine
+        %\BlankLine
         \State $real\_delta\_norm \gets \text{NormalizarDelta}(real\_pos - last\_pos)$
         \State $loss\_pos \gets \mathcal{L}_{L1}(pred\_delta\_norm, real\_delta\_norm)$ \Comment{Cálculo del Loss de Posición}
         
-        \BlankLine
+        %\BlankLine
         \State $pred\_vel \gets pred\_pos - prev\_pred\_pos$
         \State $real\_vel \gets real\_pos - real\_prev\_pos$
         \State $loss\_vel \gets \mathcal{L}_{L1}(pred\_vel / \sigma_{target}, real\_vel / \sigma_{target})$ \Comment{Cálculo del Loss de Velocidad}
         
-        \BlankLine
+        %\BlankLine
         \State $total\_loss \gets total\_loss + loss\_pos + (\gamma_{vel} \times loss\_vel)$
         
-        \BlankLine
+        %\BlankLine
         \Comment{\textit{Feedback Loop}}
         \State $new\_frame \gets \text{ConstruirFrame}(pred\_pos, \text{resto de propiedades reales})$
         \State $window \gets [window[:, 1:], new\_frame]$ \Comment{Desplazar ventana temporal}
