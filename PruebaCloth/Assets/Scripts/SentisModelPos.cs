@@ -1,11 +1,6 @@
-using System;
-using System.Drawing;
 using System.IO;
-using Unity.AppUI.UI;
 using Unity.InferenceEngine;
-using UnityEditor.Build.Content;
 using UnityEngine;
-using UnityEngine.UIElements;
 
 
 public class ClothMLPos : MonoBehaviour

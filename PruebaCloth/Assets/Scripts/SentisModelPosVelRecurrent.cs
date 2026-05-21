@@ -1,9 +1,6 @@
-using System;
 using System.IO;
 using Unity.InferenceEngine; // O Unity.Sentis dependiendo de tu versión exacta
 using UnityEngine;
-using UnityEngine.UIElements;
-using static UnityEditor.PlayerSettings;
 
 public class ClothMLPosVelRec : MonoBehaviour
 {
