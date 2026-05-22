@@ -1,4 +1,4 @@
-\section{SimulacionUnity}
+\section{Inferencia en Unity}
 \label{sec:SimulacionUnity}
 
 Como se ha explicado en el último apartado, el entrenamiento genera dos archivos indispensables para la ejecución del modelo en Unity. El archivo ONNX que contiene el modelo entrenado, y el archivo JSON con los datos de normalización de los inputs y outputs del modelo. Estos archivos serán recogidos por los componentes de tipo ClothML que se han generado para remplazar el componente Cloth del objeto-tela en Unity. En este apartado se explica este proceso y sus elementos con detalle.
@@ -16,13 +16,13 @@ Al inicio del capítulo se describe este pipeline como circular, pues se utiliza
 
 En este apartado se profundiza en el componente mencionado, que se añade en el anexo de esta memoria. % incluir 
 
-\subsubsection{Funcionamento de sentis}
-Sentis permite importar modelos de redes neuronales entrenados a Unity y ejecutarlos en tiempo real tanto en CPU como en GPU. Para utilizar Sentis se crea un motor o \textit{worker} que se encarga de planear las operaciones del tensor de forma paralela. Además procesa cada capa del modelo de manera secuencial, obteniendo con los datos aportados la salida del modelo.
+\subsubsection{Funcionamento de Sentis}
+Sentis permite importar modelos de redes neuronales entrenados a Unity y ejecutarlos en tiempo real tanto en CPU como en GPU. Para utilizar Sentis se crea un motor o \textit{worker} que se encarga de planear las operaciones del tensor de forma paralela. El ejecutarlo, se obtenienen los resultados del modelo. En muchos aspectos la arquitectura es análoga a Pytorch, por ejemplo, en Sentis la entrada y salida de los modelos también se gestiona con tensores. Estos pueden llegar a tener hasta 8 dimensiones, pero en memoria se almacenan los tensores como un array en el que los valores de la última dimensión son adyacentes\footnote{Manual de Unity que describe las bases de los tensores: \url{https://docs.unity3d.com/Packages/com.unity.sentis@1.1/manual/tensor-fundamentals.html}}. 
 
 \subsubsection{Estructura del componente}
-Habiendo descrito el funcionamiento interno de la herramienta, en este apartado se explica el uso que se le ha dado para adaptarla a las necesidades del proyecto. Los componentes ClothML han sido generados a partir del \textit{Mono Behaviour} de Unity, esta clase engloba los comportamientos de un \textit{Game Object}. Proporciona métodos como \textit{Start()} o \textit{FixedUpdate()} que representan el ciclo de vida del objeto.\newline
+Habiendo descrito el funcionamiento interno de la herramienta, en este apartado se explica el uso que se le ha dado para adaptarla a las necesidades del proyecto. Los componentes ClothML han sido generados a partir del \textit{Mono Behaviour} de Unity, esta clase engloba los comportamientos de un \textit{Game Object}, la unidad básica de entidad que funciona como contenedor de componentes. Proporciona métodos como \textit{Start()} o \textit{FixedUpdate()} que representan el ciclo de vida del objeto.\newline
 
-\textit{Start()} se ejecuta una sola vez al inicio del programa, por lo que se utiliza para crear el worker e inicializar los parámetros necesarios. Los parámetros que el componente recibe son los siguientes:
+\textit{Start()} se ejecuta una sola vez al inicio del programa, por lo que se utiliza para crear el worker, el tensor de entrada e inicializar los parámetros necesarios. Los parámetros que el componente recibe son los siguientes:
 \begin{itemize}
     \item \textbf{JSON:} Contiene los parámetros de normalización. Estos se utilizarán para normalizar los datos de entrada del tensor y desnormalizar los deltas resultantes.
     \item \textbf{ONNX:} El modelo entrenado en formato ONNX se utiliza para inicializar el modelo de Sentis.
@@ -31,9 +31,16 @@ Habiendo descrito el funcionamiento interno de la herramienta, en este apartado 
     \item \textbf{Collisionador/es:} Los colliders que representan el objeto que la tela debe tener en cuenta para su colisión. Al igual que en el componente de Cloth de Unity, puede estar formado por una o más esferas y cápsulas.
 \end{itemize}
 
-Asimismo, se determinan los constraints de los puntos. Se establece el parámetro \textit{max distance} para la lista de vértices. También se llena el history buffer con el estado de la tela quieta en su posición inicial.
+Asimismo, se establece el parámetro \textit{max distance} para la lista de vértices, determinando así los constraints de los puntos. También se crea el history buffer como un array de floats y se llena con el estado de la tela quieta en su posición inicial. Imitar el formato previamente explicado que Sentis utiliza como entrada de los modelos, permite construir el tensor de entrada con una referencia directa a este array, ahorrando así mucho trasiego de memoria. En la siguiente figura (\ref{fig:historyBuffer}) puede visualizarse la organización de nuestras variables de entrada en este formato.
 
-\textit{FixedUpdate()} es el método que Unity utiliza por defecto para la ejecución de las físicas. En él iteramos sobre los puntos de la geometría para inferir las nuevas posiciones. En la siguiente figura se visualiza una iteración para un modelo recurrente. Se accede a la malla para calcular los parámetros del frame de input, como la posición local o el SDF. Estos parámetros son normalizados con la media y la desviación típicas recibidas en el JSON. Se introducen al historial de estados, que previamente habrá liberado su primera posición, manteniendo así un tamaño constante. Se crea el tensor de las dimensiones necesarias (1 x secuencia de frames del historial x cantidad de vértices x cantidad de características) y se vuelca el contenido del historial de estados. Se ejecuta el modelo y se desnormalizan los resultados, también con los parámetros del JSON. Estos resultados finalmente se suman a la posición de los vértices en el estado del input, estableciendo así la nueva posición.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{Imagenes/HistoryBuffer.png}
+    \caption{Array del tamaño \([window size * vértices * features]\) de las dimensiones necesarias (1 x secuencia de frames del historial x cantidad de vértices x cantidad de características)}
+    \label{fig:historyBuffer}
+\end{figure}
+
+\textit{FixedUpdate()} es el método que Unity utiliza por defecto para la ejecución de las físicas. En él iteramos sobre los puntos de la geometría para inferir las nuevas posiciones. En la siguiente figura se visualiza una iteración para un modelo recurrente. Se accede a la malla para calcular los parámetros del frame de input, como la posición local o el SDF. Estos parámetros son normalizados con la media y la desviación típica calculados previamente en la normalización de los modelos en python. Se introducen al historial de estados, que previamente habrá liberado su primera posición, manteniendo así un tamaño constante. Se ejecuta el modelo con el tensor de entrada, que se habrá actualizado automáticamente, y se recogen los resultados del mismo. Estos serán desnormalizados con los parám calculados en el entrenamiento en python. Finalmente se suman los deltas a la posición de los vértices en el estado del input, estableciendo así la nueva posición.
 
 \begin{figure}[H]
     \centering
@@ -41,26 +48,18 @@ Asimismo, se determinan los constraints de los puntos. Se establece el parámetr
     \caption{Esquema del contenido de FixedUpdate() de ClothML.}
 \end{figure}
 
-Al igual que en el caso de los notebooks del entrenamiento, se trabajó de forma paralela y existen distintas versiones de este componente en función de el modelo entrenado y las características de la tela. 
-
-\begin{itemize}
-    \item Se adapta la generación del input para ajustarse a las características que el modelo necesita.
-    \item Los modelos MLP no requieren de historial de eventos, por lo que los datos de estado se normalizan y se transforman directamente en el tensor de input para el modelo.
-    \item Del mismo modo, los modelos PCA que se implementaron requieren de un procesamiento específico para generar los componentes con los que se entrenó el modelo. En este caso, se aplana el vector de entrada para estandarizarlo y proyectar los datos en el espacio de componentes que se generó al entrenar el dataset, como se puede observar en el siguiente pseudocódigo:
-\end{itemize}
+Existen distintas versiones de este componente en función del modelo entrenado. Todos los modelos coinciden en las variables de salida, sin embargo, la forma y el contenido de la entrada cambian según el entrenamiemto del modelo. En el caso de los modelos MLP, por ejemplo, el historial se reduciría a un solo frame, el script básico se adapta automáticamente a este tipo de variaciones, como número de frames de input o cantidad de vértices. Para otros modelos en cambio, es necesario cambiar el registro del estado. Este se lleva acabo en el método \textit{saveStateAt(offset)}, este recoge las features que el modelo necesita y las guarda en el formato adecuado en la posición del historial determinanda por la variable \textit{offset}, que típicamente corresponderá a la posición del último frame del historial. Del mismo modo, los modelos PCA que se implementaron requieren de un procesamiento específico, descrito en la siguiente sección de pseudocódigo. Esencialmente se aplana el vector de entrada para estandarizarlo y proyectar los datos en el espacio de componentes que se generó al entrenar el dataset, los componentes pasan a guardarse en la posición pertinente del buffer.
 
 \begin{algorithm}[H]
-    \caption{Procesamiento de los datos de entrada para modelos PCA}
-    \DontPrintSemicolon
-    %\BlankLine
-    \SetKwInOut{Input}{Entrada}\SetKwInOut{Output}{Salida}
-    \SetKwData{Raw}{raw}\SetKwData{Scaled}{scaled}\SetKwData{Centered}
-    {centered}\SetKwData{PCA}{pca}
+\caption{Procesamiento de datos de entrada para modelos PCA}
+\DontPrintSemicolon
+\Function{saveStateAt}{$offset$}
     \SetKwComment{Comment}{$\triangleright$\ }{}
-    \Input{Vértices actuales $\mathbf{V}$, Vértices anteriores $\mathbf{V}_{last}$, Parámetros de normalización $\theta$, Matriz de componentes $\mathbf{W}$}
-    \Output{Vector proyectado}
-    %\BlankLine
-    \Comment*[l]{Paso 1: Construcción del vector crudo $\mathbf{X} \in \mathbb{R}^{78}$}
+    \SetKwData{Raw}{raw}\SetKwData{Scaled}{scaled}\SetKwData{Centered}
+    {centered}\SetKwData{HistoryBuffer}{HistoryBuffer}\SetKwData{PCA}{pca}
+    \State Vértices actuales $\mathbf{V}$, Vértices anteriores $\mathbf{V}_{last}$, Parámetros en crudo $F$ , Parámetros de normalización $\theta$, Matriz de componentes $\mathbf{W}$
+    \BlankLine
+    \Comment*[l]{Paso 1: Construcción del vector crudo tamaño $V*F$}
     \For{$v \leftarrow 0$ \KwTo $\mathbf{V}$.length}{
         $\mathbf{pos} \leftarrow \mathbf{V}_v$\;
         $\mathbf{vel} \leftarrow (\mathbf{pos} - \mathbf{V}_{last, v}) / \Delta t$\;
@@ -69,89 +68,20 @@ Al igual que en el caso de los notebooks del entrenamiento, se trabajó de forma
         Llenar bloque $\mathbf{X}_{v}$ con $\{\mathbf{pos}, \mathbf{vel}, \mathbf{sdf}, \mathbf{n}, \mathbf{maxDist}, \mathbf{uv}\}$}
     %\BlankLine
     \Comment*[l]{Paso 2: StandardScaler}
-    \For{$f \leftarrow 0$ \KwTo $77$}
+    \For{$f \leftarrow 0$ \KwTo $V*F$}
     {$\Scaled[f] \leftarrow \frac{\Raw[f] - \mu_{\text{input}, f}}{\sigma_{\text{input}, f}}$}
     %\BlankLine
     \Comment*[l]{Paso 3: Centrado PCA}
-    \For{$f \leftarrow 0$ \KwTo $77$}
+    \For{$f \leftarrow 0$ \KwTo $V*F$}
     {$\Centered[f] \leftarrow \Scaled[f] - \mu_{\text{pca}, f}$}
     \BlankLine\Comment*[l]{Paso 4: Proyección Lineal}
     \For{$c \leftarrow 0$ \KwTo $optimalN - 1$}{$dot \leftarrow 0$;}
-    \For{$f \leftarrow 0$ \KwTo $77$}{$dot \leftarrow dot + \mathbf{W}_{c, f} \cdot \Centered[f]$
+    \For{$f \leftarrow 0$ \KwTo $V*F$}{$dot \leftarrow dot + \mathbf{W}_{c, f} \cdot \Centered[f]$
     $\PCA[c] \leftarrow dot$;}
-    \Return{\PCA};
+    \Comment*[l]{Paso 5: Bolcado a buffer}
+    {$\HistoryBuffer[offset] \leftarrow {\PCA}}
+\EndFunction
 \end{algorithm}
-
-\begin{itemize}
-    \item El script se adapta automáticamente al resto de variaciones como número de frames de input o cantidad de vértices.
-\end{itemize}
-
-\subsection{Resultados visuales de la inferencia}
-En este apartado se muestran ejemplos comparando la tela simulada por Unity y la inferencia que el modelo consigue. \newline
-\subsubsection{Entrenamiento movimiento lineal}
-En el caso de los modelos entrenados con un movimiento lineal, la inferencia es casi perfecta con un entrenamiento muy sencillo.
-
-\subsubsection{Entrenamiento movimiento aleatorio}
-En el caso de los modelos entrenados con aleatoriedad en el movimiento del colisionador, que se describen en el apartado \ref{subsec:sim}, puede conseguirse un resultado adecuado pero requiere de un entrenamiento mucho más costoso. 
-
-Este movimiento se probó entrenando dos modelos con los mismos parámetros: uno con los parámetros de posición y SDF, y otro con la velocidad añadida. Se descartó el modelo entrenado con velocidad, que pese ser el modelo que obtiene mejores resultados en este entrenamiento, con un error medio por vértice de 0.000923m, en Unity no logra mantener la estructura de la tela. Pese a que la tela consigue replicar el movimiento pendular adecuado, y no se rompe por completo durante toda la duración de la simulación, se forman en la tela picos o deformaciones incorrectas que rompen la coherencia visual por completo. %insertese foto%.
-
-Hiiii 
-
-\begin{table}[H]
-    \begin{center}
-        \begin{tabular}{ | m{2.2cm} | m{2cm} | m{1.2cm} | m{2.1cm} | m{2.4cm} | m{2.2cm} | }
-        \hline \textbf{Windows size} & \textbf{Rollout steps} & \textbf{Noise} & \textbf{Learning rate} & \textbf{Tamaño dataset} & \textbf{Batch size} \\ \hline
-            16 & 24 & 3\% & 0.001 & 25000 & 32 \\ \hline
-        \end{tabular}
-        \BlankLine
-        \begin{tabular}{ | m{3cm} | m{3cm} | m{1.2cm} | }
-        \hline \textbf{Tiempo} & \textbf{Error medio por vertice} & \textbf{FPS} \\ \hline
-            20h(gpu) & 0.000923 & 110 \\ \hline
-        \end{tabular}
-    \end{center}
-    \caption{Hiperparámetros, configuración y resultados del entrenamiento.}
-    \label{tab:randomTraining}
-\end{table}
-
-Por ende, se realizan finalmente las pruebas de entrenamiento y visualización finales sobre el modelo que recibe como parámetros de entrada la posición de los vértices y el SDF. Se llevan a cabo tres iteraciones de la prueba, con objeto de encontrar el balance entre tasa de frames alcanzada y calidad de la recreación de la tela. Estas tres pruebas se realizan manteniendo los mismos parámetros descritos en la tabla  x, e incrementando sobre la secuencia de longitud que toma el modelo en la recurrencia. 
-
-En las siguientes tablas y figuras, \ref{tab:randomTraining}, \ref{fig:inferenciaRandom} y \ref{fig:realRandom}, se muestran estos resultados. Puede apreciarse que la bola atraviesa la tela en ocasiones, esto se debe a las limitaciones del entrenamiento pero también a las de la propia simulación de Cloth, ya que el solver de Unity comete errores de solapamiento igualmente.
-
-\begin{table}[H]
-    \begin{center}
-        \begin{tabular}{ | m{2.2cm} | m{2cm} | m{1.2cm} | m{2.1cm} | m{2.4cm} | m{2.2cm} | }
-        \hline \textbf{Windows size} & \textbf{Rollout steps} & \textbf{Noise} & \textbf{Learning rate} & \textbf{Tamaño dataset} & \textbf{Batch size} \\ \hline
-            16 & 24 & 3\% & 0.001 & 25000 & 32 \\ \hline
-        \end{tabular}
-         \end{center}
-    \caption{Hiperparámetros y configuración del entrenamiento.}
-    \label{tab:randomTrainHip}
-\end{table}
-
-\begin{table}[H]
-    \begin{center}
-        \begin{tabular}{ | m{3cm} | m{3cm} | m{1.2cm} | }
-        \hline \textbf{Tiempo} & \textbf{Error medio por vertice} & \textbf{FPS} \\ \hline
-            18h & 0.0019 & 110 \\ \hline
-        \end{tabular}
-    \end{center}
-    \caption{Resultados del entrenamiento.}
-    \label{tab:randomTrainRes}
-\end{table}
-
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Imagenes/inferenciaRandom.png}
-    \caption{Inferencia del modelo para una muestra aleatoria.}
-    \label{fig:inferenciaRandom}
-\end{figure}
-\begin{figure}[H]
-    \centering
-    \includegraphics[width=0.9\textwidth]{Imagenes/realRandom.png}
-    \caption{Simulación de Unity para una muestra aleatoria.}
-    \label{fig:realRandom}
-\end{figure}
 
 \subsection{Post-procesamiento}
 En las investigaciones más visualmente convincentes del estado del arte, se consigue llegar a ese nivel de credibilidad en la simulación gracias a estrategias de post-procesamiento que refinan la apariencia de la geometría tras ser inferida. Entre ellas destacan la corrección de intercolisiones o intersecciones con los objetos colisionadores, la reconstrucción de las normales de los vértices, la conservación de la integridad física de la tela mediante medidas de separación entre vértices o el suavizado de temblores. Al tener en este proyecto como objetivos comparar resultados de la inferencia y observar la capacidad de los modelos de replicar estas simulaciones por sí mismos, se ha querido afinar la predicción de la simulación de la manera más precisa posible fuera del motor de videojuegos. Es decir, se apreciaba medir visualmente el resultado directo del modelo sin correciones adicionales. Esto supone resultados menos pulidos pero más significativos respecto a la capacidad de los modelos. \newline

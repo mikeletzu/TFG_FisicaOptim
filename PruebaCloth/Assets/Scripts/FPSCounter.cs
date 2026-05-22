@@ -40,6 +40,15 @@ public class FPSCounter : MonoBehaviour
         metricTimer = metricTime;
     }
 
+    private void Start()
+    {
+        // Disable V-Sync to allow uncapped framerate
+        QualitySettings.vSyncCount = 0;
+
+        // Ensure no cap.
+        Application.targetFrameRate = -1;
+    }
+
     private void Update()
     {
         totalTime += Time.deltaTime;
