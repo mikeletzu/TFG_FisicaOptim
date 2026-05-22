@@ -3,6 +3,7 @@ using TMPro;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine.UI;
+using UnityEngine.Splines;
 
 
 public class FPSCounter : MonoBehaviour
@@ -94,10 +95,6 @@ public class FPSCounter : MonoBehaviour
         metricsText[i].text = Mathf.RoundToInt(framesCount / accumTime) + "\n" +
                             Mathf.RoundToInt(minFps) + "\n" + Mathf.RoundToInt(maxFps);
 
-        GameObject s = GameObject.Find("Sphere");
-        s.GetComponent<BallMovement>().enabled = false;
-        s.transform.position = new Vector3(1.79999995f, -0.485000014f, 0);
-
         interactableToggles(true);
     }
 
@@ -129,6 +126,7 @@ public class FPSCounter : MonoBehaviour
             countdown = 5;
             timerTxt.text = "Measuring " + modelNames[i] + ".\nWait " + Mathf.RoundToInt(metricTime) + "s.";
             interactableToggles(false);
+
             GameObject.Find("Sphere").GetComponent<BallMovement>().enabled = true;
         }
     }
