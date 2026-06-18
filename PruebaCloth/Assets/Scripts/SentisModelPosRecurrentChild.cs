@@ -45,14 +45,19 @@ public class ClothMLPosRecChild : ClothML
         var mesh = clothMeshFilter.mesh;
         var vertices = mesh.vertices;
 
-        for (int v = 0; v < VertexCount; v++)
+        //float[] sdf = new float [vertices.Length];
+        //SDFUtil.getSDFOfSet(vertices, capsuleColliders, sphereColliders, collidersUnionSmoothness, transform, sdf);
+        Vector3 spherePos = transform.InverseTransformPoint(sphereColliders[0].transform.position); 
+		float sphereRad = sphereColliders[0].radius/4;
+		for (int v = 0; v < VertexCount; v++)
         {
             Vector3 pos = vertices[v];
-            float sdf = SDFUtil.getSDFOfSet(pos, capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
+            float sdf = Vector3.Distance(pos, spherePos) - sphereRad; // SDFUtil.getSDFOfSet(pos, capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
 
             historyBuffer[offset + v * FeatureCount + 0] = (pos.x - normData.mean[0]) / normData.std[0];
             historyBuffer[offset + v * FeatureCount + 1] = (pos.y - normData.mean[1]) / normData.std[1];
             historyBuffer[offset + v * FeatureCount + 2] = (pos.z - normData.mean[2]) / normData.std[2];
+           // historyBuffer[offset + v * FeatureCount + 3] = (sdf[v] - normData.mean[3]) / normData.std[3];
             historyBuffer[offset + v * FeatureCount + 3] = (sdf - normData.mean[3]) / normData.std[3];
         }
     }

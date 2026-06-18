@@ -15,6 +15,7 @@ public abstract class ClothML : MonoBehaviour
 
     protected float[] maxDistance;
     protected int VertexCount;
+    private Vector3[] newVertices;
 
     Worker worker;
     Tensor<float> inputTensor;
@@ -65,7 +66,9 @@ public abstract class ClothML : MonoBehaviour
 
         FillInitialBuffer();
         inputTensor.Upload(historyBuffer);
-    }
+
+		newVertices = new Vector3[VertexCount];
+	}
 
     public void SaveData(string moment, string data)
     {
@@ -86,9 +89,7 @@ public abstract class ClothML : MonoBehaviour
         // Se ejecuta el modelo, el inputTensor ya apunta al array historyBuffer, que se ha actualizado
         worker.Schedule(inputTensor);
         using var output = worker.PeekOutput() as Tensor<float>;
-        var result = output.ReadbackAndClone();
-
-        Vector3[] newVertices = new Vector3[VertexCount];
+		var result = output.ReadbackAndClone(); 
 
         for (int i = 0; i < VertexCount; i++)
         {
@@ -118,7 +119,7 @@ public abstract class ClothML : MonoBehaviour
         mesh.RecalculateBounds();
 
         result.Dispose();
-    }
+	}
 
     protected abstract void FillInitialBuffer();
     protected abstract void UpdateBuffer();
