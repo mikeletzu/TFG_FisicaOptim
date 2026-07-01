@@ -56,6 +56,9 @@ public class ClothDatasetRecorder : MonoBehaviour
     private Vector3[] pos_t_minus_1;
     private bool hasPrevious = false;
 
+    private float[] collisionTimer_t;     // Negativo si colisiona, positivo si no
+    private float[] hasEverCollided_t;
+
     private StringBuilder sb;
     private string filePath;
 
@@ -72,7 +75,9 @@ public class ClothDatasetRecorder : MonoBehaviour
         public float[] sdf;
         public float[] maxDist;
         public Vector2[] uv;
-	}
+        public float[] collisionTimer;
+        public float[] hasEverCollided;
+    }
 
     List<SnapInfo> snapshots;
      
@@ -115,6 +120,8 @@ public class ClothDatasetRecorder : MonoBehaviour
         pos_t_minus_1 = new Vector3[vertexIndices.Length];
         maxDist_t = new float[vertexIndices.Length];
         uvs_t = new Vector2[vertexIndices.Length];
+        collisionTimer_t = new float[vertexIndices.Length];
+        hasEverCollided_t = new float[vertexIndices.Length];
 
         // Auxiliar para acceder rapidamente a las UVs
         // UVs = GetComponent<MeshFilter>().mesh.uv;
@@ -132,7 +139,7 @@ public class ClothDatasetRecorder : MonoBehaviour
         // CSV Header
         sb.Append("frame");
         foreach (int i in vertexIndices)  // Input
-            sb.Append($",x{i},y{i},z{i},vx{i},vy{i},vz{i},sdf{i},nx{i},ny{i},nz{i},md{i},u{i},v{i}");
+            sb.Append($",x{i},y{i},z{i},vx{i},vy{i},vz{i},sdf{i},nx{i},ny{i},nz{i},md{i},u{i},v{i},colTimer{i},everCol{i}");
         sb.AppendLine();
 	}
 
@@ -178,7 +185,7 @@ public class ClothDatasetRecorder : MonoBehaviour
         //Se actualiza a la vez que la física. 
         if (!record) return;
 
-        recordTimeLeft -= Time.deltaTime;
+        recordTimeLeft -= Time.fixedDeltaTime;
         if (recordTimeLeft < 0)
         {
             stopRecording();
@@ -221,6 +228,23 @@ public class ClothDatasetRecorder : MonoBehaviour
              * Esto no te da los vértices sino listas con las coordenadas de cada vértice por tipo de peso.
              **/
 
+            if (sdf_t[j] <= 0.01f) // COLISIONA
+            {
+                // Si estaba en positivo (sin colisionar), lo reseteamos a 0 y empezamos a restar
+                if (collisionTimer_t[j] > 0f) collisionTimer_t[j] = 0f;
+
+                collisionTimer_t[j] -= Time.fixedDeltaTime;
+                hasEverCollided_t[j] = 1.0f; // Ha colisionado alguna vez
+            }
+            else // NO COLISIONA
+            {
+                // Si estaba en negativo (colisionando), lo reseteamos a 0 y empezamos a sumar
+                if (collisionTimer_t[j] < 0f) collisionTimer_t[j] = 0f;
+
+                collisionTimer_t[j] += Time.fixedDeltaTime;
+            }
+            // ---------------------------------------
+
             pos_t_minus_1[j] = pos_t[j];
 
             // Recolectar UVs de cada vertice
@@ -231,32 +255,39 @@ public class ClothDatasetRecorder : MonoBehaviour
         hasPrevious = true;
 
         // Guardamos snapshot
-		snapTimeLeft -= Time.deltaTime;
+		snapTimeLeft -= Time.fixedDeltaTime;
 		if (snapTimeLeft < 0 || !timed)
 		{
-            RecordSnapshot(pos_t, vel_t, sdf_t, normal_t, maxDist_t, uvs_t);
+            RecordSnapshot(pos_t, vel_t, sdf_t, normal_t, maxDist_t, uvs_t, collisionTimer_t, hasEverCollided_t);
             snapTimeLeft = snapShotTime;
             totalFramesRecorded++;
 		}
 		
 	}
 
-    void RecordSnapshot(Vector3[] pos, Vector3[] vel, float[] sdf, Vector3[] normals, float[] maxDist, Vector2[] uv) // Si vemos que no queremos acceder a snapshot anterior guardamos en vector concatenando directamente
+    void RecordSnapshot(Vector3[] pos, Vector3[] vel, float[] sdf, Vector3[] normals, float[] maxDist, Vector2[] uv, float[] colTimer, float[] everCol) // Si vemos que no queremos acceder a snapshot anterior guardamos en vector concatenando directamente
     {
-        SnapInfo snapInfo = new SnapInfo();
-		snapInfo.pos = new Vector3[vertexIndices.Length]; // Esto se puede optimizar?
-		snapInfo.vel = new Vector3[vertexIndices.Length];
-		snapInfo.sdf = new float[vertexIndices.Length];
-		snapInfo.normal = new Vector3[vertexIndices.Length];
-        snapInfo.maxDist = new float[vertexIndices.Length];
-        snapInfo.uv = new Vector2[vertexIndices.Length];
+        SnapInfo snapInfo = new SnapInfo
+        {
+            pos = new Vector3[vertexIndices.Length],
+            vel = new Vector3[vertexIndices.Length],
+            sdf = new float[vertexIndices.Length],
+            normal = new Vector3[vertexIndices.Length],
+            maxDist = new float[vertexIndices.Length],
+            uv = new Vector2[vertexIndices.Length],
+            collisionTimer = new float[vertexIndices.Length],
+            hasEverCollided = new float[vertexIndices.Length]
+        };
 
-		pos.CopyTo(snapInfo.pos, 0);
+        pos.CopyTo(snapInfo.pos, 0);
         vel.CopyTo(snapInfo.vel , 0);
         sdf.CopyTo(snapInfo.sdf, 0);
         normals.CopyTo(snapInfo.normal, 0);
         maxDist.CopyTo(snapInfo.maxDist, 0);
-        uv.CopyTo(snapInfo.uv, 0);
+        uv.CopyTo(snapInfo.uv, 0); 
+        colTimer.CopyTo(snapInfo.collisionTimer, 0);
+        everCol.CopyTo(snapInfo.hasEverCollided, 0);
+
         snapshots.Add(snapInfo);
 
 
@@ -279,7 +310,9 @@ public class ClothDatasetRecorder : MonoBehaviour
 				sb.Append($",{snap.normal[j].x.ToString(nfi)},{snap.normal[j].y.ToString(nfi)},{snap.normal[j].z.ToString(nfi)}");
                 sb.Append($",{snap.maxDist[j].ToString(nfi)}");
                 sb.Append($",{snap.uv[j].x.ToString(nfi)}");
-                sb.Append($",{snap.uv[j].y.ToString(nfi)}");
+                sb.Append($",{snap.uv[j].y.ToString(nfi)}"); 
+                sb.Append($",{snap.collisionTimer[j].ToString(nfi)}");
+                sb.Append($",{snap.hasEverCollided[j].ToString(nfi)}");
 
             }
             sb.AppendLine();

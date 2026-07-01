@@ -83,8 +83,8 @@ public abstract class ClothML : MonoBehaviour
         var vertices = mesh.vertices;
 
         // Se actualiza el buffer del historial
-        UpdateBuffer();
-        inputTensor.Upload(historyBuffer);
+        //UpdateBuffer();
+        //inputTensor.Upload(historyBuffer);
 
         // Se ejecuta el modelo, el inputTensor ya apunta al array historyBuffer, que se ha actualizado
         worker.Schedule(inputTensor);
@@ -115,8 +115,8 @@ public abstract class ClothML : MonoBehaviour
         }
 
         mesh.SetVertices(newVertices);
-        mesh.RecalculateNormals();
-        mesh.RecalculateBounds();
+        //mesh.RecalculateNormals();
+        //mesh.RecalculateBounds();
 
         result.Dispose();
 	}

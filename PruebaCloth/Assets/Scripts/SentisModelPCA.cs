@@ -21,6 +21,7 @@ public class ClothMLpca : MonoBehaviour
     int vertexCount;
 
     private int seqLen = 8;
+    private int numFeatures = 4;
     // Buffer en espacio PCA: [seqLen, optimal_n]
     private float[,] historyBuffer;
     private int optimalN;
@@ -69,7 +70,7 @@ public class ClothMLpca : MonoBehaviour
         vertexCount = clothMeshFilter.mesh.vertexCount;
 
         optimalN = normData.optimal_n;
-        rawFeatureSize = normData.num_vertices * 7; // x,y,z,vx,vy,vz,sdf,nx,ny,nz,md,u,v
+        rawFeatureSize = normData.num_vertices * numFeatures; // x,y,z, sdf /o/ ,vx,vy,vz,sdf,nx,ny,nz,md,u,v
 
         maxDistance = new float[vertexCount];
         historyBuffer = new float[seqLen, optimalN];
@@ -95,21 +96,21 @@ public class ClothMLpca : MonoBehaviour
         // Definir puntos anclados (0 = se mueve)
         int j = 0;
         //MINI
-        for (; j < 4; j++)
-        {
-            maxDistance[j] = 1.0f;
-        }
+        //for (; j < 4; j++)
+        //{
+        //    maxDistance[j] = 1.0f;
+        //}
         while (j < vertexCount)
         {
-            maxDistance[j] = 0.0f;
+            maxDistance[j] = 1.0f;
             j++;
         }
         //MAX
-        //maxDistance[11] = 0f;
-        //maxDistance[12] = 0f;
-        //maxDistance[18] = 0f;
-        //maxDistance[22] = 0f;
-        //maxDistance[24] = 0f;
+        maxDistance[11] = 0f;
+        maxDistance[12] = 0f;
+        maxDistance[18] = 0f;
+        maxDistance[22] = 0f;
+        maxDistance[24] = 0f;
 
         /* // Falda 32 v
         maxDistance[2] = 0f;
@@ -223,20 +224,20 @@ public class ClothMLpca : MonoBehaviour
             Vector3 pos = verts[v];  // ya en espacio local (mesh.vertices)
 
             // FIX: velocidad desde posiciones predichas del frame anterior
-            Vector3 vel = (pos - prevPositions[v]) / Time.fixedDeltaTime;
+            //Vector3 vel = (pos - prevPositions[v]) / Time.fixedDeltaTime;
 
             // FIX: SDF coherente — pos y ballPosLocal ambos en espacio local
             float sdf = Vector3.Distance(pos, ballPosLocal) - ballCollider.radius;
 
-            Vector3 normal = (v < normals.Length) ? normals[v] : Vector3.up;
+            //Vector3 normal = (v < normals.Length) ? normals[v] : Vector3.up;
 
-            int f = v * 7;
+            int f = v * numFeatures;
             raw[f++] = pos.x;
             raw[f++] = pos.y;
             raw[f++] = pos.z;
-            raw[f++] = vel.x;
-            raw[f++] = vel.y;
-            raw[f++] = vel.z;
+            //raw[f++] = vel.x;
+            //raw[f++] = vel.y;
+            //raw[f++] = vel.z;
             raw[f++] = sdf;
             //raw[f++] = normal.x;
             //raw[f++] = normal.y;
