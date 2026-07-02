@@ -8,6 +8,15 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/BallScene.unity
     guid: 8534d19d499154249be5e15dc3784425
+  - enabled: 1
+    path: Assets/Scenes/Metricas.unity
+    guid: 0d158d09501d5e148947921a7228fcee
+  - enabled: 1
+    path: Assets/Scenes/MenuScene.unity
+    guid: ea42a63c70eaf984f88941148a434268
+  - enabled: 1
+    path: Assets/Scenes/ShirtScene.unity
+    guid: 11ce45a3a1f292a44b07b1a7235792ec
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
   m_UseUCBPForAssetBundles: 0
