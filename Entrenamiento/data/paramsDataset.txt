@@ -5,9 +5,6 @@ dataset 	num	vertex		fixedDT		frames		movmiento
 		71	25		0.02		25000		rndmMov
 		102	25		0.02		25000		rndmMov
 		77?     288             0.02            300s 		skirt 
-        	92      25              0.02            12500 	       semi-randomMov
-       		107     25              0.02            25000          random-0.35velSphere  finalTestPos, finalTestVelO
-		96	25		0.02		25000		rndm - zLim - prueba coll timers
-
-
-
+        92      25              0.02            12500 	       semi-randomMov
+       	107      25              0.02            25000          random-0.35velSphere  finalTestPos, finalTestVelO
+		96	25		0.02		15000		random dampning del cloth 0.3
