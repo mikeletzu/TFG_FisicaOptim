@@ -45,8 +45,8 @@ public class ClothMLpca : MonoBehaviour
         public float[] input_scaler_std;    // longitud = num_vertices * 13
         public float[] pca_components;      // aplanado: optimal_n × (num_vertices*13)
         public float[] pca_mean;            // longitud = num_vertices*13
-        public float[] target_mean;         // longitud = 3
-        public float[] target_std;          // longitud = 3
+		public float[] target_pca_mean;
+        public float[] target_pca_std;
         public int optimal_n;
         public int num_vertices;
     }
@@ -164,25 +164,65 @@ public class ClothMLpca : MonoBehaviour
         using var output = worker.PeekOutput() as Tensor<float>;
         var result = output.ReadbackAndClone();
 
-        // 5. Aplicar predicciones
-        Vector3[] newVertices = new Vector3[vertexCount];
+        // 5. Reconstruir pose deshaciendo PCA
+		Vector3[] newVertices = new Vector3[vertexCount];
 
-        for (int i = 0; i < vertexCount; i++)
-        {
-            if (maxDistance[i] == 0f)
-            {
-                newVertices[i] = vertices[i];
-                continue;
-            }
+        // Desnormalizacion delta e integración
+		float[] predPCANext = new float[optimalN];
+		for (int c = 0; c < optimalN; c++)
+		{
+			float delta = result[0, c] * normData.target_pca_std[c]
+									   + normData.target_pca_mean[c];
+			predPCANext[c] = currentPCA[c] + delta;
+		}
+        
+        // Reconstrucción PCA (inverso espacio componentes)
+		float[] scaledRaw = new float[rawFeatureSize];
+		for (int f = 0; f < rawFeatureSize; f++)
+		{
+			float val = pcaMean[f];
+			for (int c = 0; c < optimalN; c++)
+				val += predPCANext[c] * pcaComponents[c, f];
+			scaledRaw[f] = val;
+		}
 
-            float dx = result[0, i, 0] * normData.target_std[0] + normData.target_mean[0];
-            float dy = result[0, i, 1] * normData.target_std[1] + normData.target_mean[1];
-            float dz = result[0, i, 2] * normData.target_std[2] + normData.target_mean[2];
+        // Desescalar
+		float[] raw = new float[rawFeatureSize];
+		for (int f = 0; f < rawFeatureSize; f++)
+			raw[f] = scaledRaw[f] * scalerStd[f] + scalerMean[f];
 
-            newVertices[i] = vertices[i] + new Vector3(dx, dy, dz);
-        }
+        // Coordenadas 3D, aplicar predicciones
+		for (int v = 0; v < vertexCount; v++)
+		{
+			if (maxDistance[v] == 0f)
+			{
+				newVertices[v] = vertices[v];
+				continue;
+			}
 
-        mesh.SetVertices(newVertices);
+			int b = v * numFeatures;  // numFeatures = 4 (x,y,z,sdf)
+			newVertices[v] = new Vector3(raw[b], raw[b + 1], raw[b + 2]);
+		}
+
+		//// 5. Aplicar predicciones
+
+		//for (int i = 0; i < vertexCount; i++)
+		//{
+		//    if (maxDistance[i] == 0f)
+		//    {
+		//        newVertices[i] = vertices[i];
+		//        continue;
+		//    }
+
+
+		//    float dx = result[0, i, 0] * normData.target_std[0] + normData.target_mean[0];
+		//    float dy = result[0, i, 1] * normData.target_std[1] + normData.target_mean[1];
+		//    float dz = result[0, i, 2] * normData.target_std[2] + normData.target_mean[2];
+
+		//    newVertices[i] = vertices[i] + new Vector3(dx, dy, dz);
+		//}
+
+		mesh.SetVertices(newVertices);
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
 

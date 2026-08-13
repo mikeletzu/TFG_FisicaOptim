@@ -52,7 +52,8 @@ public class ClothMLPosRecChild : ClothML
 		for (int v = 0; v < VertexCount; v++)
         {
             Vector3 pos = vertices[v];
-            float sdf = Vector3.Distance(pos, spherePos) - sphereRad; // SDFUtil.getSDFOfSet(pos, capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
+            float sdf = Vector3.Distance(pos, spherePos) - sphereRad; 
+            //float sdf = SDFUtil.getSDFOfSet(pos, capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
 
             historyBuffer[offset + v * FeatureCount + 0] = (pos.x - normData.mean[0]) / normData.std[0];
             historyBuffer[offset + v * FeatureCount + 1] = (pos.y - normData.mean[1]) / normData.std[1];

@@ -197,15 +197,20 @@ public class ClothDatasetRecorder : MonoBehaviour
         //cloth.coefficients[].maxDistance
         ClothSkinningCoefficient[] coeffs = cloth.coefficients;
 
-        // Sphere collider of cloth
-        //Vector3 spherePos = cloth.sphereColliders[0].first.transform.position; // cventer para que es
-        //float sphereRad = cloth.sphereColliders[0].first.radius;
+		// Sphere collider of cloth
+		//Vector3 spherePos = cloth.sphereColliders[0].first.transform.position; // cventer para que es
+		//float sphereRad = cloth.sphereColliders[0].first.radius;
 
-        for (int j = 0; j < vertexIndices.Length; j++)
+		Vector3 spherePos = transform.InverseTransformPoint(sphereColliders[0].transform.position);
+		float sphereRad = sphereColliders[0].radius / 4;
+
+		for (int j = 0; j < vertexIndices.Length; j++)
         {
             int idx = vertexIndices[j];
             pos_t[j] = particles[idx]; // Local position of vertices
-            //pos_t[j] = transform.TransformPoint(particles[idx]); // Global position of vertices
+									   //pos_t[j] = transform.TransformPoint(particles[idx]); // Global position of vertices
+
+			float sdf = Vector3.Distance(pos_t[j], spherePos) - sphereRad;
 
 			if (hasPrevious)
             {
@@ -217,7 +222,7 @@ public class ClothDatasetRecorder : MonoBehaviour
             }
             //if()
             //// sdf_t[j] = SDFSphere(pos_t[j], transform.InverseTransformPoint(spherePos), sphereRad);(
-            sdf_t[j] = SDFUtil.getSDFOfSet(pos_t[j], capsuleColliders, sphereColliders, collidersUnionSmoothness, transform);
+            sdf_t[j] = sdf;
             normal_t[j] = Vector3.zero;  //NormalToSphere(pos_t[j], spherePos); ESTO PORQUE AUN NO LO USAMOS!!!
 
 
