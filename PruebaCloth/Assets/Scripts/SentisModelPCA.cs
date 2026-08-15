@@ -20,7 +20,7 @@ public class ClothMLpca : MonoBehaviour
     public int contador = 0;
     int vertexCount;
 
-    private int seqLen = 8;
+    public int seqLen = 8; //8
     private int numFeatures = 4;
     // Buffer en espacio PCA: [seqLen, optimal_n]
     private float[,] historyBuffer;
@@ -35,8 +35,9 @@ public class ClothMLpca : MonoBehaviour
     private float[] scalerMean;        // [rawFeatureSize]
     private float[] scalerStd;         // [rawFeatureSize]
     private float[,] pcaComponents;    // [optimal_n, rawFeatureSize]
+    float[] pcaMin, pcaMax;
 
-    public TextAsset jsonFile;
+	public TextAsset jsonFile;
 
     [System.Serializable]
     public class NormalizationData
@@ -45,12 +46,27 @@ public class ClothMLpca : MonoBehaviour
         public float[] input_scaler_std;    // longitud = num_vertices * 13
         public float[] pca_components;      // aplanado: optimal_n × (num_vertices*13)
         public float[] pca_mean;            // longitud = num_vertices*13
-		public float[] target_pca_mean;
+        public float[] target_pca_mean;
         public float[] target_pca_std;
         public int optimal_n;
         public int num_vertices;
-    }
-    public NormalizationData normData;
+		public float[] pca_min;
+		public float[] pca_max;
+	}
+ //   [System.Serializable]
+
+ //   public class NormalizationData
+	//{
+	//	public float[] input_scaler_mean;   // longitud = num_vertices * 13
+	//	public float[] input_scaler_std;    // longitud = num_vertices * 13
+	//	public float[] pca_components;      // aplanado: optimal_n × (num_vertices*13)
+	//	public float[] pca_mean;            // longitud = num_vertices*13
+	//	public float[] target_mean;
+	//	public float[] target_std;
+	//	public int optimal_n;
+	//	public int num_vertices;
+	//}
+	public NormalizationData normData;
 
     // num_vertices * 13 features: x,y,z,vx,vy,vz,sdf,nx,ny,nz,maxDist,u,v
     private int rawFeatureSize;
@@ -87,7 +103,10 @@ public class ClothMLpca : MonoBehaviour
         scalerStd = normData.input_scaler_std;
         pcaMean = normData.pca_mean;
 
-        pcaComponents = new float[optimalN, rawFeatureSize];
+		pcaMin = normData.pca_min;
+		pcaMax = normData.pca_max;
+
+		pcaComponents = new float[optimalN, rawFeatureSize];
         for (int c = 0; c < optimalN; c++)
             for (int f = 0; f < rawFeatureSize; f++)
                 pcaComponents[c, f] = normData.pca_components[c * rawFeatureSize + f];
@@ -168,61 +187,61 @@ public class ClothMLpca : MonoBehaviour
 		Vector3[] newVertices = new Vector3[vertexCount];
 
         // Desnormalizacion delta e integración
-		float[] predPCANext = new float[optimalN];
-		for (int c = 0; c < optimalN; c++)
-		{
-			float delta = result[0, c] * normData.target_pca_std[c]
-									   + normData.target_pca_mean[c];
-			predPCANext[c] = currentPCA[c] + delta;
-		}
-        
+        float[] predPCANext = new float[optimalN];
+        for (int c = 0; c < optimalN; c++)
+        {
+            float delta = result[0, c] * normData.target_pca_std[c]
+                                       + normData.target_pca_mean[c];
+            predPCANext[c] = currentPCA[c] + delta;
+        }
+
         // Reconstrucción PCA (inverso espacio componentes)
-		float[] scaledRaw = new float[rawFeatureSize];
-		for (int f = 0; f < rawFeatureSize; f++)
-		{
-			float val = pcaMean[f];
-			for (int c = 0; c < optimalN; c++)
-				val += predPCANext[c] * pcaComponents[c, f];
-			scaledRaw[f] = val;
-		}
+        float[] scaledRaw = new float[rawFeatureSize];
+        for (int f = 0; f < rawFeatureSize; f++)
+        {
+            float val = pcaMean[f];
+            for (int c = 0; c < optimalN; c++)
+                val += predPCANext[c] * pcaComponents[c, f];
+            scaledRaw[f] = val;
+        }
 
         // Desescalar
-		float[] raw = new float[rawFeatureSize];
-		for (int f = 0; f < rawFeatureSize; f++)
-			raw[f] = scaledRaw[f] * scalerStd[f] + scalerMean[f];
+        float[] raw = new float[rawFeatureSize];
+        for (int f = 0; f < rawFeatureSize; f++)
+            raw[f] = scaledRaw[f] * scalerStd[f] + scalerMean[f];
 
         // Coordenadas 3D, aplicar predicciones
-		for (int v = 0; v < vertexCount; v++)
-		{
-			if (maxDistance[v] == 0f)
-			{
-				newVertices[v] = vertices[v];
-				continue;
-			}
+        for (int v = 0; v < vertexCount; v++)
+        {
+            if (maxDistance[v] == 0f)
+            {
+                newVertices[v] = vertices[v];
+                continue;
+            }
 
-			int b = v * numFeatures;  // numFeatures = 4 (x,y,z,sdf)
-			newVertices[v] = new Vector3(raw[b], raw[b + 1], raw[b + 2]);
-		}
+            int b = v * numFeatures;  // numFeatures = 4 (x,y,z,sdf)
+            newVertices[v] = new Vector3(raw[b], raw[b + 1], raw[b + 2]);
+        }
 
-		//// 5. Aplicar predicciones
+        //// 5. Aplicar predicciones
 
-		//for (int i = 0; i < vertexCount; i++)
-		//{
-		//    if (maxDistance[i] == 0f)
-		//    {
-		//        newVertices[i] = vertices[i];
-		//        continue;
-		//    }
+        //for (int i = 0; i < vertexCount; i++)
+        //{
+        //    if (maxDistance[i] == 0f)
+        //    {
+        //        newVertices[i] = vertices[i];
+        //        continue;
+        //    }
 
 
-		//    float dx = result[0, i, 0] * normData.target_std[0] + normData.target_mean[0];
-		//    float dy = result[0, i, 1] * normData.target_std[1] + normData.target_mean[1];
-		//    float dz = result[0, i, 2] * normData.target_std[2] + normData.target_mean[2];
+        //    float dx = result[0, i, 0] * normData.target_pca_std[0] + normData.target_pca_mean[0];
+        //    float dy = result[0, i, 1] * normData.target_pca_std[1] + normData.target_pca_mean[1];
+        //    float dz = result[0, i, 2] * normData.target_pca_std[2] + normData.target_pca_mean[2];
 
-		//    newVertices[i] = vertices[i] + new Vector3(dx, dy, dz);
-		//}
+        //    newVertices[i] = vertices[i] + new Vector3(dx, dy, dz);
+        //}
 
-		mesh.SetVertices(newVertices);
+        mesh.SetVertices(newVertices);
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
 
@@ -264,7 +283,7 @@ public class ClothMLpca : MonoBehaviour
             Vector3 pos = verts[v];  // ya en espacio local (mesh.vertices)
 
             // FIX: velocidad desde posiciones predichas del frame anterior
-            //Vector3 vel = (pos - prevPositions[v]) / Time.fixedDeltaTime;
+            Vector3 vel = (pos - prevPositions[v]) / Time.fixedDeltaTime;
 
             // FIX: SDF coherente — pos y ballPosLocal ambos en espacio local
             float sdf = Vector3.Distance(pos, ballPosLocal) - ballCollider.radius;
