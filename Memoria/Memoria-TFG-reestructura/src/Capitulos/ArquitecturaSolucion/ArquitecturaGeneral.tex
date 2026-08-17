@@ -1,0 +1,19 @@
+\section{Arquitectura General}
+\label{sec:ArquitecturaGeneral}
+
+El desarrollo de las pruebas de este proyecto se divide en tres secciones; la de simulación, la de entrenamiento del modelo y la de inferencia. En este apartado se explican estas de manera general, para crear una base de entendimiento del pipeline. En los proximos apartados del capítulo se explica cada elemento de manera más exhaustiva, con las distintas iteraciónes y mejoras conseguidas a raíz de la investigación.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=1\textwidth]{Imagenes/Arquitectura.png}
+	\caption{Diagrama de la arquitectura General del proyecto}
+	\label{fig:arq}
+\end{figure}
+
+Como puede apreciarse en la figura \ref{fig:arq}, el pipeline del proyecto es circular, es decir, la plataforma en la que se genera la simulación y posteriormente se prueba la inferencia del modelo es la misma; en nuestro caso, Unity. Esto se debe a dos de nuestros objetivos: el de hacer un sistema accesible y fácil de utilizar y el de poder comparar verazmente la optimización de la simulación física. \newline
+
+\begin{itemize}
+	\item \textbf{Simulación:} Si bien se han llevado a cabo puebas con distintas geometrías y tiempos, colisionadores con distintos tipos de movimiento y aleatoriedad de los mismos, las bases de las escenas es equivalente. La simulación, en el que la tela actúa con componente Cloth de Unity, pasa por un sistema de registro con el que se crea un archivo CSV que recoge la información de la geometría simulada y las variables pertinentes.
+	\item \textbf{Entrenamiento:} Estos archivos se recogen en una carpeta que pasa a procesarse en un entorno de python. Con las librerías explicadas en el estado del arte se han entrenado distintos modelos, iterando sobre ellos hasta conseguir las configuraciones e hiperparámetros óptimos. La efectividad de estos modelos se mide en primer lugar dentro del entorno de phyton con el ``accuracy'' de las predicciones, midiendo el error de distancia real de los vértices, visualizando la progresión a través de distintos frames.
+	\item \textbf{Inferencia:} Posteriormente se exportan estos modelos ya entrenados en formato ONNX a la escena de Unity en la que se hizo la simulación incial y correspondiente recogida de datos. Haciendo uso de la arquitectura dirigida a objetos de Unity, se cambia la configuración de la geometría inicial y se incorpora el modelo entrenado y sus parámeteros, consiguiendo así inferir el movimiento de la tela en tiempo real y confirmar que la simulación es visualmente fiel a las físicas reales.
+\end{itemize}

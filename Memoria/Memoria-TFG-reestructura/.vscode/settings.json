@@ -1,0 +1,49 @@
+{
+  "latex-workshop.latex.tools": [
+    {
+      "name": "xelatex",
+      "command": "xelatex",
+      "args": [
+        "-synctex=1",
+        "-interaction=nonstopmode",
+        "-file-line-error",
+        "%DOC%"
+      ]
+    },
+    {
+      "name": "bibtex",
+      "command": "bibtex",
+      "args": ["%DOCFILE%"]
+    },
+    {
+      "name": "makeglossaries",
+      "command": "makeglossaries",
+      "args": ["-q", "%DOCFILE%"]
+    },
+    {
+      "name": "latexmk-xelatex",
+      "command": "latexmk",
+      "args": [
+        "-xelatex",
+        "-interaction=nonstopmode",
+        "-synctex=1",
+        "-file-line-error",
+        "-shell-escape",
+        "-use-make",
+        "-f",
+        "%DOC%"
+      ]
+    }
+  ],
+  "latex-workshop.latex.recipes": [
+    {
+      "name": "latexmk (xelatex + incremental)",
+      "tools": ["latexmk-xelatex"]
+    },
+    {
+      "name": "xetex -> bibtex -> glossaries -> xetex (full, manual)",
+      "tools": ["xelatex", "bibtex", "makeglossaries", "xelatex", "xelatex"]
+    }
+  ],
+  "latex-workshop.latex.recipe.default": "lastUsed"
+}
