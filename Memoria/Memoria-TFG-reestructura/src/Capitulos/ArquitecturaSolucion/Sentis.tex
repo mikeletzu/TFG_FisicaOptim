@@ -49,7 +49,7 @@ Asimismo, se establece el parámetro \textit{max distance} para la lista de vér
 \end{figure}
 
 Existen distintas versiones de este componente en función del modelo entrenado. Todos los modelos coinciden en las variables de salida, sin embargo, la forma y el contenido de la entrada cambian según el entrenamiemto del modelo. En el caso de los modelos MLP, por ejemplo, el historial se reduciría a un solo frame, el script básico se adapta automáticamente a este tipo de variaciones, como número de frames de input o cantidad de vértices. Para otros modelos en cambio, es necesario cambiar el registro del estado. Este se lleva acabo en el método \textit{saveStateAt(offset)}, este recoge las features que el modelo necesita y las guarda en el formato adecuado en la posición del historial determinanda por la variable \textit{offset}, que típicamente corresponderá a la posición del último frame del historial. Del mismo modo, los modelos PCA que se implementaron requieren de un procesamiento específico, descrito en la siguiente sección de pseudocódigo. Esencialmente se aplana el vector de entrada para estandarizarlo y proyectar los datos en el espacio de componentes que se generó al entrenar el dataset, los componentes pasan a guardarse en la posición pertinente del buffer.
-
+\begin{comment}
 \begin{algorithm}[H]
 \caption{Procesamiento de datos de entrada para modelos PCA}
 \DontPrintSemicolon
@@ -82,7 +82,7 @@ Existen distintas versiones de este componente en función del modelo entrenado.
     {$\HistoryBuffer[offset] \leftarrow {\PCA}}
 \EndFunction
 \end{algorithm}
-
+\end{comment}
 \subsection{Post-procesamiento}
 En las investigaciones más visualmente convincentes del estado del arte, se consigue llegar a ese nivel de credibilidad en la simulación gracias a estrategias de post-procesamiento que refinan la apariencia de la geometría tras ser inferida. Entre ellas destacan la corrección de intercolisiones o intersecciones con los objetos colisionadores, la reconstrucción de las normales de los vértices, la conservación de la integridad física de la tela mediante medidas de separación entre vértices o el suavizado de temblores. Al tener en este proyecto como objetivos comparar resultados de la inferencia y observar la capacidad de los modelos de replicar estas simulaciones por sí mismos, se ha querido afinar la predicción de la simulación de la manera más precisa posible fuera del motor de videojuegos. Es decir, se apreciaba medir visualmente el resultado directo del modelo sin correciones adicionales. Esto supone resultados menos pulidos pero más significativos respecto a la capacidad de los modelos. \newline
 

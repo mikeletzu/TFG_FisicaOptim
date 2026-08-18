@@ -29,7 +29,7 @@ Para crear un entorno de trabajo adaptable, y asegurar la consistencia entre los
 
 \subsection{Apartados de la ejecución del entrenamiento}
 
-Dada su flexibilidad para segmentar la ejecución y su capacidad de visualizar los resultados claramente, se ha elegido IPython Notebook (.ipynb) como como herramienta de desarrollo en python. Si bien cada tipo de modelo se ha creado en un archivo distinto, todos comparten la misma estructura. Pese a la inevitable repetición de código y potencial optimización, la utilización de diferentes notebooks ha resultado clave para el desarollo e investigación paralela de los diferentes modelos. La estructura tiene la siguiente forma:
+Dada su flexibilidad para segmentar la ejecución y su capacidad de visualizar los resultados claramente, se ha elegido IPython Notebook (.ipynb) como como herramienta de desarrollo en python. Si bien cada tipo de modelo se ha creado en un archivo distinto, todos comparten la misma estructura. Pese a la inevitable repetición de código y potencial optimización, la utilización de diferentes notebooks ha resultado clave para el desarollo e investigación paralela de los diferentes modelos. La estructura tiene la siguiente forma: ESTO HAY QUE CAMBIARLO tt
 
 \begin{enumerate}
 
@@ -73,21 +73,69 @@ Dada su flexibilidad para segmentar la ejecución y su capacidad de visualizar l
         \end{figure}
     
     \item \textbf{Exportación}: Por último, tras considerar los resultados generados como adecuados con la guía de los valores y gráficas generadas, se procede a exportar la red neuronal a formato ONNX.
-
 \end{enumerate}
 
+\subsection{Modelos}
+Los modelos entrenados infieren la diferencia de desplazamiento entre un frame y el siguiente. Utilizan como función de pérdida \textit{L1Loss}\footnote{\textbf{L1Loss:} Función proporcionada por Pytorch que calcula el error absoluto medio entre los valores predichos y los valores reales.} de la posición y la velocidad. El input se construye con el SDF, la posición y velocidad de los vértices normalizados con inyección de ruido aolanados en un vector y como output se obtienen los deltas de desplazamiento normalizados. Estos deltas de posición se añaden a las posiciones del frame actual para obtener el siguiente paso de la simulación. \newline
 
-\subsection{Los modelos}
-Como se ha mencionado previamente, hay dos nociones principales que han guiado el desarrollo de este proyecto. Por un lado, combinanar las técnicas óptimas o prometedoras de las investigaciones citadas en el estado del arte. Y por otro, el objetivo de priorizar la simplicidad y accesibilidad de nuestro modelo. Prueba y error NO. Reclacar. TODO: Eva explica q holden no cambia los modelos por q sabe q no se lo puede permitir. En virtud de ello se optó por empezar el entrenamiento con una red neuronal muy sencilla y aumentar progresivamente la complejidad de la red en base a los resultados, problemas y limitaciones que fueran surgiendo. \newline
+Como se ha mencionado previamente, hay dos nociones principales que han guiado el desarrollo de este proyecto. Por un lado, combinar las técnicas óptimas o prometedoras de las investigaciones citadas en el estado del arte. Y por otro, priorizar la simplicidad y accesibilidad de nuestro modelo en la plataforma elegida. Hemos seleccionado redes específicas y características que han permitido llegar a un movimiento de una tela coherente. Estas son las siguientes características que conforman nuestros modelos, y sobre las cuales se harán comparativas en el apartado de experimentos.
 
-\subsubsection{Modelo inicial}
-El modelo inicial es un perceptrón multicapa (MLP) sencillo con una sola capa oculta. Este infiere la diferencia de desplazamiento entre un frame y el siguiente. Utilizando un dataset que genera lotes que contienen pares de la información de un frame y su frame consecutivo, se pasa el frame normalizado al modelo y este predice el delta de desplazamiento para cada vértice. Desnormalizando este delta se calcula la posición inferida por el modelo.  La diferencia entre esta posición predicha y la posición real recibida en el frameInfo + 1 se utiliza como pérdida para el entrenamiento. La función de pérdida elegida inicialmente, MSELoss, se utiliza generalmente en problemas de regresión pues penaliza fuertemente las diferencias grandes entre la predicción y el valor real, alineandose con nuestro objetivo. El modelo está compuesto por dos capas lineales y una RELU; y sus dimensiones son: 13 de entrada (los parámetros de cada punto), el número de neuronas en la capa oculta (inicialmente entre 64 y 128) y 3 de salida (el delta de desplazamiento en cada eje). \newline
+\subsubsection{Gestión de error acumulado}
+\begin{figure}[H]
+        \centering
+        \includegraphics[width=0.91\textwidth]{Imagenes/errorAcumulado.png}
+        \caption{Error acumulado}
+    \end{figure}
 
+En primer lugar, se incorporan diferentes técnicas que ayudan a estabilizar el error acumulado de distancia de vértices. Estas permiten que el aprendizaje pueda aprender a autocorregirse y conservar la geometría original de la tela, así como evitar movimientos extremos a medida que avanza la simulación. Son las siguientes:
+\begin{itemize}
+    \item \textbf{Ruido en el input:} Una de las técnicas más sencillas para mejorar la capacidad del modelo de corregir sus errores es entrenarlo creando pequeños errores de forma artifical. Esto se consigue añadiéndole ruido a los datos de entrada, en este caso se añade un ruido gaussiano de entre un 2 y un 5\% de magnitud respecto a los datos de entrada antes de normalizar. De esta manera, el modelo aprende a corregir estos errores para corregir los suyos propios en un futuro.
+    
+    \item \textbf{Unrolling for training:} La idea de dividir el entrenamiento en distintos modelos es habitual; ya sea con una red que dé resultados más generales y una segunda que consiga refinar los detalles (arrugas, intersecciones con el colisionador, etc.) como en TailorNet \cite{patel2020tailornet}, o con modelos que actúen como predictor-corrector siendo el segundo normalmente en post-procesado. Sin embargo, en este proyecto se propone incluir esta idea en el propio entrenamiendo del modelo, con la función de pérdida. El caso de \cite{chen2025learning}, por ejemplo, el concepto de una función de pérdida \textit{force-inpulse} que penaliza tanto el error en la fuerza predicha como el inpulso que esta genera para las siguientes inferencias. De manera similar, en este proyecto se genera una secuencia de predicciones; la cadena de deltas generados sucesivamente permiten al modelo tener una noción sobre el cambio de velocidad y aceleración provocados. 
+    
+    La implementación que se incorpora en este proyecto se inspira más en la investigación de \cite{holden_subspace_2019}, en la que se lleva acabo un proceso similar. Además de retroalimentar los frames generados a la secuencia de input, se propaga el error utilizando la técnica BPTT (\textit{Backpropagation Through Time}). Esta técnica consiste en retropropagar el error a lo largo de la secuencia temporal y permite a la red aprender dependencias temporales.
+    
+    \begin{itemize}
+        \item \textbf{Ventana inicial:} $V_0 = [y_{t-n+1}, \dots, y_t]$
+        \item \textbf{Bucle de predicción:} Para $i = 1, 2, \dots, W$:
+        \begin{enumerate}
+            \item Calcular predicción: $\hat{y}_{t+i} = f(V_{i-1})$
+            \item Actualizar ventana: $V_i = [V_{i-1} \setminus \{y_{primero}\}] \cup \{\hat{y}_{t+i}\}$
+        \end{enumerate}
+        \item \textbf{Función de pérdida (Loss):} 
+        $$\mathcal{L} = \frac{1}{W} \sum_{i=1}^{W} (y_{t+i} - \hat{y}_{t+i})^2$$
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{Tipos de redes y recurrencia}
+En este estudio nos hemos enfocado en dos tipos de redes neuronales que se alienan con nuestro objetivos de emplear modelos sencillos: los \textbf{perceptrones multicapa (MLP)} y las \textbf{redes neuronales recurrentes (RNN)}. Otras redes como las CNN o las GNNS han sido descartados debido a la alta complejidad para representar y proporcionar los datos al modelo.
+
+\begin{itemize}
+    \item \cite{holden_subspace_2019} resalta el MLP como una red sencilla computancionalmente más accesible que las CNNs empleadas en otros estudios, manteniendo la capacidad de proporcionar resultados adecuados mediante su uso de subespacios y correcciones. 
+    \item Por otra parte, empleamos una RNN para comprobar si la memoria recurrente ayuda a gestionar mejor el movimiento dinámico y conservar la geometría a través del tiempo. Varias de las investigaciones del estado del arte, como por ejemplo \cite{santesteban2022snug}, mencionan como limitación las telas más dinámicas, ya que, al tener muchas menos restricciones, las mallas que no van pegadas a un cuerpo de colisión son mucho más susceptibles a la inercia. Naturalmente, el aprendizaje de estas propiedades físicas requiere del conocimiento de atributos como la velocidad o la aceleración de las partículas. La recurrencia permite al modelo tener una memoria a corto plazo del movimiento en cada vértice, haciendo su entrenamiento mucho más eficaz. Sigue la arquitectura de tipo "many to one", donde una cantidad determinada de frames se utilizan como input para generar el delta de desplazamiento entre el último frame de la secuencia y el que sería el siguiente.
+\end{itemize}
+
+
+
+\subsubsection{Reducción de dimensionalidad}
+Para conseguir alcanzar una mejora de rendimiento y complejidad en los modelos, se necesita reducir la dimensionalidad de las entradas y salidas del modelo. Encontramos distintas formas de reducir, como 
+El PCA se usa ampliamente para conservar las deformaciones principales en simulaciones complejas, pudiendo compactar la informacion y reducir la complejidad. Se pasa al modelo unos coeficientes del subespacio PCA y se reconstruye de vuelta en Unity! :3
+
+Aplicamos un PCA con un número de componentes que respeta que el umbral de varianza esté sobre el 95\%. En el caso de este estudio, X componentes.
+
+\begin{figure}[H]
+    \centering
+        \includegraphics[width=0.91\textwidth]{Imagenes/resultPCA.png}
+        \caption{Componentes óptimas para PCA}
+\end{figure}
+
+Se calculan los frames con el PCA aplicados necesarios para realizar todas las predicciones de
 \subsection{Resultado e hiperparámetros}
 
 Tras el proceso de iteraciones descrito, se concluye que la red neuronal más óptima es una RNN con \textit{unrolling}, utilizando como función de pérdida \textit{L1Loss}\footnote{\textbf{L1Loss:} Función proporcionada por Pytorch que calcula el error absoluto medio entre los valores predichos y los valores reales.} de la posición y la velocidad. El input se construye con el SDF, la posición y velocidad de los vértices normalizados con inyección de ruido y como output se obtienen los deltas de desplazamiento normalizados.\newline
 La siguiente función, \textit{RunRollout()}, lleva a cabo el cálculo de las predicciones y la pérdida de las mismas para cada lote de datos del dataset. Siguiendo la técnica mencionada, ejecuta las predicciones necesarias para avanzar en el tiempo tanto como el tamaño de la ventana de unrolling le indica. Por simplicidad el modelo que sa ha decidido representar por pseudocódigo recoge únicamente la posición y sdf como parámetro de entrada.
 
+\begin{comment}
 \begin{algorithm}[H]
 \caption{Función de \textit{Unrolling}}
 \label{alg:run_rollout}
@@ -139,9 +187,10 @@ La siguiente función, \textit{RunRollout()}, lleva a cabo el cálculo de las pr
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
-
+\end{comment}
 La siguiente sección de pseudocódigo describe el bucle para llevar a cabo el entrenamiento completo del modelo. Inicialmente, se dividen los datos de entrenamiento en lotes, estos contienen una secuencia de entrada para el modelo y la secuencia de frames inmediatamente posterior. Con estos datos y la función descrita anteriormente, se obtiene la pérdida del modelo para la retropropagación y se actualizan sus pesos. La fase de evaluación también utiliza la función anterior para analizar la calidad del modelo ante situaciones nuevas, y calcula el primer frame de cada lote para obtener una aproximación de la media de error en la predicción de los deltas.
 
+\begin{comment}
 \begin{algorithm}[H]
 \caption{Bucle de Entrenamiento y Validación}
 \label{alg:training_loop}
@@ -184,6 +233,7 @@ La siguiente sección de pseudocódigo describe el bucle para llevar a cabo el e
 \end{algorithmic}
 \end{algorithm}
 
+\end{comment}
 Para acabar de ajustar el modelo se itera sobre los mismos datasets modificando los parámetros variables.
 \begin{itemize}
     \item \textbf{Windows size:} Cantidad de frames de la secuencia de input, esta actuará como ventana deslizante conforme se añadan los frames predichos.
