@@ -221,7 +221,7 @@ public class ClothDatasetRecorder : MonoBehaviour
                 vel_t[j] = Vector3.zero;
             }
             //if()
-            //// sdf_t[j] = SDFSphere(pos_t[j], transform.InverseTransformPoint(spherePos), sphereRad);(
+            //// sdf_t[j] = SDFSphere(pos_t[j], transform.InverseTransformPoint(spherePos), sphereRad);
             sdf_t[j] = sdf;
             normal_t[j] = Vector3.zero;  //NormalToSphere(pos_t[j], spherePos); ESTO PORQUE AUN NO LO USAMOS!!!
 
@@ -232,7 +232,7 @@ public class ClothDatasetRecorder : MonoBehaviour
              * cloth.GetVirtualParticleWeights();
              * Esto no te da los vértices sino listas con las coordenadas de cada vértice por tipo de peso.
              **/
-
+            /*
             if (sdf_t[j] <= 0.01f) // COLISIONA
             {
                 // Si estaba en positivo (sin colisionar), lo reseteamos a 0 y empezamos a restar
@@ -249,7 +249,7 @@ public class ClothDatasetRecorder : MonoBehaviour
                 collisionTimer_t[j] += Time.fixedDeltaTime;
             }
             // ---------------------------------------
-
+            */
             pos_t_minus_1[j] = pos_t[j];
 
             // Recolectar UVs de cada vertice

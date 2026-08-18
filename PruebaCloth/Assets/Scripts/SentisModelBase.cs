@@ -51,7 +51,7 @@ public abstract class ClothML : MonoBehaviour
         }
     }
 
-    void Start()
+    public virtual void Start()
     {
         var model = ModelLoader.Load(modelAsset);
         worker = new Worker(model, procActive);
