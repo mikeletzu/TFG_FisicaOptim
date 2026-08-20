@@ -76,9 +76,31 @@ Dada su flexibilidad para segmentar la ejecución y su capacidad de visualizar l
 \end{enumerate}
 
 \subsection{Modelos}
-Los modelos entrenados infieren la diferencia de desplazamiento entre un frame y el siguiente. Utilizan como función de pérdida \textit{L1Loss}\footnote{\textbf{L1Loss:} Función proporcionada por Pytorch que calcula el error absoluto medio entre los valores predichos y los valores reales.} de la posición y la velocidad. El input se construye con el SDF, la posición y velocidad de los vértices normalizados con inyección de ruido aolanados en un vector y como output se obtienen los deltas de desplazamiento normalizados. Estos deltas de posición se añaden a las posiciones del frame actual para obtener el siguiente paso de la simulación. \newline
+Para lograr simular el comportamiento de la tela, los modelos entrenados infieren la diferencia de desplazamiento entre un frame y el siguiente. El funcionamiento base de todos los modelos entrenados consiste en recibir una entrada construida a partir de la posición, velocidad y SDF normalizados de los vértices aplanados en un vector, y obtener como output los deltas de desplazamiento normalizados. Estos deltas de posición se añaden a las posiciones del frame actual para obtener el siguiente paso de la simulación. Los modelos emplean como función de pérdida \textit{L1Loss}\footnote{\textbf{L1Loss:} Función proporcionada por Pytorch que calcula el error absoluto medio entre los valores predichos y los valores reales.} sobre las diferencias entre los deltas reales y predichos.  \newline
 
-Como se ha mencionado previamente, hay dos nociones principales que han guiado el desarrollo de este proyecto. Por un lado, combinar las técnicas óptimas o prometedoras de las investigaciones citadas en el estado del arte. Y por otro, priorizar la simplicidad y accesibilidad de nuestro modelo en la plataforma elegida. Hemos seleccionado redes específicas y características que han permitido llegar a un movimiento de una tela coherente. Estas son las siguientes características que conforman nuestros modelos, y sobre las cuales se harán comparativas en el apartado de experimentos.
+\begin{equation}
+    \mathbf{x}_{t} = \bigl[
+        \hat{x}_1,\, \hat{y}_1,\, \hat{z}_1,\,
+        \hat{v}^x_1,\, \hat{v}^y_1,\, \hat{v}^z_1,\,
+        \hat{s}_1,\;
+        \ldots,\;
+        \hat{x}_n,\, \hat{y}_n,\, \hat{z}_n,\,
+        \hat{v}^x_n,\, \hat{v}^y_n,\, \hat{v}^z_n,\,
+        \hat{s}_n
+    \bigr]
+\end{equation}
+
+\begin{equation}
+    \hat{\boldsymbol{\delta}}_{t+1} = f_\theta(\mathbf{x}_{t}) \in \mathbb{R}^{3n}
+\end{equation}
+
+\begin{equation}
+    \mathbf{p}_{t+1} = \mathbf{p}_{t} + \hat{\boldsymbol{\delta}}_{t+1}
+\end{equation}
+
+Donde $\hat{\cdot}$ denota normalización, $n$ el número de vértices, $s_i$ el SDF del vértice $i$ . \newline
+
+A este concepto básico se añadirán diferentes técnicas y tipos de redes sobre las que realizar experimentos y comparativas que se verán en los apartados \ref{cap:experimentos} y \ref{cap:evaluacionDiscusion}. Como se ha mencionado previamente, hay dos nociones principales que han guiado el desarrollo de este proyecto. Por un lado, combinar las técnicas óptimas o prometedoras de las investigaciones citadas en el estado del arte. Y por otro, priorizar la simplicidad y accesibilidad de nuestro modelo en la plataforma elegida. Hemos seleccionado redes específicas y características que han permitido llegar a un movimiento de una tela coherente. Estas son las siguientes características que conforman nuestros modelos, y sobre las cuales se realizarán los experimentos y evaluación final.
 
 \subsubsection{Gestión de error acumulado}
 \begin{figure}[H]
@@ -87,7 +109,7 @@ Como se ha mencionado previamente, hay dos nociones principales que han guiado e
         \caption{Error acumulado}
     \end{figure}
 
-En primer lugar, se incorporan diferentes técnicas que ayudan a estabilizar el error acumulado de distancia de vértices. Estas permiten que el aprendizaje pueda aprender a autocorregirse y conservar la geometría original de la tela, así como evitar movimientos extremos a medida que avanza la simulación. Son las siguientes:
+Una simulación sin restricciones específicas tiende a acumular errores, y pequeños desplazamientos se convierten rápidamente en movimientos erráticos y de gran magnitud. Las altas tasas de frames en tiempo real aceleran lo rápido que una simulación se desestabiliza. Para evitar esto se seleccionan diferentes técnicas que ayudan a estabilizar el error acumulado de distancia de vértices. Estas no funcionan como límites físicos, sino que permiten que el aprendizaje pueda aprender a autocorregirse y conservar la geometría original de la tela, así como evitar movimientos extremos a medida que avanza la simulación. Son las siguientes:
 \begin{itemize}
     \item \textbf{Ruido en el input:} Una de las técnicas más sencillas para mejorar la capacidad del modelo de corregir sus errores es entrenarlo creando pequeños errores de forma artifical. Esto se consigue añadiéndole ruido a los datos de entrada, en este caso se añade un ruido gaussiano de entre un 2 y un 5\% de magnitud respecto a los datos de entrada antes de normalizar. De esta manera, el modelo aprende a corregir estos errores para corregir los suyos propios en un futuro.
     
@@ -111,25 +133,57 @@ En primer lugar, se incorporan diferentes técnicas que ayudan a estabilizar el 
 En este estudio nos hemos enfocado en dos tipos de redes neuronales que se alienan con nuestro objetivos de emplear modelos sencillos: los \textbf{perceptrones multicapa (MLP)} y las \textbf{redes neuronales recurrentes (RNN)}. Otras redes como las CNN o las GNNS han sido descartados debido a la alta complejidad para representar y proporcionar los datos al modelo.
 
 \begin{itemize}
-    \item \cite{holden_subspace_2019} resalta el MLP como una red sencilla computancionalmente más accesible que las CNNs empleadas en otros estudios, manteniendo la capacidad de proporcionar resultados adecuados mediante su uso de subespacios y correcciones. 
+    \item \cite{holden_subspace_2019} resalta el MLP como una red sencilla computancionalmente más accesible que las CNNs empleadas en otros estudios, manteniendo la capacidad de proporcionar resultados adecuados mediante técnicas adicionales, como hemos visto anteriormente, subespacios y correcciones en post-procesamiento. Este estudio usa una MLP con cuatro capas ocultas ReLU y una lineal para producir la salida (cinco capas densas).
+    
     \item Por otra parte, empleamos una RNN para comprobar si la memoria recurrente ayuda a gestionar mejor el movimiento dinámico y conservar la geometría a través del tiempo. Varias de las investigaciones del estado del arte, como por ejemplo \cite{santesteban2022snug}, mencionan como limitación las telas más dinámicas, ya que, al tener muchas menos restricciones, las mallas que no van pegadas a un cuerpo de colisión son mucho más susceptibles a la inercia. Naturalmente, el aprendizaje de estas propiedades físicas requiere del conocimiento de atributos como la velocidad o la aceleración de las partículas. La recurrencia permite al modelo tener una memoria a corto plazo del movimiento en cada vértice, haciendo su entrenamiento mucho más eficaz. Sigue la arquitectura de tipo "many to one", donde una cantidad determinada de frames se utilizan como input para generar el delta de desplazamiento entre el último frame de la secuencia y el que sería el siguiente.
 \end{itemize}
 
-
+En ambos casos se usa el optimizador Adam.
 
 \subsubsection{Reducción de dimensionalidad}
-Para conseguir alcanzar una mejora de rendimiento y complejidad en los modelos, se necesita reducir la dimensionalidad de las entradas y salidas del modelo. Encontramos distintas formas de reducir, como 
-El PCA se usa ampliamente para conservar las deformaciones principales en simulaciones complejas, pudiendo compactar la informacion y reducir la complejidad. Se pasa al modelo unos coeficientes del subespacio PCA y se reconstruye de vuelta en Unity! :3
+Para conseguir alcanzar una mejora de rendimiento y complejidad en los modelos, se necesita reducir la dimensionalidad de las entradas y salidas del modelo. Se elije el \textbf{PCA} como método de reducción pues este se usa ampliamente para conservar las deformaciones principales en simulaciones complejas, pudiendo compactar la informacion y reducir la complejidad, como se observa en estudios como \cite{holden_subspace_2019} o \cite{chentanez_cloth_2020}. El movimiento físico de una tela no se rige únicamente por los vértices de su malla, sino que las deformaciones y restricciones físicas internas corresponden al movimiento de una estructura de menor dimensionalidad. Esto implica que se pueden extraer ejes de deformación que definen el movimiento, acelerando la obtención de las posiciones de la tela. La posición se reconstruye más tarde haciendo el proceso de PCA inverso, tanto en el entorno de entrenamiento como en el propio Unity. Una ténica adicional que se aplica y también se aprecia en el estudio de Holden consiste en el \textbf{\textit{clipping}}, es decir, acotar las salidas PCA a los extremos encontrados en el training. Esto evita comportamientos extraños ante errores o situaciones no previstas. Cabe recalcar que en este estudio no se realiza el PCA sobre una posición ya calculada (Verlet integration) o sobre joints, sino sobre los propios deltas de posiciones. Esto se verá con más profundidad en el experimento y posterior discusión. \newline
 
-Aplicamos un PCA con un número de componentes que respeta que el umbral de varianza esté sobre el 95\%. En el caso de este estudio, X componentes.
+No obstante, cabe recalcar que la reducción conlleva un coste. Pese a aportar mejor rendimiento, un menor número de componentes compromete el nivel de detalle o la deformación en la simulacion, supone una mayor restricción geométrica para la tela. Para encontrar el punto intermedio entre coste de la inferencia y un movimiento más detallado, menos restrictivo, se elige un número de componentes que explican un umbral de varianza. En este estudio se emplea una varianza del 95\%. \newline
+
+El PCA empleado en el entrenamiento pertence a la librería de sklearn. El cálculo del número óptimo de componentes se obtiene mediante a través del proporcionado \textit{pca.explained\_variance\_ratio\_.cumsum()}. Una vez obtenido, se aplica y ajusta el PCA sobre el dataset.
 
 \begin{figure}[H]
     \centering
         \includegraphics[width=0.91\textwidth]{Imagenes/resultPCA.png}
-        \caption{Componentes óptimas para PCA}
+        \caption{Ejemplo de componentes óptimos para PCA}
 \end{figure}
 
-Se calculan los frames con el PCA aplicados necesarios para realizar todas las predicciones de
+Podemos definir la reducción de la siguiente forma:
+
+\begin{algorithm}
+\caption{Reducción de dimensionalidad mediante PCA}
+\begin{algorithmic}[1]
+
+\Statex \textbf{Entrenamiento}
+\State Recopilar $F$ frames de simulación: $\mathbf{D} \in \mathbb{R}^{F \times 3n}$
+\State Ajustar StandardScaler: $\boldsymbol{\mu}_s,\, \boldsymbol{\sigma}_s \leftarrow \operatorname{mean}(\mathbf{D}),\, \operatorname{std}(\mathbf{D})$
+\State $\hat{\mathbf{D}} \leftarrow (\mathbf{D} - \boldsymbol{\mu}_s) / \boldsymbol{\sigma}_s$
+\State Ajustar PCA sobre $\hat{\mathbf{D}}$: obtener $\boldsymbol{\mu}_p,\, \mathbf{U}_k \in \mathbb{R}^{3n \times k}$
+\Statex \hspace{1.5em} donde $k$ es el número de componentes que explican $\geq 95\%$ de varianza
+
+\Statex
+\Statex \textbf{Codificación} (frame $\mathbf{p}_t \rightarrow \mathbf{z}_t$)
+\State $\hat{\mathbf{p}}_t \leftarrow (\mathbf{p}_t - \boldsymbol{\mu}_s) / \boldsymbol{\sigma}_s$
+\State $\mathbf{z}_t \leftarrow (\hat{\mathbf{p}}_t - \boldsymbol{\mu}_p)\,\mathbf{U}_k \;\in\; \mathbb{R}^{k}$
+
+\Statex
+\Statex \textbf{Decodificación} (coordenadas PCA $\mathbf{z}_t \rightarrow \mathbf{p}_t$)
+\State $\hat{\mathbf{p}}_t \leftarrow \mathbf{z}_t\,\mathbf{U}_k^\top + \boldsymbol{\mu}_p$
+\State $\mathbf{p}_t \leftarrow \hat{\mathbf{p}}_t \cdot \boldsymbol{\sigma}_s + \boldsymbol{\mu}_s$
+\State \textbf{Recortar} $\mathbf{z}_t$ al rango $[\mathbf{z}_{\min},\, \mathbf{z}_{\max}]$ observado en training
+
+\end{algorithmic}
+\end{algorithm}
+
+Tanto en el entorno de entrenamiento se encuentran funciones que facilitan el cálculo de PCA sobre un conjunto de datos de vértices y su cálculo inverso, es decir, la obtención de la coordenada local xyz de los vértices. 
+
+Este uso de PCA modifica en el modelo qué se entrena, la pérdida ya no consiste en el delta de posiciones, sino en el delta de PCA entre frames. Y quizá es la razón por la que es inestable...? Quién sabe. Pero va muy rápido.
+
 \subsection{Resultado e hiperparámetros}
 
 Tras el proceso de iteraciones descrito, se concluye que la red neuronal más óptima es una RNN con \textit{unrolling}, utilizando como función de pérdida \textit{L1Loss}\footnote{\textbf{L1Loss:} Función proporcionada por Pytorch que calcula el error absoluto medio entre los valores predichos y los valores reales.} de la posición y la velocidad. El input se construye con el SDF, la posición y velocidad de los vértices normalizados con inyección de ruido y como output se obtienen los deltas de desplazamiento normalizados.\newline
