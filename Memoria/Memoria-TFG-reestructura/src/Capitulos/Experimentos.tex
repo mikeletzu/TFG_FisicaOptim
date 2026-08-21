@@ -54,18 +54,26 @@ A la hora de escalar el proyecto, aumentando tanto la geometría como los tipos 
 \section{Unrolling}
 De manera similar, en este proyecto se genera una secuencia de predicciones; la cadena de deltas generados sucesivamente permiten al modelo tener una noción sobre el cambio de velocidad y aceleración provocados. Esta técnica consiste en retropropagar el error a lo largo de la secuencia temporal y permite a la red aprender dependencias temporales.
 
+\section{Aplicacion para la visualización de los experimentos}
 
+Para poder visualizar los resultados de la infraestructura creada, se ha implementado una aplicación disponible en el repositorio del proyecto. La interfaz permite acceder a los distintos experimentos llevados a cabo, los cuales son explicados en profundidad en el siguiente capitulo. 
 
+En cada experimento pueden compararse distintas versiones de modelos estudiados con la simulación de cloth de Unity. Asímismo, se generan métricas  de rendimiento de cada simulación, para poder comparar estas no solo de manera visual.
 
+Para obtener metricas veraces se recomienda mantener cada simulación en curso durante al menos un minuto. Ya que dada la aleatoriedad del dataset, BLA BLA BLA
 
-%\subsection{Gestión del error acumulado}
-%En este punto del desarrollo, los resultados de accuracy del modelo son adecuados, se alcanzan entrenamientos con un error medio por vertice de hasta 0.001m, lo que en un contexto estático sería imperceptible. Sin embargo, nuestro modelo ha de mantenerse consistente a lo largo del tiempo. A 60 fotogramas por segundo, un error tan bajo puede convertirse en una geometría completamente dañada al cabo de pocos segundos. Ante este problema, se plantean varias opciones para que el aprendizaje pueda ser capaz de autocorregirse.
-
-%\begin{figure}[H]
-%        \centering
-%        \includegraphics[width=0.91\textwidth]{Imagenes/errorAcumulado.png}
-%        \caption{Reducción de características}
-%    \end{figure}
-
-%\textbf{Anchored training:} Otra forma de intentar reducir el error consiste en inferir el desplazamiento de los vértices respecto a las posiciones originales de la malla en lugar de las posiciones en el último frame (\cite{bertiche_deepsd_2021}, \cite{santesteban2022snug}, \cite{holden_subspace_2019}). Este es un planteamiento intuitivo que se presenta en distintos papers mencionados previamente: DeePSD, SNUG o Subspace Neural Physics. Al pensar en simulaciones de telas, ya sea una bandera con su mástil o una prenda con su personaje, todas cuentan con unos puntos, es decir, algo a lo que anclarse. Actuando sobre esos puntos se puede asegurar que la simulación se mantendrá dentro de un espacio concreto. En esta investigación aplicamos esta técnica guardando las posiciones de los vértices en su estado incial y aplicando los nuevos desplazamientos sobre estos.
-%Al coger un punto de referencia del que medir los desplazamientos y no basarse en posicines generadas, el MSE del modelo, calculado como la diferencia entre las posiciones reales y predichas, en las pruebas de python mejora notablemente. No obstante, la simualción en Unity aún adolece de errores de pecisión.
+\begin{figure}[H]
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Imagenes/AplicacionA.png}
+        \caption{Menu principal de la aplicación}
+        \label{fig:appA}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=\textwidth]{Imagenes/AplicacionB.png}
+        \caption{Ejemplo de la ejecución de una simulación de un experimento}
+        \label{fig:appB}
+    \end{minipage}
+\end{figure}

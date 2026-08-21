@@ -15,15 +15,14 @@ En la misma línea de otras tecnologías ya utilizadas en el desarrollo de video
 Este enfoque implica una carga elevada al inicio de entrenamiento de modelos, compensado con una ejecución eficiente en tiempo real. Cabe destacar que, si bien utilizar la IA supone sacrificar la precisión absoluta de las físicas, no queremos caer en la falacia de la inmersión \cite{salenc2004rules}. Nuestro objetivo es lograr simulaciones visualmente verosímiles, centrándonos en la percepción del usuario. Por ello, se ha optado por la simulación de telas. Este caso de estudio representa un equilibrio adecuado entre complejidad física y familiaridad con el resultado visual, de esta manera, realizaremos un análisis tanto técnico como perceptivo.
 
 \section{Objetivos}
-
-El objetivo general de este proyecto es la implementación de un modelo de IA que permita replicar el movimiento en tiempo real de una tela en un motor de videojuegos con baja latencia. Para cumplir con este objetivo, se plantean las siguientes metas durante el desarrollo del proyecto:
+El objetivo general de este proyecto es construir una infraestructura que permita identificar las limitaciones actuales de la implementación de un modelo de IA que replique el movimiento en tiempo real de una tela en un motor de videojuegos con baja latencia. Para cumplir con este objetivo, se plantean las siguientes metas durante el desarrollo del proyecto:
 
 \begin{enumerate}
 	%\renewcommand{\theenumi}{\alph{enumi}}
 	\item Generar una animación de una tela y un colisionador que varíe su movimiento en cada ejecución de la escena.
 	\item Generar y procesar datasets con la información relevante de la tela respecto a su entorno y colisionador.
 	\item Implementar, entrenar y evaluar los distintos modelos de aprendizaje automático, tales como redes neuronales.
-	\item Analizar y comparar los resultados visuales de los distintos modelos.
+	\item Analizar y comparar los resultados tanto visuales como de rendimiento de los distintos modelos.
 \end{enumerate}
 
 \section{Plan de trabajo}
