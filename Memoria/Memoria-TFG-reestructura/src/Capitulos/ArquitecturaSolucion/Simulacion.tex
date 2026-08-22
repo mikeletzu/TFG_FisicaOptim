@@ -14,7 +14,7 @@ La simulación base que se emplea para entrenar y ajustar los modelos se lleva a
     \label{fig:maxDistance}
 \end{figure}
 
-SOBRA? Durante parte del desarollo del modelo, para poder identificar los motivos de inestibilidades e identificar otros errores con más facilidad, se redujo el tamaño de la malla a 6 vértices. \newline
+Durante parte del desarollo del modelo, para poder identificar los motivos de inestibilidades e identificar otros errores con más facilidad, se redujo el tamaño de la malla a 6 vértices. \newline
 
 El movimiento de la bola que colisiona con la tela está descrito por un componente \textit{BallMovement}. Este puede ser automático o generado a través de entrada con el teclado. El movimiento automático tiene dos movimientos descritos: 
 
@@ -53,6 +53,7 @@ Para probar el enfoque más estático y pegado al cuerpo se creó una simulació
     \end{minipage}
 \end{figure}
 
+\begin{comment}
 La otra simulación llevada a cabo consiste en un personaje andando con una \textbf{falda}. El personaje, simplificado, está formado por tres cápsulas: un torso y dos piernas; y la falda es un malla en forma de cilindro compuesta por 288 vértices, para habilitar un movimiento más dinámico. Una vez ajustados los colliders de las cápsulas para ser más grandes que las mallas de las piernas, esta simulación genera un buen resultado a nivel visual. Lo emplearemos más adelante para representar animaciones más complejas y realizar  comparaciones y mediciones adicionales al plano de 25 vértices.
 \begin{figure}[htbp]
     \centering
@@ -60,6 +61,7 @@ La otra simulación llevada a cabo consiste en un personaje andando con una \tex
     \caption{Simulación de una falda con componente Cloth.}
     \label{fig:skirt}
 \end{figure}
+\end{comment}
 
 \subsection{Los parámetros}
 Las telas que usamos para generar las simulaciones en las que se basarán nuestros modelos son objetos formados por mallas con un componente Cloth (y su correspondiente \textit{Skinned Mesh Renderer}) y un componente de grabación  \textit{ClothDatasetRecorder}, encargado de guardar los datos de la simulación. Se plantea recoger diferentes parámetros que representen las características más importantes de la tela durante la simulación:  \newline
@@ -78,20 +80,17 @@ Las telas que usamos para generar las simulaciones en las que se basarán nuestr
 
 Cabe recalcar que el registro de las posiciones se realiza de forma local respecto al pivote de la tela. Pese a que tanto utilizando posiciones globales (reales en el mundo) como locales se mantiene la consistencia y un origen único de coordenadas, las posiciones locales son más relevantes para los modelos y los resultados no son dependientes de las traslaciones en el espacio. Se ha confirmado la relevancia de emplear un \textbf{sistema de coordenadas local} tras evaluar el desempeño del modelo con datasets relativos a ambos sistemas.
 
-En Cloth, las posiciones de los vértices de la tela ya se obtienen de forma relativa a su pivote. Unity proporciona los métodos \textit{TransformPoint(Vector3 position)} y \textit{InverseTransformPoint(Vector3 position)} para obtener coordenadas de mundo a partir de coordenadas locales de un objeto y para pasarlas a coordenadas locales a partir de un transform respectivamente. Se utilizan estos métodos para realizar todos los cálculos y proporcionar al modelo los datos en en el mismo sistema de coordenadas.
+En Cloth, las posiciones de los vértices de la tela ya se obtienen de forma relativa a su pivote. Unity proporciona los métodos \textit{TransformPoint(Vector3 position)} y \textit{InverseTransformPoint(Vector3 position)} para obtener coordenadas de mundo a partir de coordenadas locales de un objeto y para pasarlas a coordenadas locales a partir de un transform respectivamente. Se utilizan estos métodos para realizar todos los cálculos y proporcionar al modelo los datos en en el mismo sistema de coordenadas. \newline
 
-% HILAR BN RANDOM FOREST
-PENSAR SI AÑADIR O NO: Tras confirmar que la reducción de features puede ser interesante, se implementa un modelo \textit{Random Forest} para ver cuáles son los parámetros más importantes para la inferencia. Se mide la importancia de Gini, esta métrica mide la reducción media de la impureza (MDI por sus siglas en inglés: Mean Decrease in Impurity), es decir, cuánta varianza o error reduce cada variable a lo largo de las divisiones en los nodos de todos los árboles. Sumando la importancia acumulada sobre los ejes temporales y espaciales (vértices de la malla), se consigue obtener la importancia de cada una de las 13 propiedades del dataset. Como se ve en la figura, los parámetros U, V y MD resultan no ser importantes para generar la predicción. Sin embargo, se aprecia la importancia de los parámetros de velocidad. En este caso es más notable en el eje x, debido a la configuración de la simulación con la que se ha generado el dataset analizado para el gráfico (\ref{fig:random_forest}).
-    \begin{figure}[H]
-        \centering
-        \includegraphics[width=0.6\textwidth]{Imagenes/resultRndFrst.png}
-        \caption{Parámetros valorados por el random forest.}
-        \label{fig:random_forest}
-    \end{figure}
-\end{itemize}
 
-%CITAR EL RESPALDO DE LA COMUNIDAD
-\cite{chen2020selecting} main, pero tmbn \cite{iranzad2025review}
+Ante la gran cantidad de datos recogidos, se investigan maneras de seleccionar las características más esenciales para el entrenamiento. Tras confirmar con estudios como \cite{chen2020selecting} o \cite{iranzad2025review} que el uso de modelos \textit{Random Forest} para la reducción de features puede ser interesante, se implementa uno de estos modelos para ver cuáles son los parámetros más importantes para la inferencia. Se mide la importancia de Gini, esta métrica mide la reducción media de la impureza (MDI por sus siglas en inglés: Mean Decrease in Impurity), es decir, cuánta varianza o error reduce cada variable a lo largo de las divisiones en los nodos de todos los árboles. Sumando la importancia acumulada sobre los ejes temporales y espaciales (vértices de la malla), se consigue obtener la importancia de cada una de las 13 propiedades del dataset. Como se ve en la figura, los parámetros U, V y MD resultan no ser importantes para generar la predicción. Sin embargo, se aprecia la importancia de los parámetros de velocidad. En este caso es más notable en el eje x, debido a la configuración de la simulación con la que se ha generado el dataset analizado para el gráfico (\ref{fig:random_forest}).
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.6\textwidth]{Imagenes/resultRndFrst.png}
+    \caption{Parámetros valorados por el random forest.}
+    \label{fig:random_forest}
+\end{figure}
+
 
 \subsection{Generación del dataset}
 A través del componente \textit{ClothDatasetRecorder} realizamos un ``snapshot'' o captura de la tela cada intervalo de tiempo \textit{recordTime}, que se declara en el inicio del desarollo como 3.5 segundos. Estos datos del frame se guardan en una estructura SnapInfo, que representa la información de los vértices de la tela en un instante de tiempo determinado, y se añade a una lista de capturas de la simulación. 
