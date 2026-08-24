@@ -7,9 +7,9 @@ Los datasets son generados de forma interna, creándose a partir de simulaciones
 
 La simulación base que se emplea para entrenar y ajustar los modelos se lleva a cabo en un escenario formado por un plano-tela de 25 vértices con la parte superior fija en el espacio, y una esfera que colisiona con la tela para generar el movimiento.  \newline
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{Imagenes/Bmap/maxDistance.png}
+    \includegraphics[width=0.5\textwidth]{Imagenes/Bmap/maxDistance.png}
     \caption{Malla de 25 vértices con parte superior fija.}
     \label{fig:maxDistance}
 \end{figure}
@@ -23,9 +23,9 @@ El movimiento de la bola que colisiona con la tela está descrito por un compone
     \item \textbf{Movimiento aleatorio:} pretende facilitar la generación de un dataset con diversidad de movimientos de forma automática, así como introducir a la tela más dinamismo y movimientos erráticos. Este desplazamiento en tres ejes aleatorio se consigue a través del uso de splines. En la escena se encuentra un objeto con el componente creado \textit{PathGenerator} que delimita una zona de generación y aporta la creación de splines en SplineContainers a partir de una posición concreta. El componente de Unity \textit{SplineAnimate} se encargará de mover la esfera por el camino hasta llegar al final del mismo; en ese instante se generará un nuevo camino aleatorio para continuar con su recorrido.
 \end{itemize}
 
-\begin{figure}[htbp]
+\begin{figure}[H]
     \centering
-    \includegraphics[width=0.6\textwidth]{Imagenes/Bmap/spline.png}
+    \includegraphics[width=0.5\textwidth]{Imagenes/Bmap/spline.png}
     \caption{Movimiento aleatorio basado en splines.}
     \label{fig:spline}
 \end{figure}

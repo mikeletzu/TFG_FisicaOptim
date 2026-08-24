@@ -12,9 +12,7 @@ A la hora de valorar la calidad de un sistema de inferencia en tiempo de ejecuci
 A lo largo del proyecto se han llevado a cabo numerosas pruebas, a continuación se describen los experimentos con los resultados más interesantes. Pueden verse de forma interactiva en la aplicación del repositorio.
 
 \section{Recurrencia}
-
-
-Los siguientes parámetros son compartidos entre ambas pruebas, con la intención de aislar únicamente la recurrencia y analizar su efecto.
+Para analizar la importancia de la memoria recurrente de los modelos, en los casos en los que la simulación cuenta con inercia, se han comparado dos tipos de modelos, un MLP y un RNN. Los siguientes parámetros son compartidos entre ambas pruebas, con la intención de aislar únicamente la recurrencia y analizar su efecto.
 \begin{table}[H]
     \begin{center}
         \begin{tabular}{ | m{2.2cm} | m{2cm} | m{1.2cm} | m{2.1cm} | m{2.4cm} | m{2.2cm} | }
@@ -26,21 +24,26 @@ Los siguientes parámetros son compartidos entre ambas pruebas, con la intenció
     \label{tab:randomTraining}
 \end{table}
 
+RESULTADOS POR DEFINIR. En principio el RNN ayuda a que la tela mantenga su estructura aun que tiene un costo añadiido de guardar el history buffer. La diferencia de rendimiento no compensa la visual.
+
 \begin{table}[H]
     \begin{center}
         \begin{tabular}{ | m{3cm} | m{3cm} | m{3cm} | m{1.2cm} | m{2cm} | }
         \hline \textbf{Prueba} & \textbf{Tiempo} & \textbf{Error medio por vertice} & \textbf{FPS} & \textbf{Percepción} \\ \hline
-            MLP & 20h(gpu) & 0.000923 & 110 & 8/10 \\ \hline
-            RNN & 20h(gpu) & 0.000923 & 110 & 8/10 \\ \hline
+            MLP & 0h(gpu) & 0.0 & 0 & 0/10 \\ \hline
+            RNN & 0h(gpu) & 0.0 & 0 & 0/10 \\ \hline
         \end{tabular}
     \end{center}
     \caption{Resultados del entrenamiento.}
     \label{tab:randomResults}
 \end{table}
 
+FIGURAS DE LOS RESULTADOS VISUALES
+
+
 
 \section{Velocidad}
-Como se ha mencionado anteriormente, hay varias características que se registran en la fase de simulación, de las cuales algunas han resultado ser más óptimas para generar un entrenamiento ligero y efectivo: la posición de los vértices, la velocidad y el sdf. Al utilizar secuencias de frames para el entrenamiento, la velocidad puede ser redundante, por lo que en este experimento se valora su efecto.
+Al utilizar secuencias de frames para el entrenamiento, teniendo las posiciones de cada vertice, la velocidad puede ser inferida. Sin embargo, la secuencia de las velocidad aporta al modelo de una conciencia acerca de la aceleración/decelarión de los vértices, por lo que en este experimento se valora su efecto.
 
 Hay que calcular la velocidad de cada punto de la tela en cada frame para generar el tensor de entrada. Además del coste computacional que esto supone, el ERROR de ...
 
