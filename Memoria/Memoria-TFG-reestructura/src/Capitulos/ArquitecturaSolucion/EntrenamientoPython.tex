@@ -111,10 +111,6 @@ Este estudio se ha enfocado en dos tipos de redes neuronales que se alienan con 
 
 La diferencia entre ambos modelos se resalta por tanto en la falta de un estado oculto que sea capaz de capturar progresiones temporales. La recurrencia y el \textit{many to one}, que vemos en redes como las RNNS, GRUs o LSTMs conllevan altos tiempos de entrenamiento, así como un incremento en el tiempo de inferencia y memoria, al tener que procesar constantemente más de un frame. Se quiere comprobar en el experimento correspondiente si, empleando técnicas equivalentes, la recurrencia aporta a la simulación de tela altamente dinámica una calidad que compense el coste de tiempo tanto en el entranamiento como en la ejecución. \newline
 
-Se emplea el optimizador Adam, frecuentemente empleado en redes neuronales físicas por su rapidez de convergencia en grandes datasets, adaptabilidad a diferentes escalas de rigidez (como podrían ser en este estudio el \textit{bending} o \textit{stiffness} mencionados) o  amortiguación de picos de gradientes generados por colisiones, entre otros. Empleamos el Adam por defecto, empleado por otros estudios como \cite{bertiche2021PBNS} o \cite{chentanez_cloth_2020}. 
-
-Hidden state, aplanado de datos. %más cosas
-
 \subsubsection{Gestión de error acumulado}
 \begin{figure}[H]
         \centering
@@ -144,59 +140,51 @@ Una simulación sin restricciones específicas tiende a la  acumulación de erro
 
 La siguiente función, \textit{RunRollout()}, lleva a cabo el cálculo de las predicciones y la pérdida de las mismas para cada lote de datos del dataset. Siguiendo la técnica mencionada, ejecuta las predicciones necesarias para avanzar en el tiempo tanto como el tamaño de la ventana de unrolling le indica. Por simplicidad el modelo que sa ha decidido representar por pseudocódigo recoge únicamente la posición y sdf como parámetro de entrada.
 
-\begin{comment}
 \begin{algorithm}[H]
-\caption{Función de \textit{Unrolling}}
+\caption{Función de \textit{Unrolling} sobre RNN}
 \label{alg:run_rollout}
-\begin{algorithmic}[1]
+\begin{algorithmic}
 \Function{RunRollout}{$ batch\_seq, batch\_future$}
-    \State $B, W, V, F \gets \text{dimensiones de } batch\_future$
-    \State $window \gets \text{copia}(batch\_seq)$ \Comment{La copia permite no alterar el tensor original}
-    %\BlankLine
-    \State \textbf{\textit{Inyección de ruido inicial}}
-    \State $noise \gets \mathcal{N}(0, \sigma_{\text{noise}}) \text{ del mismo tamaño que } window[:, -N:]$
-    \State $window[:, -N:] \gets window[:, -N:] + noise$
+    \State $ batch\_seq \gets \text{Sequencia de entrada real: tamaño windowSize}$
+    \State $ batch\_future \gets \text{Sequencia de unrolling real: tamaño rolloutSteps (W)}$
+    \BlankLine
+    \State $window \gets \text{copia}(batch\_seq)$ \Comment{Copia para no alterar el tensor original}
+    \BlankLine
+    \State $noise \gets \mathcal{N}(0, \sigma_{\text{noise}})$
+    \State $window[:, -N:] \gets window[:, -N:] + noise$ \Comment{Inyección de ruido inicial}
     
-    %\BlankLine
-    \State \textbf{\textit{Iteración sobre la secuencia}}
+    \BlankLine
     \State $total\_loss \gets 0$
-    \State $prev\_pred\_pos \gets window[:, -1, :, 0:3]$ \Comment{Posición en $t-1$}
+    \Statex \For {$k \gets 0$ \textbf{to} $W - 1$} {
+        \State $ prev\_pred\_pos \gets window[:, -1, :, 0:3]$ \Comment{Posición inferida ($t-1$)}
+
+    \BlankLine
+    \State $\textbf{\textit{Inferencia:}}$
+        \State $window\_norm \gets \text{NormEntrada}(window)$
+        \State $ pred\_delta\_norm \gets \text{Modelo}(window\_norm)$ \Comment{Delta inferido ($t$)}        
+        \State $ pred\_delta \gets \text{DesnormDelta}(pred\_delta\_norm)$ 
+        \State $ pred\_pos \gets prev\_pred\_pos + pred\_delta$ \Comment{Posición inferida ($t$)}
+
+    \BlankLine
+    \State $\textbf{\textit{Comparación:}}$
+        \State $real\_pos \gets batch\_future[:, k, :, 0:3]$ \Comment{Posición real}
+        \State $real\_delta\_norm \gets \text{NormDelta}(real\_pos - prev\_pred\_pos)$
+        \State $loss\_pos \gets \mathcal{L}_{L1}(pred\_delta\_norm, real\_delta\_norm)$ \Comment{Loss de posición}
         
-    %\BlankLine
-    \For{$k \gets 0$ \textbf{to} $W - 1$}
-        \State $window\_norm \gets \text{NormalizarEntrada}(window)$
-        \State $ pred\_delta\_norm \gets \text{Modelo}(window\_norm)$ \Comment{Inferencia de la red}        
-        \State $ last\_pos \gets window[:, -1, :, 0:3]$
-        \State $ pred\_delta\_real \gets \text{DesnormalizarDelta}(pred\_delta\_norm)$
-        \State $ pred\_pos \gets last\_pos + pred\_delta\_real$ \Comment{Nueva posición absoluta}
-        
-        %\BlankLine
-        \State $real\_pos \gets batch\_future[:, k, :, 0:3]$
-        \State $real\_prev\_pos \gets (k > 0) \mathrel{?} batch\_future[:, k-1, :, 0:3] : batch\_seq[:, -1, :, 0:3]$
-        
-        %\BlankLine
-        \State $real\_delta\_norm \gets \text{NormalizarDelta}(real\_pos - last\_pos)$
-        \State $loss\_pos \gets \mathcal{L}_{L1}(pred\_delta\_norm, real\_delta\_norm)$ \Comment{Cálculo del Loss de Posición}
-        
-        %\BlankLine
-        \State $pred\_vel \gets pred\_pos - prev\_pred\_pos$
-        \State $real\_vel \gets real\_pos - real\_prev\_pos$
-        \State $loss\_vel \gets \mathcal{L}_{L1}(pred\_vel / \sigma_{target}, real\_vel / \sigma_{target})$ \Comment{Cálculo del Loss de Velocidad}
-        
-        %\BlankLine
-        \State $total\_loss \gets total\_loss + loss\_pos + (\gamma_{vel} \times loss\_vel)$
-        
-        %\BlankLine
-        \Comment{\textit{Feedback Loop}}
+    \BlankLine
+    \State $\textbf{\textit{Feedback:}}$
         \State $new\_frame \gets \text{ConstruirFrame}(pred\_pos, \text{resto de propiedades reales})$
         \State $window \gets [window[:, 1:], new\_frame]$ \Comment{Desplazar ventana temporal}
-        \State $prev\_pred\_pos \gets pred\_pos$
-    \EndFor 
+    
+    \BlankLine
+    \State $total\_loss \gets total\_loss + loss\_pos$
+    }
     \State \Return $total\_loss / W$
+
+\BlankLine
 \EndFunction
 \end{algorithmic}
 \end{algorithm}
-\end{comment}
 
 \subsubsection{Reducción de dimensionalidad}
 Para conseguir alcanzar una mejora de rendimiento y complejidad en los modelos, se necesita reducir la dimensionalidad de las entradas y salidas del modelo. Se elige el \textbf{PCA} como método de reducción pues este se usa ampliamente para conservar las deformaciones principales en simulaciones complejas, pudiendo compactar la informacion y reducir la complejidad, como se observa en estudios como \cite{holden_subspace_2019} o \cite{chentanez_cloth_2020}. El movimiento físico de una tela no se rige únicamente por los vértices de su malla, sino que las deformaciones y restricciones físicas internas corresponden al movimiento de una estructura de menor dimensionalidad. Esto implica que se pueden extraer ejes de deformación que definen el movimiento, acelerando la obtención de las posiciones de la tela. La posición se reconstruye más tarde haciendo el proceso de PCA inverso, tanto en el entorno de entrenamiento como en el propio Unity. Una ténica adicional que se aplica y también se aprecia en el estudio de Holden consiste en el \textbf{\textit{clipping}}, o en otras palabras, acotar las salidas PCA a los extremos encontrados en el training. Esto evita comportamientos extraños ante errores o situaciones no previstas. Cabe recalcar que en este estudio no se realiza el PCA sobre una posición ya calculada (como la integración de Verlet de Holden) o sobre ejes de rotación, sino sobre los propios deltas de posiciones. Esto se verá con más profundidad en el experimento y posterior discusión. \newline
@@ -215,7 +203,8 @@ Podemos definir la reducción de la siguiente forma:
 
 \begin{algorithm}
 \caption{Reducción de dimensionalidad mediante PCA}
-\begin{algorithmic}[1]
+\label{alg:pca}
+\begin{algorithmic}
 
 \Statex \textbf{Entrenamiento}
 \State Recopilar $F$ frames de simulación: $\mathbf{D} \in \mathbb{R}^{F \times 3n}$
@@ -245,32 +234,34 @@ Es importante resalta que el uso de PCA modifica en el modelo qué se entrena; l
 \subsection{Bucle de entrenamiento}
 La siguiente sección de pseudocódigo describe el bucle para llevar a cabo el entrenamiento completo del modelo. Inicialmente, se dividen los datos de entrenamiento en lotes, estos contienen una secuencia de entrada para el modelo y la secuencia de frames inmediatamente posterior. Con estos datos y la función descrita anteriormente, se obtiene la pérdida del modelo para la retropropagación y se actualizan sus pesos. La fase de evaluación también utiliza la función anterior para analizar la calidad del modelo ante situaciones nuevas, y calcula el primer frame de cada lote para obtener una aproximación de la media de error en la predicción de los deltas.
 
-\begin{comment}
+
 \begin{algorithm}[H]
 \caption{Bucle de Entrenamiento y Validación}
-\label{alg:training_loop}
-\begin{algorithmic}[1]
-\For{$epoch \gets 1$ \textbf{to} $\text{EPOCHS}$}
-    
-    \State\textbf{Fase de Entrenamiento (Train)}
+\label{alg:trainingloop}
+\begin{algorithmic}
+
+\State \For{$epoch \gets 1$ \textbf{to} $\text{EPOCHS}$} {
+    \BlankLine
+    \State $\textbf{\textit{Fase de Entrenamiento (Train):}}$
     \State Establecer modelo en modo entrenamiento
     \State $train\_loss \gets 0.0$
-    \For{cada $(batch\_seq, batch\_future)$ en $train\_loader$}
+    \State \For{cada $(batch\_seq, batch\_future)$ en $train\_loader$} {
         \State $loss \gets \textsc{RunRollout}(batch\_seq, batch\_future)$
         \State $\text{Optimizador.zero\_grad}()$
         \State $loss.\text{backward}()$
         \State $\text{RecortarGradientes}(model.parameters, \text{umbral}=1.0)$
         \State $\text{Optimizador.step}()$
         \State $train\_loss \gets train\_loss + loss.\text{item}()$
-    \EndFor
+    }
 
     \State $\text{Planificador.step}()$ \Comment{Actualizar tasa de aprendizaje}
     
-    \State\textbf{Fase de Evaluación (Test)}
+    \BlankLine
+    \State $\textbf{\textit{Fase de Evaluación (Test):}}$
     \State Establecer modelo en modo evaluación y desactivar gradientes
     \State $test\_loss \gets 0.0$, $total\_err \gets 0.0$, $total\_verts \gets 0$
 
-    \For{cada $(batch\_seq, batch\_future)$ en $test\_loader$}
+    \State \For{cada $(batch\_seq, batch\_future)$ en $test\_loader$} {
         \State $loss \gets \textsc{RunRollout}(batch\_seq, batch\_future)$
         \State $test\_loss \gets test\_loss + loss.\text{item}()$
         
@@ -280,21 +271,22 @@ La siguiente sección de pseudocódigo describe el bucle para llevar a cabo el e
         \State $distancias \gets \|pred\_pos - target\_pos\|_2$
         \State $total\_err \gets total\_err + \sum(distancias)$
         \State $total\_verts \gets total\_verts + \text{NúmeroDeElementos}(distancias)$
-    \EndFor
-    \State $\text{ErrorVértice} \gets total\_err  /  total\_verts$
-    \State Almacenar métricas medias del $epoch$ en el historial
-    \State Imprimir en consola: $epoch$, $train\_loss$, $test\_loss$, $\text{ErrorVértice}$
-\EndFor
+    }
+\State $\text{ErrorVértice} \gets total\_err  /  total\_verts$
+\State Almacenar métricas medias del $epoch$ en el historial
+\State Imprimir en consola: $epoch$, $train\_loss$, $test\_loss$, $\text{ErrorVértice}$
+}
+
 \end{algorithmic}
 \end{algorithm}
 
-\end{comment}
+
 Para acabar de ajustar el modelo se itera sobre los mismos datasets modificando los parámetros variables.
 \begin{itemize}
     \item \textbf{Windows size:} Cantidad de frames de la secuencia de input, esta actuará como ventana deslizante conforme se añadan los frames predichos.
     \item \textbf{Rollout steps:} Cantidad de frames que el modelo produce en el unroll.
-    \item \textbf{Noise:} Se varía en la cantidad proporcional de ruido en el input normalizado (entre un 2 y un 5 \%) y este se aplica a los últimos n frames de la ventana del input.
-    \item \textbf{Learning rate:} Se reduce la tasa de aprendizaje cuando este se estanca.
-    \item \textbf{Tamaño dataset:} Se varía entre datasets desde 5000 a 25000 frames para determinar el tamaño mínimo con el que se consigue un resultado apropiado.
+    \item \textbf{Noise:} Se varía en la cantidad proporcional de ruido en el input normalizado (entre un 1 y un 3 \%) y este se aplica a los últimos n frames de la ventana del input.
+    \item \textbf{Learning rate:} Se emplea el optimizador Adam, frecuentemente empleado en redes neuronales físicas por su rapidez de convergencia en grandes datasets, adaptabilidad a diferentes escalas de rigidez (como podrían ser en este estudio el \textit{bending} o \textit{stiffness} mencionados) o  amortiguación de picos de gradientes generados por colisiones, entre otros. Empleamos el Adam por defecto, empleado por otros estudios como \cite{bertiche2021PBNS} o \cite{chentanez_cloth_2020}. 
+    \item \textbf{Tamaño dataset:} Se varía entre datasets desde 25000 a 100000 frames para determinar el tamaño mínimo con el que se consigue un resultado apropiado.
     \item \textbf{Batch size:} Este depende del tamaño del dataset y el detalle que se esté dispuesto a sacrificar para reducir el tiempo de entrenamiento.
 \end{itemize}

@@ -5,14 +5,26 @@ Como se ha comentado en el apartado del estado del arte, la investigación acerc
 
 A la hora de valorar la calidad de un sistema de inferencia en tiempo de ejecución, hay dos criterios fundamentales:
 \begin{itemize}
-  \item \textit{Resultado visual}: El movimiento inferido por el modelo ha de respetar las reglas fisicas suficientes para tener credibilidad. Además, es importante que la simulación se mantenga estable y la tela mantenga su estructura a lo largo de la ejecución.
-  \item \textit{Rendimiento}: Los modelos deben ser capaces de competir con los reducidos tiempos de computo de los solvers. Para ello tanto los modelos como los datos de input han de ser lo más ligeros posibles.
+  \item \textit{Rendimiento}: Los modelos deben ser capaces de competir con los reducidos tiempos de computo de los solvers. Para ello tanto los modelos como los datos de input han de ser lo más ligeros posibles. Las métricas que se emplean para medir la calidad del rendimiento son los siguentes: 
+  \begin{itemize}
+    \item \textit{Tiempo de entrenamiento}:
+    \item \textit{Tiempo de inferencia}:
+    \item \textit{Error medio por vértice}:
+    \item \textit{FPS}:
+  \end{itemize}
+  \item \textit{Resultado visual}: El movimiento inferido por el modelo ha de respetar las reglas fisicas suficientes para tener credibilidad. Además, es importante que la simulación se mantenga estable y la tela mantenga su estructura a lo largo de la ejecución. La evaluación de este aspecto es más subjetiva, por lo que se le ha dado una puntuación del 1 al 10 a diferentes características basada en la observación.
+  \begin{itemize}
+    \item \textit{Reactividad al colisionador}
+    \item \textit{Conservación de la estructura}
+    \item \textit{Estabilidad a largo plazo}
+    \item \textit{Credibilidad del movimiento}
+  \end{itemize}
 \end{itemize}
 
-A lo largo del proyecto se han llevado a cabo numerosas pruebas, a continuación se describen los experimentos con los resultados más interesantes. Pueden verse de forma interactiva en la aplicación del repositorio.
+A lo largo del proyecto se han llevado a cabo numerosas pruebas, a continuación se describen los experimentos con los resultados más interesantes. Pueden verse de forma interactiva en la aplicación del repositorio, explicada en el apartado \ref{sec:App}.
 
 \section{Recurrencia}
-Para analizar la importancia de la memoria recurrente de los modelos, en los casos en los que la simulación cuenta con inercia, se han comparado dos tipos de modelos, un MLP y un RNN. Los siguientes parámetros son compartidos entre ambas pruebas, con la intención de aislar únicamente la recurrencia y analizar su efecto.
+Para analizar la importancia de la memoria recurrente de los modelos, en los casos en los que la simulación cuenta con inercia, se han comparado los dos tipos de modelos definidos anteriormente, el MLP y el RNN. Los siguientes parámetros son compartidos entre ambas pruebas, con la intención de aislar únicamente la recurrencia y analizar su efecto.
 \begin{table}[H]
     \begin{center}
         \begin{tabular}{ | m{2.2cm} | m{2cm} | m{1.2cm} | m{2.1cm} | m{2.4cm} | m{2.2cm} | }
@@ -24,18 +36,29 @@ Para analizar la importancia de la memoria recurrente de los modelos, en los cas
     \label{tab:randomTraining}
 \end{table}
 
-RESULTADOS POR DEFINIR. En principio el RNN ayuda a que la tela mantenga su estructura aun que tiene un costo añadiido de guardar el history buffer. La diferencia de rendimiento no compensa la visual.
+\textit{RESULTADOS POR DEFINIR. En principio el RNN ayuda a que la tela mantenga su estructura aun que tiene un costo añadiido de guardar el history buffer. La diferencia de rendimiento no compensa la visual. }
 
 \begin{table}[H]
     \begin{center}
-        \begin{tabular}{ | m{3cm} | m{3cm} | m{3cm} | m{1.2cm} | m{2cm} | }
-        \hline \textbf{Prueba} & \textbf{Tiempo} & \textbf{Error medio por vertice} & \textbf{FPS} & \textbf{Percepción} \\ \hline
-            MLP & 0h(gpu) & 0.0 & 0 & 0/10 \\ \hline
-            RNN & 0h(gpu) & 0.0 & 0 & 0/10 \\ \hline
+        \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.6cm} | m{1.2cm} |}
+        \hline \textbf{Prueba} & \textbf{T entrenamiento} & \textbf{T inferencia} & \textbf{Error medio por vertice} & \textbf{FPS} \\ \hline
+            MLP & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
+            RNN & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
         \end{tabular}
     \end{center}
-    \caption{Resultados del entrenamiento.}
-    \label{tab:randomResults}
+    \caption{Resultados del entrenamiento en base al rendimiento.}
+    \label{tab:rendResults}
+\end{table}
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.8cm} | m{2.8cm} |}
+        \hline \textbf{Prueba} & \textbf{Reactividad} & \textbf{Conservación} & \textbf{Estabilidad} & \textbf{Credibilidad} \\ \hline
+            MLP & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
+            RNN & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados del entrenamiento en base a la percepción.}
+    \label{tab:visResults}
 \end{table}
 
 FIGURAS DE LOS RESULTADOS VISUALES
@@ -43,14 +66,51 @@ FIGURAS DE LOS RESULTADOS VISUALES
 
 
 \section{Velocidad}
-Al utilizar secuencias de frames para el entrenamiento, teniendo las posiciones de cada vertice, la velocidad puede ser inferida. Sin embargo, la secuencia de las velocidad aporta al modelo de una conciencia acerca de la aceleración/decelarión de los vértices, por lo que en este experimento se valora su efecto.
+Al utilizar secuencias de frames para el entrenamiento, teniendo las posiciones de cada vértice, la velocidad puede ser inferida. Sin embargo, la secuencia de las velocidad aporta al modelo de una conciencia acerca de la aceleración y deceleración de los vértices, por lo que se considera importante medir el impacto en este experimento. En el momento de medir los parámetros mediante el random forest en el apartado \ref{sec:Dataset} se resalta la velodidad en el eje X como la información de la simulación más relevante.
 
-Hay que calcular la velocidad de cada punto de la tela en cada frame para generar el tensor de entrada. Además del coste computacional que esto supone, el ERROR de ...
+De forma previa al experimento, ya se pueden realizar observaciones que de qué implica la involucración de la velocidad en el entrenamiento. En primer lugar, para generar el tensor de entrada es necesario calcular primero la velocidad de cada punto de la tela en cada frame. Esto supondrá un aumento en el coste computacional en la inferencia. Y adicionalmente, la velocidad implica una mayor sensibilidad al error en el modelo, y por ende, propicia actitudes erráticas. 
 
+Ambas pruebas siguen los parámetros:
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{ | m{2.2cm} | m{2cm} | m{1.2cm} | m{2.1cm} | m{2.4cm} | m{2.2cm} | }
+        \hline \textbf{Windows size} & \textbf{Rollout steps} & \textbf{Noise} & \textbf{Learning rate} & \textbf{Tamaño dataset} & \textbf{Batch size} \\ \hline
+            16 & 24 & 3\% & 0.001 & 25000 & 32 \\ \hline
+        \end{tabular}
+            \end{center}
+    \caption{Hiperparámetros y configuración del entrenamiento.}
+    \label{tab:randomTraining}
+\end{table}
+
+A nivel de entrenamiento, la diferencia entre ambas pruebas consiste en cuántos deltas se tienen en cuenta para el loss del modelo. El experimento que sólo toma las posiciones como parámetros junto al sdf calcula el loss como la diferencia de deltas de posición de un frame y el anterior, mientras que el de la velocidad suma dos losses, el de la posición y el de la velocidad, quien también toma el tiempo como parámetro, y calcula el delta de velocidades entre frames. % incluir dibujo
+
+Los resultados son los siguientes:
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.6cm} | m{1.2cm} |}
+        \hline \textbf{Prueba} & \textbf{T entrenamiento} & \textbf{T inferencia} & \textbf{Error medio por vertice} & \textbf{FPS} \\ \hline
+            Pos & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
+            Pos + Vel & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados del entrenamiento en base al rendimiento.}
+    \label{tab:rendResults}
+\end{table}
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.8cm} | m{2.8cm} |}
+        \hline \textbf{Prueba} & \textbf{Reactividad} & \textbf{Conservación} & \textbf{Estabilidad} & \textbf{Credibilidad} \\ \hline
+            Pos & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
+            Pos + Vel & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados del entrenamiento en base a la percepción.}
+    \label{tab:visResults}
+\end{table}
+
+En este experimento, podemos observar que el error de vértice que incorpora los deltas de velocidad en el loss es notablemente inferior. No obstante...
 
 \section{PCA}
-Siguiendo con la noción de disminuir la ......
-
 A la hora de escalar el proyecto, aumentando tanto la geometría como los tipos de movimiento, resulta interesante introducir un modelo que se valga de un PCA para reducir la dimensión de los parámetros de entrada. Utilizando el método del umbral de varianza, se calcula el mínimo de características necesarias para alcanzar un gran porcentaje de la variabilidad de los datos. En el caso de la figura por ejemplo, partiendo de un dataset con 25 vértices y 13 features por cada uno, que resultaría en 325 elementos de input, con un umbral de varianza del 95\% consigue reducirse a 45. 
 
 
@@ -58,6 +118,7 @@ A la hora de escalar el proyecto, aumentando tanto la geometría como los tipos 
 De manera similar, en este proyecto se genera una secuencia de predicciones; la cadena de deltas generados sucesivamente permiten al modelo tener una noción sobre el cambio de velocidad y aceleración provocados. Esta técnica consiste en retropropagar el error a lo largo de la secuencia temporal y permite a la red aprender dependencias temporales.
 
 \section{Aplicacion para la visualización de los experimentos}
+\label{sec:App}
 
 Para poder visualizar los resultados, se ha implementado una aplicación disponible en el repositorio del proyecto. La interfaz permite acceder a los distintos experimentos llevados a cabo a través de un menu principal, que puede verse en la figura \ref{fig:appA}. 
 \begin{figure}[H]
