@@ -64,7 +64,47 @@ Para analizar la importancia de la memoria recurrente de los modelos, en los cas
 FIGURAS DE LOS RESULTADOS VISUALES
 
 
+\section{Unrolling}
+La cadena de deltas generados sucesivamente permiten al modelo tener una noción sobre el cambio de velocidad y aceleración provocados. Esta técnica consiste en retropropagar el error a lo largo de la secuencia temporal y permite a la red aprender dependencias temporales. Realizamos el experimento modificando la secuencia de entrada del RNN entre 0, 16 y 32 frames futuras.
+Se mantienen los mismos parámetros entre las diferentes pruebas:
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{ | m{2.2cm} | m{2cm} | m{1.2cm} | m{2.1cm} | m{2.4cm} | m{2.2cm} | }
+        \hline \textbf{Windows size} & \textbf{Rollout steps} & \textbf{Noise} & \textbf{Learning rate} & \textbf{Tamaño dataset} & \textbf{Batch size} \\ \hline
+            16 & 24 & 3\% & 0.001 & 25000 & 32 \\ \hline
+        \end{tabular}
+            \end{center}
+    \caption{Hiperparámetros y configuración del entrenamiento.}
+    \label{tab:randomTraining}
+\end{table}
+Los resultados son:
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.6cm} | m{1.2cm} |}
+        \hline \textbf{Rolling steps} & \textbf{T entrenamiento} & \textbf{T inferencia} & \textbf{Error medio por vertice} & \textbf{FPS} \\ \hline
+            0 & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
+            16 & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
+            32 & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados del entrenamiento en base al rendimiento.}
+    \label{tab:rendResults}
+\end{table}
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.8cm} | m{2.8cm} |}
+        \hline \textbf{Rolling steps} & \textbf{Reactividad} & \textbf{Conservación} & \textbf{Estabilidad} & \textbf{Credibilidad} \\ \hline
+            0 & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
+            16 & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
+            32 & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados del entrenamiento en base a la percepción.}
+    \label{tab:visResults}
+\end{table}
 
+
+\textit{FIGURAS, OBSERVACIONES ADICIONALES}
 \section{Velocidad}
 Al utilizar secuencias de frames para el entrenamiento, teniendo las posiciones de cada vértice, la velocidad puede ser inferida. Sin embargo, la secuencia de las velocidad aporta al modelo de una conciencia acerca de la aceleración y deceleración de los vértices, por lo que se considera importante medir el impacto en este experimento. En el momento de medir los parámetros mediante el random forest en el apartado \ref{sec:Dataset} se resalta la velodidad en el eje X como la información de la simulación más relevante.
 
@@ -110,12 +150,51 @@ Los resultados son los siguientes:
 
 En este experimento, podemos observar que el error de vértice que incorpora los deltas de velocidad en el loss es notablemente inferior. No obstante...
 
+\textit{FIGURAS, OBSERVACIONES ADICIONALES}
+
 \section{PCA}
-A la hora de escalar el proyecto, aumentando tanto la geometría como los tipos de movimiento, resulta interesante introducir un modelo que se valga de un PCA para reducir la dimensión de los parámetros de entrada. Utilizando el método del umbral de varianza, se calcula el mínimo de características necesarias para alcanzar un gran porcentaje de la variabilidad de los datos. En el caso de la figura por ejemplo, partiendo de un dataset con 25 vértices y 13 features por cada uno, que resultaría en 325 elementos de input, con un umbral de varianza del 95\% consigue reducirse a 45. 
+A la hora de escalar el proyecto, aumentando tanto la geometría como los tipos de movimiento, resulta interesante introducir un modelo que se valga de un PCA para reducir la dimensión de los parámetros de entrada. Permanece una de las técnicas más utilizadas para alcanzar mejoras de rendimiento. En este experimento, utilizando el método del umbral de varianza, se calcula el mínimo de características necesarias para alcanzar un gran porcentaje de la variabilidad de los datos con un umbral de varianza del 95\%, reduciendo drásticamente a 13 componentes. 
 
+Se aplica el PCA sobre una versión de RNN que incorpora unrolling, similar a lo propuesto por \cite{holden_subspace_2019}, exceptuando la incorporación de la recurrencia como método de contención de la inercia de la simulación. Como se explica anteriormente, la diferencia de ambos elementos reside en qué el modelo opera sobre deltas de posiciones o deltas de las posiciones en el subespacio.
 
-\section{Unrolling}
-De manera similar, en este proyecto se genera una secuencia de predicciones; la cadena de deltas generados sucesivamente permiten al modelo tener una noción sobre el cambio de velocidad y aceleración provocados. Esta técnica consiste en retropropagar el error a lo largo de la secuencia temporal y permite a la red aprender dependencias temporales.
+Ambas pruebas comparten los parámetros:
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{ | m{2.2cm} | m{2cm} | m{1.2cm} | m{2.1cm} | m{2.4cm} | m{2.2cm} | }
+        \hline \textbf{Windows size} & \textbf{Rollout steps} & \textbf{Noise} & \textbf{Learning rate} & \textbf{Tamaño dataset} & \textbf{Batch size} \\ \hline
+            16 & 24 & 3\% & 0.001 & 25000 & 32 \\ \hline
+        \end{tabular}
+            \end{center}
+    \caption{Hiperparámetros y configuración del entrenamiento.}
+    \label{tab:randomTraining}
+\end{table}
+
+Los resultados son los siguientes:
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.6cm} | m{1.2cm} |}
+        \hline \textbf{Prueba} & \textbf{T entrenamiento} & \textbf{T inferencia} & \textbf{Error medio por vertice} & \textbf{FPS} \\ \hline
+            Basic & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
+            PCA & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados del entrenamiento en base al rendimiento.}
+    \label{tab:rendResults}
+\end{table}
+\begin{table}[H]
+    \begin{center}
+        \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.8cm} | m{2.8cm} |}
+        \hline \textbf{Prueba} & \textbf{Reactividad} & \textbf{Conservación} & \textbf{Estabilidad} & \textbf{Credibilidad} \\ \hline
+            Basic & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
+            PCA & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados del entrenamiento en base a la percepción.}
+    \label{tab:visResults}
+\end{table}
+
+Se observa una pequeña mejora de rendimiento en la versión que incopora PCA, aunque esta también presenta un mayor error de vértice y movimientos desescalados.
+\textit{FIGURAS, OBSERVACIONES ADICIONALES}
 
 \section{Aplicacion para la visualización de los experimentos}
 \label{sec:App}
