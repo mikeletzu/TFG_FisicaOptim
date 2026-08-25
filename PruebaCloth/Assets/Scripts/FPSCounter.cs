@@ -8,7 +8,6 @@ using UnityEngine.Splines;
 
 public class FPSCounter : MonoBehaviour
 {
-    string[] modelNames = new string[] { "MLlow", "MLmid", "MLhigh", "Cloth" };
     private float metricTimer;
     [SerializeField]
     private float metricTime;
@@ -16,6 +15,7 @@ public class FPSCounter : MonoBehaviour
     private TextMeshProUGUI timerTxt;
     private int countdown = 5;
 
+    private int activeModel = 0;
     public GameObject[] models;
     [SerializeField]
     private TextMeshProUGUI[] metricsText;
@@ -35,6 +35,11 @@ public class FPSCounter : MonoBehaviour
     private float minFps = float.MinValue;
     private float maxFps = float.MinValue;
 
+    private bool measuring = false;
+
+    [SerializeField]
+    GameObject stopButton;
+
     private void Awake()
     {
         fpsHistory = new List<float>();
@@ -52,20 +57,16 @@ public class FPSCounter : MonoBehaviour
 
     private void Update()
     {
-        totalTime += Time.deltaTime;
-        if (totalTime >= updateInterval)
+        if (measuring)
         {
-            fpsText.text = $"{Mathf.RoundToInt(1 / Time.deltaTime)} FPS";
-            totalTime = 0;
-        }
-
-        for (int i = 0; i < models.Length; i++)
-        {
-            if (!models[i].activeSelf) continue;
+            totalTime += Time.deltaTime;
+            if (totalTime >= updateInterval)
+            {
+                fpsText.text = $"{Mathf.RoundToInt(1 / Time.deltaTime)} FPS";
+                totalTime = 0;
+            }
 
             metricTimer -= Time.deltaTime;
-
-            if (metricTimer > metricTime*0.9) continue;
 
             framesCount++;
             accumTime += Time.unscaledDeltaTime;
@@ -74,43 +75,28 @@ public class FPSCounter : MonoBehaviour
 
             if (metricTimer <= 0)
             {
-                reload(i);
-                metricTimer = metricTime;
+                stop();
             }
 
             if (metricTimer <= metricTime - countdown)
             {
-                timerTxt.text = "Measuring " + modelNames[i] + ".\nWait " + Mathf.RoundToInt(metricTime - countdown) + "s.";
+                timerTxt.text = "Measuring.\nWait " + Mathf.RoundToInt(metricTime - countdown) + "s.";
                 countdown += 5;
             }
         }
+        
     }
 
     public void reload(int i)
     {
         models[i].SetActive(false);
 
-        timerTxt.text = "Finished measuring " + modelNames[i] + ".\nChoose another model.";
+        timerTxt.text = "Finished measuring.\nChoose another model.";
      
-        metricsText[i].text = Mathf.RoundToInt(framesCount / accumTime) + "\n" +
-                            Mathf.RoundToInt(minFps) + "\n" + Mathf.RoundToInt(maxFps);
+        metricsText[i].text = Mathf.RoundToInt(minFps).ToString("000") + "   " + Mathf.RoundToInt(maxFps).ToString("000")
+              + "   " + Mathf.RoundToInt(framesCount / accumTime).ToString("000");
 
         interactableToggles(true);
-    }
-
-    public void resetMean()
-    {
-        for (int i = 0; i < models.Length; i++)
-        {
-            if (!models[i].activeSelf) continue;
-            fpsHistory = new List<float>();
-            minFps = float.MaxValue;
-            maxFps = float.MinValue;
-            metricTimer = metricTime;
-            countdown = 5;
-            timerTxt.text = "Measuring " + modelNames[i] + ".\nWait " + Mathf.RoundToInt(metricTime) + "s.";
-            metricsText[i].text = "00\n00\n00";
-        }
     }
 
     public void modelChange()
@@ -118,17 +104,31 @@ public class FPSCounter : MonoBehaviour
         for (int i = 0; i < models.Length; i++)
         {
             if (!models[i].activeSelf) continue;
+            activeModel = i;
             fpsHistory.Clear();
             minFps = float.MaxValue;
             maxFps = float.MinValue;
-            metricsText[i].text = "00\n00\n00";
-            metricTimer = metricTime;
-            countdown = 5;
-            timerTxt.text = "Measuring " + modelNames[i] + ".\nWait " + Mathf.RoundToInt(metricTime) + "s.";
-            interactableToggles(false);
-
-            GameObject.Find("Sphere").GetComponent<BallMovement>().enabled = true;
+            metricsText[i].text = "000   000   000";
         }
+    }
+
+    public void start()
+    {
+        metricTimer = metricTime;
+        countdown = 5;
+        measuring = true;
+        interactableToggles(false);
+        timerTxt.text = "Measuring.\nWait " + Mathf.RoundToInt(metricTime) + "s.";
+        GameObject.Find("Sphere").GetComponent<BallMovement>().enabled = true;
+    }
+
+    public void stop()
+    {
+        measuring = false;
+        interactableToggles(true);
+        GameObject.Find("Sphere").GetComponent<BallMovement>().enabled = false;
+        stopButton.SetActive(false);
+        reload(activeModel);
     }
 
     private void interactableToggles(bool isActive)
@@ -138,7 +138,6 @@ public class FPSCounter : MonoBehaviour
         {
             toggle.gameObject.GetComponent<Toggle>().interactable = isActive;
         }
-        GameObject.Find("MeasureTime").GetComponent<TMP_InputField>().interactable = isActive;
     }
 
     public void changeTime(string input)
