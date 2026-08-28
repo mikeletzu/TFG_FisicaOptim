@@ -15,3 +15,9 @@ Como puede apreciarse todos los FPS son bastante iguales.
 Dice Isme q necesitamos más datos, no necesariamente un modelo más grande. Como se ha mencionado previamente el objetivo d la optimización y los resultados visualmento txulos son intereses en conflicto. 
 
 El rendimiento ha sido plof. Pero se han logrado cosas parecidas. Se mencionará en trabajo futuro ideas pa optimizar.
+
+Organización
+- El modelo que mejor rendimiento es el PCA, que supera ligermente la tasa de frames alcanzada con el cloth de Unity, con una inferencia de tal. Hopefully esto con 2000 vertices es mas visible (escalable?).
+- Los otros modelos se han quedado atrás. Es esto suficiente? No. Por ejemplo, la rnn para tratar estos datos aunque sea con el PCA, sirve para inferir la inercia pero no es óptimo. (mencionar todos los resultados de inferncia, comparacion con otro modelo de otro estudio...?)
+
+- Se ha primado en parte del proceso el resultado coherente y visual, lo cual va directamente en conflicto con el rendimiento. Veremos ahora los resultados visuales. 
