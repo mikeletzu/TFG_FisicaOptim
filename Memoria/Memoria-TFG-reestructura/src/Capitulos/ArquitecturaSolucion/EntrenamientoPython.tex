@@ -149,12 +149,12 @@ No obstante, en el caso de esta investigación se estudiará una loss basada en 
     \item \textit{LossVel}: Compara la velocidad predicha con la real, entendiendola como desplazamiento por frame.
 \end{itemize}
 
-Sin embargo, el objetivo de aplicar esta técnica no se trata únicamente de afinar las predicciones del modelo, sino también de hacer que el modelo aprenda a corregirse. Para ello se altera el calculo de \textit{LossPos}. En vez de calcular las posiciónes absolutas, se compara el desplazamiento inferido con el desplazamiento necesario para llegar a la posición real tras los pasos de unfolding. Aunando los valores reales con los predichos, se consigue reforzar en esa comparación la capacidad de corregirse en el mismo paso. \newline
+Sin embargo, el objetivo de aplicar esta técnica no se trata únicamente de afinar las predicciones del modelo, sino también de hacer que el modelo aprenda a corregirse. Para ello se altera el calculo de \textit{LossPos}. En vez de calcular las posiciónes absolutas, se compara el desplazamiento inferido con el desplazamiento necesario para llegar a la posición real tras los pasos de unfolding. Aunando los valores reales con los predichos, se consigue reforzar en esa comparación la capacidad de corregirse en el mismo paso.
 
 \begin{figure}[H]
 	\centering
-	\includegraphics[width=0.5\textwidth]{Imagenes/Loss.png}
-	\caption{Comparación de métodos de calcular el LossPos}
+	\includegraphics[width=0.8\textwidth]{Imagenes/Loss.png}
+	\caption{Comparación de métodos para el cálculo de LossPos. A la izquierda se encuentra el primero mencionado, comparando la posición absoluta inferida para el frame con la posición real. A la derecha está el siguiente mencionado, el desplazamiento inferido con el desplazamiento necesario para llegar a la posición real tras los pasos de unfolding. }
 	\label{fig:loss}
 \end{figure}
 

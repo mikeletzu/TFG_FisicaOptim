@@ -4,7 +4,7 @@
 
 El resultado alcanzado es natural, que se discutirá en pruebas de testers, en muchos casos, y aunque depende la variabilidad explicada, se ha conseguido que generalice más o menos para un movimiento que no es siempre el mismo. 
 
-El pca no se que le ha pasado, el mlp se queda corto si le quitas el seq_len, para la inercia si es importante. El unrolling lo borda supongo, que aprenda a autocorregirse es lo que mantiene la estructura y lo hace creible. Aun asi, cabe recalcar que aunque mantiene la forma, la autocorrecion a veces puede tener efectos visuales un poco bizarros, suavizando por ejemplo un pico ocasionado por una colision de forma interpolada (como si tratara de un lerp). 
+El pca no se que le ha pasado, el mlp se queda corto si le quitas el seqLen, para la inercia si es importante. El unrolling lo borda supongo, que aprenda a autocorregirse es lo que mantiene la estructura y lo hace creible. Aun asi, cabe recalcar que aunque mantiene la forma, la autocorrecion a veces puede tener efectos visuales un poco bizarros, suavizando por ejemplo un pico ocasionado por una colision de forma interpolada, como si tratara de un lerp. 
 
 -mantiene estructura a traves de tiempo
 - se recupera de colisiones
