@@ -7,10 +7,10 @@ A la hora de valorar la calidad de un sistema de inferencia en tiempo de ejecuci
 \begin{itemize}
   \item \textit{Rendimiento}: Los modelos deben ser capaces de competir con los reducidos tiempos de computo de los solvers. Para ello tanto los modelos como los datos de input han de ser lo más ligeros posibles. Las métricas que se emplean para medir la calidad del rendimiento son los siguentes: 
   \begin{itemize}
-    \item \textit{Tiempo de entrenamiento}:
-    \item \textit{Tiempo de inferencia}:
-    \item \textit{Error medio por vértice}:
-    \item \textit{FPS}:
+    \item \textit{Tiempo de entrenamiento}
+    \item \textit{Tiempo de inferencia}
+    \item \textit{Error medio por vértice}
+    \item \textit{FPS}
   \end{itemize}
   \item \textit{Resultado visual}: El movimiento inferido por el modelo ha de respetar las reglas fisicas suficientes para tener credibilidad. Además, es importante que la simulación se mantenga estable y la tela mantenga su estructura a lo largo de la ejecución. La evaluación de este aspecto es más subjetiva, por lo que se le ha dado una puntuación del 1 al 10 a diferentes características basada en la observación.
   \begin{itemize}
@@ -207,8 +207,8 @@ Para poder visualizar los resultados, se ha implementado una aplicación disponi
     \label{fig:appA}
 \end{figure}
 
-En cada experimento pueden compararse distintas versiones de modelos estudiados con la simulación de cloth de Unity. Asímismo, se generan métricas de rendimiento de cada simulación, para poder comparar estas no solo de manera visual. Para obtener metricas veraces se recomienda mantener cada simulación en curso durante al menos un minuto. Ya que dada la aleatoriedad del dataset, BLA BLA BLA
-\begin{figure}
+En cada experimento pueden activarse distintas versiones de los modelos entrenados, así como la simulación de cloth de Unity. Además de la comparación visual que esto permite, se generan diferentes métricas del rendimiento en tiempo de ejecución de cada simulación: La media de frames por segundo y la máxima y mínima tasas alcanzadas en el tiempo especificado. Las ejecuciones pueden pararse en cualquier momento con el botón de "Stop"  pero se recomienda mantener cada simulación en curso durante al menos un minuto para obtener metricas más veraces.
+\begin{figure}[H]
     \centering
     \includegraphics[width=0.7\textwidth]{Imagenes/AplicacionB.png}
     \caption{Ejemplo de la ejecución de una simulación de un experimento}

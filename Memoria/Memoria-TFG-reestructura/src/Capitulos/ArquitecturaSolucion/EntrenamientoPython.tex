@@ -74,7 +74,7 @@ Para crear un entorno de trabajo adaptable, y asegurar la consistencia entre los
 \end{enumerate}
 
 \subsection{Modelos}
-Para lograr simular el comportamiento de la tela, los modelos entrenados infieren la diferencia de desplazamiento entre un frame y el siguiente. El funcionamiento base de todos los modelos entrenados consiste en recibir una entrada construida a partir de la posición, velocidad y SDF normalizados de los vértices aplanados en un vector, y obtener como output los deltas de desplazamiento normalizados. Estos deltas de posición, es decir, las diferencias de posiciones consecutivas de los vértices, se añaden a las posiciones del frame actual para obtener el siguiente paso de la simulación. Los modelos emplean como función de pérdida \textit{L1Loss}\footnote{\textbf{L1Loss:} Función proporcionada por Pytorch que calcula el error absoluto medio entre los valores predichos y los valores reales.} sobre las diferencias entre los deltas reales y predichos.  \newline
+Para lograr simular el comportamiento de la tela, los modelos entrenados infieren la diferencia de desplazamiento de cada vértice entre un frame y el siguiente. El funcionamiento base de todos los modelos entrenados consiste en recibir una entrada construida a partir de la posición, velocidad y SDF normalizados de los vértices aplanados en un vector, y obtener como output los deltas de desplazamiento normalizados. Para el aprendizaje, los modelos emplean como función de pérdida \textit{L1Loss}, esta es una función proporcionada por Pytorch que calcula el error absoluto medio entre dos valores, generalmente el valor inferido por el modelo y su análogo real del dataset. \newline
 
 \begin{equation}
     \mathbf{x}_{t} = \bigl[
@@ -98,7 +98,7 @@ Para lograr simular el comportamiento de la tela, los modelos entrenados infiere
 
 Donde $\hat{\cdot}$ denota normalización, $n$ el número de vértices, $s_i$ el SDF del vértice $i$ . \newline
 
-Sobre este entrenamiento básico se añadirán diferentes técnicas y tipos de redes, eligiéndose a partir de las dos nociones principales que guían el desarrollo de este proyecto: por un lado, combinar las técnicas óptimas y prometedoras de las investigaciones citadas en el estado del arte; y por otro, priorizar la simplicidad y accesibilidad de nuestro modelo en la plataforma elegida. Se han seleccionado redes específicas y características que permiten llegar a un movimiento de tela coherente, y sobre ellas se realizará posteriormente, en los capítulos \ref{cap:experimentos} y \ref{cap:evaluacionDiscusion}, una serie de experimentos y comparativas para medir su desempeño, así como una discusión y evaluación final respectivamente. Separamos las características que conforman los modelos en los siguientes campos:
+Partiendo de esta idea principal del entrenamiento, en los próximos apartados se explicarán las diferentes técnicas y tipos de redes implementadas para la optimización del mismo. Estas se eligen a partir de las dos nociones principales que guían el desarrollo de este proyecto: por un lado, combinar las técnicas óptimas y prometedoras de las investigaciones citadas en el estado del arte; y por otro, priorizar la simplicidad y accesibilidad de nuestro modelo en la plataforma elegida. Se han seleccionado redes específicas y características que permiten llegar a un movimiento de tela coherente, y sobre ellas se realizará posteriormente, en los capítulos \ref{cap:experimentos} y \ref{cap:evaluacionDiscusion}, una serie de experimentos y comparativas para medir su desempeño, así como una discusión y evaluación final respectivamente. Separamos las características que conforman los modelos en los siguientes campos:
 
 \subsubsection{Tipos de redes y recurrencia}
 Este estudio se ha enfocado en dos tipos de redes neuronales que se alienan con el objetivo de emplear modelos sencillos: los \textbf{perceptrones multicapa (MLP)} y las \textbf{redes neuronales recurrentes (RNN)}. Otras redes como las CNN o las GNNS han sido descartadas debido a la alta complejidad para representar y proporcionar los datos al modelo.
@@ -118,14 +118,13 @@ La diferencia entre ambos modelos se resalta por tanto en la falta de un estado 
         \caption{Error acumulado}
     \end{figure}
 
-Una simulación sin restricciones específicas tiende a la  acumulación de error a través del tiempo, lo que implica que pequeños desplazamientos se convierten rápidamente en movimientos erráticos y de gran magnitud. Las altas tasas de frames, como serían los estándard 60 frames por segundo en videojuegos a tiempo real, aceleran lo rápido que una simulación se desestabiliza. Para evitar esto, en este estudio se seleccionan diferentes técnicas que ayudan a estabilizar el error acumulado de distancia de vértices. Estas no funcionan como límites físicos, sino que permiten que el aprendizaje pueda aprender a autocorregirse y conservar la geometría original de la tela, así como evitar movimientos extremos a medida que avanza la simulación. Son las siguientes:
+Una simulación sin restricciones específicas tiende a la  acumulación de error a través del tiempo, lo que implica que pequeños desplazamientos se convierten rápidamente en movimientos erráticos y de gran magnitud. Las altas tasas de frames, como serían los estándard 60 frames por segundo en videojuegos a tiempo real, aceleran lo rápido que una simulación se desestabiliza. Como se explicará en el siguiente apartado, varios estudios del estado del arte lidian con esto através de métodos de post-procesado en la fase de inferencia, como límites físicos o modelos que pueden funcionar tanto de correctores como para refinar los detalles (arrugas, intersecciones con el colisionador, etc.) como en TailorNet \cite{patel2020tailornet}. No obstante, existen maneras de evitar el error de antemano, reforzandolo en el entrenamiento através de la función de pérdida, de esta manera el modelo el aprende a autocorregirse y conservar la geometría original de la tela, así como a evitar movimientos extremos a medida que avanza la simulación.
+
+Las técnicas más favorables que se han seleccionado para este estudio son las siguientes:
 \begin{itemize}
-    \item \textbf{Ruido en el input:} Una de las técnicas más sencillas para mejorar la capacidad del modelo de corregir sus errores es entrenarlo creando pequeños errores de forma artifical. Esto se consigue añadiéndole ruido a los datos de entrada, en este caso se añade un ruido gaussiano de entre un 2 y un 5\% de magnitud respecto a los datos de entrada antes de normalizar. De esta manera, el modelo aprende a corregir estos errores para corregir los suyos propios en un futuro.
+    \item \textbf{Ruido en el input:} Una de las técnicas más sencillas para mejorar la capacidad del modelo de corregir sus errores es entrenarlo creando pequeños errores de forma artifical. Esto se consigue añadiéndole ruido a los datos de entrada, en este caso se añade un ruido gaussiano de entre un 1 y un 3\% de magnitud respecto a los datos de entrada antes de normalizar. De esta manera, el modelo aprende a corregir estos errores para corregir los suyos propios en un futuro.
     
-    \item \textbf{Unrolling for training:} La idea de dividir el entrenamiento en distintos modelos es habitual; ya sea con una red que dé resultados más generales y una segunda que consiga refinar los detalles (arrugas, intersecciones con el colisionador, etc.) como en TailorNet \cite{patel2020tailornet}, o con modelos que actúen como predictor-corrector siendo el segundo normalmente en post-procesado. Sin embargo, en este proyecto se propone incluir esta idea en el propio entrenamiendo del modelo, con la función de pérdida. El caso de \cite{chen2025learning}, por ejemplo, el concepto de una función de pérdida \textit{force-inpulse} que penaliza tanto el error en la fuerza predicha como el inpulso que esta genera para las siguientes inferencias. De manera similar, en este proyecto se genera una secuencia de predicciones; la cadena de deltas generados sucesivamente permiten al modelo tener una noción sobre el cambio de velocidad y aceleración provocados. 
-    
-    La implementación que se incorpora en este proyecto se inspira más en la investigación de \cite{holden_subspace_2019}, en la que se lleva acabo un proceso similar. Además de retroalimentar los frames generados a la secuencia de input, se propaga el error utilizando la técnica BPTT (\textit{Backpropagation Through Time}). Esta técnica consiste en retropropagar el error a lo largo de la secuencia temporal y permite a la red aprender dependencias temporales.
-    
+    \item \textbf{Unrolling for training:} Esta técnica consiste en crear una secuencia de predicciones, esto permite al modelo tener una noción sobre el cambio de velocidad y aceleración provocados con sus predicciones de desplazamiento. Tomando como ejemplo el RNN, que como se ha explicado previamente sigue la arquitectura \textit{many to one}, el unrolling permite que esta ventana se deslice, avanzando a lo largo del tiempo. Los deltas inferidos en el primer paso se utilizan para calcular la nueva posición de los vértices en el siguiente frame; esta posición predicha sumada al resto de características reales del frame se añaden al final de la ventana. Este proceso se repite sucesivamente, como puede verse a continuación.
     \begin{itemize}
         \item \textbf{Ventana inicial:} $V_0 = [y_{t-n+1}, \dots, y_t]$
         \item \textbf{Bucle de predicción:} Para $i = 1, 2, \dots, W$:
@@ -133,12 +132,33 @@ Una simulación sin restricciones específicas tiende a la  acumulación de erro
             \item Calcular predicción: $\hat{y}_{t+i} = f(V_{i-1})$
             \item Actualizar ventana: $V_i = [V_{i-1} \setminus \{y_{primero}\}] \cup \{\hat{y}_{t+i}\}$
         \end{enumerate}
+    \end{itemize}
+    
+    La implementación que se incorpora en este proyecto se inspira en la investigación de \cite{holden_subspace_2019} para añadir la técnica BPTT (\textit{Backpropagation Through Time}). Además de retroalimentar los frames generados a la secuencia de input, se retropropaga el error a lo largo de la secuencia temporal, es decir, el loss de la predicción inicial contará con el error generado para todos los siguientes frames del unfolding. Para conseguir esto, se mantiene una variable de pérdida total a lo largo del bucle de predicciones y el loss final será la media del error en cada paso.
+    \begin{itemize}
         \item \textbf{Función de pérdida (Loss):} 
         $$\mathcal{L} = \frac{1}{W} \sum_{i=1}^{W} (y_{t+i} - \hat{y}_{t+i})^2$$
     \end{itemize}
 \end{itemize}
 
-La siguiente función, \textit{RunRollout()}, lleva a cabo el cálculo de las predicciones y la pérdida de las mismas para cada lote de datos del dataset. Siguiendo la técnica mencionada, ejecuta las predicciones necesarias para avanzar en el tiempo tanto como el tamaño de la ventana de unrolling le indica. Por simplicidad el modelo que sa ha decidido representar por pseudocódigo recoge únicamente la posición y sdf como parámetro de entrada.
+En referencia al cálculo del loss de cada paso, se encuentran distintas maneras de abordarlo. El valor de desplazamiento inferido puede compararse con el real en crudo, utilizarse para calcular la posición absoluta y comparar esta o sumar a cualquiera de ellas otros criterios de rectificación. En los estudios más recientes en particular, se utilizan funciones de pérdida basadas en reglas físicas. \cite{santesteban2022snug} o \cite{bertiche2021PBNS} juzgan la conformidad de las predicciones con la elasticidad, rigidez, distancia a los colisionadores y demás propiedades de la tela. De manera similar, \cite{chen2025learning} aplica el concepto de una función de pérdida \textit{force-inpulse} que penaliza tanto el error en la fuerza predicha como el inpulso que esta genera para las siguientes inferencias.
+
+No obstante, en el caso de esta investigación se estudiará una loss basada en la comparación de datos, combinando los siguientes valores.
+\begin{itemize}
+    \item \textit{LossPos}: Compara la posición absoluta inferida para el frame con la posición real. El unfolding hace que los errores de inferencia al calcular el desplazamiento se vayan sumando a la posición del primer frame del bucle de predicciones, por lo que el modelo puede tener en cuenta sus errores.
+    \item \textit{LossVel}: Compara la velocidad predicha con la real, entendiendola como desplazamiento por frame.
+\end{itemize}
+
+Sin embargo, el objetivo de aplicar esta técnica no se trata únicamente de afinar las predicciones del modelo, sino también de hacer que el modelo aprenda a corregirse. Para ello se altera el calculo de \textit{LossPos}. En vez de calcular las posiciónes absolutas, se compara el desplazamiento inferido con el desplazamiento necesario para llegar a la posición real tras los pasos de unfolding. Aunando los valores reales con los predichos, se consigue reforzar en esa comparación la capacidad de corregirse en el mismo paso. \newline
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{Imagenes/Loss.png}
+	\caption{Comparación de métodos de calcular el LossPos}
+	\label{fig:loss}
+\end{figure}
+
+Ambas técnicas pueden verse reflejadas en la siguiente función, \textit{RunRollout()}, que lleva a cabo el cálculo de las predicciones y la pérdida de las mismas para cada lote de datos del dataset. Por simplicidad el modelo que se ha decidido representar por pseudocódigo recoge únicamente la posición y sdf como parámetros de entrada.
 
 \begin{algorithm}[H]
 \caption{Función de \textit{Unrolling} sobre RNN}
@@ -166,18 +186,29 @@ La siguiente función, \textit{RunRollout()}, lleva a cabo el cálculo de las pr
         \State $ pred\_pos \gets prev\_pred\_pos + pred\_delta$ \Comment{Posición inferida ($t$)}
 
     \BlankLine
-    \State $\textbf{\textit{Comparación:}}$
-        \State $real\_pos \gets batch\_future[:, k, :, 0:3]$ \Comment{Posición real}
-        \State $real\_delta\_norm \gets \text{NormDelta}(real\_pos - prev\_pred\_pos)$
+    \State $\textbf{\textit{Comparación posición:}}$
+        \State $real\_pos \gets batch\_future[:, k, :, 0:3]$ \Comment{Posición real ($t$)}
+        \State $real\_delta\_norm \gets \text{NormDelta}(real\_pos - prev\_pred\_pos)$ \Comment{Diferencia para correción}
         \State $loss\_pos \gets \mathcal{L}_{L1}(pred\_delta\_norm, real\_delta\_norm)$ \Comment{Loss de posición}
         
+    \BlankLine
+    \State $\textbf{\textit{Comparación velocidad:}}$
+        \State $pred\_vel\_norm \gets \text{NormVel}(pred\_pos - prev\_pred\_pos)$
+        \State \If { $k  > 0$}{ \Comment{Velocidad real}
+            \State $real\_prev\_pos \gets batch\_future[:, k-1, :, 0:3]$
+        }
+        \Else {
+            \State $real\_prev\_pos \gets batch\_seq[:, -1, :, 0:3]$
+        }
+        \State $real\_vel\_norm \gets \text{NormVel}(real\_pos - real\_prev\_pos)$  \Comment{Delta real ($t$)} 
+        \State $loss\_vel \gets \mathcal{L}_{L1}(pred\_vel\_norm, real\_vel\_norm)$  \Comment{Loss de velocidad}
     \BlankLine
     \State $\textbf{\textit{Feedback:}}$
         \State $new\_frame \gets \text{ConstruirFrame}(pred\_pos, \text{resto de propiedades reales})$
         \State $window \gets [window[:, 1:], new\_frame]$ \Comment{Desplazar ventana temporal}
     
     \BlankLine
-    \State $total\_loss \gets total\_loss + loss\_pos$
+    \State $total\_loss \gets total\_loss + loss\_pos + (\gamma_{vel} \times loss\_vel)$
     }
     \State \Return $total\_loss / W$
 
