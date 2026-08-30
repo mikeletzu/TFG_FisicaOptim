@@ -1,39 +1,56 @@
 \section{Pruebas de usuario}
 \label{sec:PruebaTesters}
 
-\subsection{Objetivos}
+Habiendo obtenido los resultados visuales de la inferencia, se opta por llevar a cabo unas pruebas de usuario en las que presentarlos, comparandolos con la simulación generada por el solver físico. En este capítulo se describen estas pruebas y los resultados obtenidos.
+
+\subsection{Objetivos} HACER EN PRESENTE
+El objetivo principal de estas pruebas era no solo averiguar si la animación generada por el modelo era capaz de reemplazar la del solver, sino también se quiso evaluar la naturalidad del modelo y cuales eran las características que hacian que el 
+tener una opinión subjetiva externa
+ver en que aspectos se ha acertado y en cuales
 Se han realizado \textbf{pruebas de usuario} para comprobar si los resultados obtenidos se perciben como naturales. La obtención de feedback por parte de usuarios de videojuegos podría confirmar qué aspectos de la tela se han conseguido replicar y dónde se deberían producir mejoras.
-Descubrir si tal tal tal
+Descubrir si tal tal 
+no exahustivo, su primer feeling about it. Ampliar la cantidad de gente que lo haría.
+Se primó la brevedad del cuestionario para maximizar la cantidad de respuestas obtenidas, ya que este fue distribuido a conocidos de las participantes del proyecto por medios electrónicos.
 
 \subsection{Diseño de las pruebas}
-el cuestionario está en el ANEXO pero baia hay tres apartados
+Para la prueba se utiliza Google Forms \footnote{Software desarrollado por Google para la creación y gestión de encuestas a través de formularios digitales: \url{https://docs.google.com/forms}} por su accesibilidad para los usuarios y la facilidad para añadir contenido audiovisual, de modo que el formulario cuenta con un video en el que se visualizan las dos telas paralelamente. El cuestionario puede encontrarse en el anexo, en rasgos generales consiste con los siguientes apartados:
+
 \begin{itemize}
-\item \textit{Perfil del usuario}
-\item \textit{Identificación}
-\item \textit{Opiniones}
+\item \textit{Perfil del usuario}: Con la idea de relacionar las percepciones de los usuarios con su perfil se les pregunta a cerca de su edad, agrupada en tramos \footnote{Los tramos de edad contemplados eran: "Menos de 20", "Entre 21 y 30", "Entre 31 y 40", "Entre 41 y 50" y "Más de 51".}, y sus habitos de uso de distintos medios o contenidos audiovisuales \footnote{Los medios contemplados eran: "Televisión/Películas", "Videojuegos" y "Contenido generado por IA".}. 
+\item \textit{Identificación}: El video mencionado enseña las dos telas refiriendose a ellas como "una ha sido simulada siguiendo leyes físicas reales, otra ha sido simulada con IA". En este apartado únicamente se les pide a los usuarios identificar cada una y se les pregunta por su preferencia.
+\item \textit{Opiniones}: Finalmente se revela la tela generada con nuestro modelo y se recogen las opiniones de los usuarios a cerca de ella. Se les pide valorar su realismo en una escala del 1 al 10 y ordenar las características visuales mencionadas en los experimentos en base a la calidad. Adicionalmente, se añade una sección para observaciones y comentarios.
 \end{itemize}
 
 \subsection{Resultados}
-Como puede verse en los siguientes gráficas BLABLABLA
-
-Es evidente que hay una diferencia entre las dos cosas
+Tras recoger 49 respuestas se concluyen los siguientes resultados. Las respuestas en la sección de identificación revelan que la inferencia no llega a XXXXXXX en una comparación lado a lado. Como se ve en el gráfico \ref{fig:identificacion} la mayoría de los encuestados son capaces de identificar la tela real. Entre los que la identifican correctamente
 \begin{figure}[H]
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=0.8\textwidth]{Imagenes/1_identificacion_ia.png}
         \caption{Simulación de una camiseta con componente Cloth.}
-        \label{fig:camiseta}
+        \label{fig:identificacion}
     \end{minipage}
     \hfill
     \begin{minipage}{0.48\textwidth}
         \centering
         \includegraphics[width=0.8\textwidth]{Imagenes/2_preferencia_realismo.png}
         \caption{Simulación de una falda con componente Cloth.}
-        \label{fig:skirt}
+        \label{fig:preferencia}
     \end{minipage}
 \end{figure}
 
-es interesante resaltar que entre esa gente se ve una tendencia con los jugadores de videojuegos
+entre las personas que lo identifican tambien prefieren la otra claro 
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{Imagenes/5_identificacion_vs_preferencia.png}
+	\caption{Diagrama de la arquitectura General del proyecto}
+	\label{fig:arq2}
+\end{figure}
+
+En el caso de la edad o la frecuencia con la que los usuarios consumen contenido generado por IA, la correlación con la identificación de la tela no ha sido clara.
+es interesante resaltar que entre esa gente se ve una tendencia con los jugadores de videojuegos.
+Probablemente se deba a que al contrario de las otros medios audiovisuales preguntados (Televisión/Películas o contenido generado por IA), los jugadores de videojuegos entienden mejor las interacciones físicas y están más acostrumbrados a verlas.
 
 \begin{figure}[H]
 	\centering
@@ -41,3 +58,39 @@ es interesante resaltar que entre esa gente se ve una tendencia con los jugadore
 	\caption{Diagrama de la arquitectura General del proyecto}
 	\label{fig:arq2}
 \end{figure}
+
+Asímiso, se ha podido identificar que la característica que más evidencia la generación por IA es el de las interacciones con colisionadores. Ante la pregunta de "Ordena las características de la tela según su calidad. Siendo la 1ª la mejor." En el orden queda consistentemente en uíltimo lugar.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{Imagenes/3_ranking_caracteristicas.png}
+	\caption{Diagrama de la arquitectura General del proyecto}
+	\label{fig:arq2}
+\end{figure}
+
+Entre las observaciones de los usuarios, 10 de los 22 mencionan:
+- cuando la pelota se junta con la tela la traspasa en vez de moverla y eso le quita realismo
+- Los colisionadores de la tela fallan a la hora de interactuar con la esfera
+- La pelota ha atravesado la tela
+- colisionador literalmente atraviesa la tela en varios momentos sin reacción
+
+Ante las otras características pasan más desapercibidas aunque
+- FORM PLIEGUES cuando se balancea tras interactuar con ésta, parece mucho más "geométrica"
+- CONSERV ESTRUC arriba a la derecha hace una esquina rara, en algún momento el colisionador parece desplazar las esquinas de la tela de forma anormal
+- MOV INERCIA le falta algo de dinamismo para llegar a ser mas realista, un poco mas de fluidez y naturalidad en los movimientos aunque está bastante conseguido. Con las dos telas me ha parecido que tenían inercia curiosa.
+
+Subjetividad.
+Si bien una comparación lado a lado es una prueba exigente para valorar la reproducción de la simulación física. Al preguntar a los encuestados por su opinión subjetiva, se recibe retroalimentación bastante positiva 
+Sin embargo si nos fijamos en los comentarios también encontramos otros positivos.
+- Me ha sorprendido lo poco que se llega a diferenciar la IA
+- No perquè la veritat que s’assembla moltíssim a l’altra i és difícil de veure alguna cosa que m’hagi cridat l’atenció a diferència de l’altre.
+- Por lo demás, diré que me ha costado ver el primer video unas tres veces para decidir que tela usaba físicas y cual usaba IA así que en mi opinión está bastante bien conseguido.
+
+\begin{figure}[H]
+	\centering
+	\includegraphics[width=0.5\textwidth]{Imagenes/4_distribucion_puntuacion.png}
+	\caption{Diagrama de la arquitectura General del proyecto}
+	\label{fig:arq2}
+\end{figure}
+
+Podemos concluir que la 
