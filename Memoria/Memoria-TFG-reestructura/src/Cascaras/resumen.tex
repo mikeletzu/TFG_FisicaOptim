@@ -1,14 +1,13 @@
 \chapter*{Resumen}
 
 \section*{\tituloPortadaVal}
+Este estudio realiza una comparativa de distintos modelos y técnicas de IA que logren replicar y hacer frente a la simulación de físicas costosas en proyectos 3D en motores de videojuegos. \newline
 
-Nuestro estudio se basa en la comparativa de distintos modelos de IA para hacer frente a la simulación de físicas costosas en proyectos 3D en motores de videojuegos. \newline
+Se toma como ejemplo el caso de las simulaciones de telas, cuya geometría y caracteríticas, y consecuente alto coste computacional en simulación, lo convierte en campo experimental para la optimización de físicas mediante redes de neuronas. Para lograr simular una tela, se crea una simulación en Unity3D con un objeto con componente Cloth y un colisionador que genera movimieto y deformaciones en la malla. En el mismo entorno de Unity se generan los datasets, los que se exportan al entorno de entrenamiento para analizar diferentes modelos en Pytorch: una MLP, una RNN, y ténicas de propagación de error así como reducciones de espacio.
 
-Para ello creamos una simulación en Unity3D con un objeto con componente Cloth y una esfera que actúe como colisionador con la tela. Tras generar los datasets, los exportamos a cuadernos de Jupyter dónde los entrenamos con diferentes modelos en Pytorch (con soporte GPU): una red neuronal sencilla, una RNN, un Encoder-Decoder.\newline
+Las redes entrenadas se exportan de vuelta a Unity, y en este se ponen en marcha los modelos para simular el movimiento (mediante el paquete Sentis). Se modifican los vértices de una tela con un componente propio ML, que pide al modelo los deesplazamientos a realizar para cada uno. Finalmente, se realizan experimentos y comparativas entre los distintos modelos, tanto en cuanto a precisión del modelo como a resultados visuales. Se concluye que el modelo que obtiene mejores resultados replicando visualmente la tela fue una red neuronal recurrente con una técnica de propagación de error a futuro, no obstante el rendimiento aún precisa de reducciones para ser prometedor.\newline
 
-Finalmente exportamos las redes entrenadas a Unity mediante el paquete de Sentis para simular el movimiento modificando los vértices de una tela sin componente Cloth. Realizamos comparativas entre los distintos modelos, tanto en cuanto a precisión del modelo como a resultados visuales.\newline
 
-Observamos que el modelo que mejores resultados obtuvo en cuanto a tal métrica fue X.
 
 \section*{Palabras clave}
 
