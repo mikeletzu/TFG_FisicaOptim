@@ -23,6 +23,8 @@ plt.rcParams.update({
 
 COLOR_IA = "#A0E07E"     # verde -> tela IA
 COLOR_FISICA = "#9FC5E8"  # azul  -> tela física
+COLOR_IA_CLARO = "#CAFFAE"
+COLOR_FISICA_CLARO = "#C7DEF4"
 COLOR_NEUTRO = "#8BA2AE"
 COLOR_NARANJA = "#FFAB40"
 
@@ -106,6 +108,58 @@ ax.set_ylim(0, 100)
 fig.tight_layout()
 fig.savefig(f"{OUT_DIR}/2_preferencia_realismo.png", dpi=300)
 plt.close(fig)
+
+# ---------------------------------------------------------------
+# 3. Figura 2 — Preferencia de realismo, desglosada según si esa misma
+#    persona identificó correctamente la tela IA o no (mismo crosstab
+#    que la figura 5, pero visto desde el lado de la preferencia)
+# ---------------------------------------------------------------
+cross = pd.crosstab(df[col_ia], df[col_real])
+azul_real_correctos = cross.loc["Tela verde (Derecha)", "Tela azul (Izquierda)"]   # identificó bien y prefiere azul
+azul_real_incorrectos = cross.loc["Tela azul (Izquierda)", "Tela azul (Izquierda)"]  # identificó mal y prefiere azul
+verde_real_correctos = cross.loc["Tela verde (Derecha)", "Tela verde (Derecha)"]   # identificó bien y prefiere verde
+verde_real_incorrectos = cross.loc["Tela azul (Izquierda)", "Tela verde (Derecha)"]  # identificó mal y prefiere verde
+  
+labels_real = ["Tela verde\n(IA)", "Tela azul\n(física)"]
+x2 = np.arange(len(labels_real))
+width2 = 0.5
+ 
+fig, ax = plt.subplots(figsize=(5.5, 5.5))
+ 
+# Verde-preferencia: correctos abajo, incorrectos encima
+ax.bar(x2[0], verde_real_correctos / n * 100, width2, color=COLOR_IA, label="Identificó\ncorrectamente")
+ax.bar(x2[0], verde_real_incorrectos / n * 100, width2,
+       bottom=verde_real_correctos / n * 100, color=COLOR_IA_CLARO, label="No identificó\ncorrectamente")
+# Azul-preferencia: correctos abajo, incorrectos encima
+ax.bar(x2[1], azul_real_correctos / n * 100, width2, color=COLOR_FISICA)
+ax.bar(x2[1], azul_real_incorrectos / n * 100, width2,
+       bottom=azul_real_correctos / n * 100, color=COLOR_FISICA_CLARO)
+ 
+def etiqueta_segmento(xpos, base, alto, valor_n):
+    if alto > 1.5:
+        ax.text(xpos, base + alto / 2, f"n={valor_n}", ha="center", va="center",
+                fontsize=9, color="black")
+ 
+etiqueta_segmento(x2[0], 0, verde_real_correctos / n * 100, verde_real_correctos)
+etiqueta_segmento(x2[0], verde_real_correctos / n * 100, verde_real_incorrectos / n * 100, verde_real_incorrectos)
+etiqueta_segmento(x2[1], 0, azul_real_correctos / n * 100, azul_real_correctos)
+etiqueta_segmento(x2[1], azul_real_correctos / n * 100, azul_real_incorrectos / n * 100, azul_real_incorrectos)
+ 
+total_verde_real = (verde_real_correctos + verde_real_incorrectos) / n * 100
+total_azul_real = (azul_real_correctos + azul_real_incorrectos) / n * 100
+ax.text(x2[0], total_verde_real + 1.5, f"{total_verde_real:.1f}%", ha="center", va="bottom", fontsize=10)
+ax.text(x2[1], total_azul_real + 1.5, f"{total_azul_real:.1f}%", ha="center", va="bottom", fontsize=10)
+ 
+ax.set_xticks(x2)
+ax.set_xticklabels(labels_real)
+ax.set_ylabel("Porcentaje de participantes (%)")
+ax.set_title("¿Qué tela te pareció más realista?\n(desglosado por acierto en la identificación)")
+ax.set_ylim(0, 105)
+ax.legend(loc="upper center", bbox_to_anchor=(0.5, -0.2), ncol=1)
+fig.tight_layout()
+fig.savefig(f"{OUT_DIR}/2_preferencia_realismo.png", dpi=300, bbox_inches="tight")
+plt.close(fig)
+
 
 # ---------------------------------------------------------------
 # 4. Figura 3 — Ranking medio por característica (con desviación típica)
