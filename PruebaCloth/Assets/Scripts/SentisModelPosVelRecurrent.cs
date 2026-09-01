@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using Unity.InferenceEngine; // O Unity.Sentis dependiendo de tu versión exacta
 using UnityEngine;
@@ -19,8 +21,16 @@ public class ClothMLPosVelRec : MonoBehaviour
 
     int vertexCount;
 
-    // --- NUEVO: Parámetros de la Secuencia ---
-    [SerializeField]
+	// Midiendo tiempos de tratado de datos y modelo 
+	protected Stopwatch stopwatch;
+
+	private List<double> inferenceArchive;
+	private double inferenceTime;
+
+	private int inferenceFrames = 0;
+
+	// --- NUEVO: Parámetros de la Secuencia ---
+	[SerializeField]
     public int seqLen = 5;
     // Buffer para guardar el estado normalizado de los últimos 5 frames
     // [tiempo, vertice, feature]
@@ -64,7 +74,7 @@ public class ClothMLPosVelRec : MonoBehaviour
 
         maxDistance = new float[vertexCount];
         historyBuffer = new float[seqLen, vertexCount, numFeatures];
-
+        
         // Definir puntos anclados (0 = se mueve)
         int i = 0;
         //MINI
@@ -109,9 +119,13 @@ public class ClothMLPosVelRec : MonoBehaviour
                 historyBuffer[t, v, 6] = (sdf - normData.mean[6]) / normData.std[6];
             }
         }
-    }
 
-    void FixedUpdate()
+		stopwatch = new Stopwatch();
+		inferenceTime = 0; inferenceFrames = 0;
+		inferenceArchive = new List<double>();
+	}
+
+	void FixedUpdate()
     {
         var mesh = clothMeshFilter.mesh;
         var vertices = mesh.vertices;
@@ -170,14 +184,27 @@ public class ClothMLPosVelRec : MonoBehaviour
             }
         }
 
-         // lastVertexPositions = vertices;
+		// lastVertexPositions = vertices;
 
-        // 4. Ejecutar modelo
-        worker.Schedule(inputTensor);
+		// 4. Ejecutar modelo
+		// Medimos tiempo de inferencia
+		stopwatch.Restart();
+		worker.Schedule(inputTensor);
         using var output = worker.PeekOutput() as Tensor<float>;
         var result = output.ReadbackAndClone();
+		// Debug inference time
+		stopwatch.Stop();
+		UnityEngine.Debug.Log($"Elapsed: {stopwatch.Elapsed}");
+		inferenceTime += stopwatch.Elapsed.TotalMilliseconds; inferenceFrames++;
+		if (inferenceFrames >= 60)
+		{
+			UnityEngine.Debug.Log($"Media de frames: {stopwatch.Elapsed}");
+			inferenceArchive.Add(inferenceTime / inferenceFrames);
+			inferenceFrames = 0;
+			inferenceTime = 0;
+		}
 
-        Vector3[] newVertices = new Vector3[vertexCount];
+		Vector3[] newVertices = new Vector3[vertexCount];
 
         for (int i = 0; i < vertexCount; i++)
         {
@@ -221,6 +248,17 @@ public class ClothMLPosVelRec : MonoBehaviour
 	}
 	void OnDestroy()
     {
+        VolcarTiempos();
         worker?.Dispose();
     }
+
+	public void VolcarTiempos()
+	{
+		string filePath = Application.persistentDataPath + "/debugInferenceVel.txt";
+
+		foreach (double arc in inferenceArchive)
+		{
+			File.WriteAllText(filePath, arc + "\n");
+		}
+	}
 }

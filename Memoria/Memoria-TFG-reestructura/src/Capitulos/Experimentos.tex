@@ -165,6 +165,7 @@ Al utilizar secuencias de frames para el entrenamiento, teniendo las posiciones 
 
 No obstante, de forma previa al experimento se pueden intuir dos implicaciones arriesgadas de emplear la velocidad como parámetro. En primer lugar, para generar el tensor de entrada es necesario calcular primero la velocidad de cada punto de la tela en cada frame, lo cual supone un aumento en el coste computacional en la simulación. Pero sobre todo, la velocidad otorga una mayor sensibilidad al error en el modelo, por lo que se puede intuir que sufrirá una mayor cantidad de desplazamientos erráticos.
 
+Se quiere comprobar si la información que aporta la velocidad compensa los márgenes de error elevados.
 Ambas pruebas siguen los parámetros:
 \begin{table}[H]
     \begin{center}
@@ -177,20 +178,41 @@ Ambas pruebas siguen los parámetros:
     \label{tab:randomTraining}
 \end{table}
 
-A nivel de entrenamiento, la diferencia entre ambas pruebas consiste en cuántos deltas se tienen en cuenta para el loss del modelo. El experimento que sólo toma las posiciones como parámetros junto al sdf calcula el loss como la diferencia de deltas de posición de un frame y el anterior, mientras que el de la velocidad suma dos losses, el de la posición y el de la velocidad, quien también toma el tiempo como parámetro, y calcula el delta de velocidades entre frames. % incluir dibujo
-
+El cálculo del loss y unrolling en ambos pruebas es equivalente, únicamente difieren por el nuevo parámetro recibido, la velocidad de cada vértice de la tela. 
 Los resultados son los siguientes:
 \begin{table}[H]
     \begin{center}
         \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.6cm} | m{1.2cm} |}
         \hline \textbf{Prueba} & \textbf{T entrenamiento} & \textbf{T inferencia} & \textbf{Error medio por vertice} & \textbf{FPS} \\ \hline
-            Pos & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
-            Pos + Vel & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
+            Pos & 18h(gpu) & 2.25952ms & 0.001929m & 417 \\ \hline
+            Pos + Vel & 18h(gpu) & 0.0ms & 0.000942m & 407 \\ \hline
         \end{tabular}
     \end{center}
     \caption{Resultados del entrenamiento en base al rendimiento.}
     \label{tab:rendResults}
 \end{table}
+
+En este experimento, podemos observar que el error de vértice observado en el entrenamiento y testing con la velocidad como parámetro es bastante inferior. El tiempo de entrenamiento prácticamente no sube, ambos rozan las 18h (a causa de la técnica de unrolling), y el tiempo de inferencia se mantiene. Las FPS y tiempo de inferencia caen ligeramente al contar con tres parámetros más de entrada (vx, vy, vz).
+
+Pese a que el error de vértice de la prueba con velocidad parece bajo, esto no se trasmite en la simulación final. La simulación muestra reacción adecuada, pero coge inercia con mucha más rapidez, y realiza movimientos exagerados. Esto perjudica la simulación, y provoca que la tela pierda la estructura a medida que avanza. En la figura \ref{fig:vel1} podemos apreciar como reacciona a tiempo a la colisión, pero realiza un movimiento más grande de lo necesario para dejar la bola pasar. En la siguiente imagen \ref{fig:vel2} se aprecia como ha quedado deformada la tela por este movimiento y posteriores. Aunque la tela se mantiene estable y no se dispara al infinito, las deformaciones se acumulan y deforman la tela permanentemente a medida que avanza el tiempo. Adicionalmente, es intersante mencionar como varía mucho más la velocidad (de forma no natural) a la que reacciona y vuelve al reposo la tela en comparación con la RNN basada en posiciones.
+
+\begin{figure}[H]
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{Imagenes/Exp/Velocidad/MovimientoExagerado.png}
+        \caption{Movimientos exagerados al comienzo de la simulación con velocidad.}
+        \label{fig:vel1}
+    \end{minipage}
+    \hfill
+    \begin{minipage}{0.48\textwidth}
+        \centering
+        \includegraphics[width=0.8\textwidth]{Imagenes/Exp/Velocidad/Deformado.png}
+        \caption{Ejemplo de deformación de la tela pasado un minuto en la simulación con velocidad.}
+        \label{fig:vel2}
+    \end{minipage}
+\end{figure}
+
+Visto esto, se concluyen las siguientes puntuaciones a nivel visual:
 \begin{table}[H]
     \begin{center}
         \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.8cm} | m{2.8cm} |}
@@ -203,10 +225,7 @@ Los resultados son los siguientes:
     \label{tab:visResults}
 \end{table}
 
-En este experimento, podemos observar que el error de vértice que incorpora los deltas de velocidad en el loss es notablemente inferior. No obstante...
-
-\textit{FIGURAS, OBSERVACIONES ADICIONALES}
-
+Se concluye que con este contexto, emplear la velocidad como parámetro no produce mejoras frente a usar únicamente las posiciones y sdfs. Los movimientos exagerados y un tanto erráticos perjudican notablemente la naturalidad de la tela.
 \section{PCA}
 A la hora de escalar el proyecto, aumentando tanto la geometría como los tipos de movimiento, resulta interesante introducir un modelo que se valga de un PCA para reducir la dimensión de los parámetros de entrada. Permanece una de las técnicas más utilizadas para alcanzar mejoras de rendimiento. En este experimento, utilizando el método del umbral de varianza, se calcula el mínimo de características necesarias para alcanzar un gran porcentaje de la variabilidad de los datos con un umbral de varianza del 95\%, reduciendo drásticamente a 13 componentes. 
 
