@@ -12,16 +12,51 @@ A la hora de valorar la calidad de un sistema de inferencia en tiempo de ejecuci
     \item \textit{Error medio por vértice}: medido en metros (m), es el error medio de predicción de un batch, es decir la diferencia media que se encuentra entre las posiciones predichas y reales de los vértices. Se calcula para cada primer frame de un batch \footnote{Para calcular el error de vértice del primer frame de un batch, se compara el último predicho de \textit{batch\_seq} con el primero de \textit{batch\_future}.}.
     \item \textit{Frames por segundo}: (FPS) la media calculada durante la simulación. 
   \end{itemize}
-  \item \textit{Resultado visual}: El movimiento inferido por el modelo ha de respetar las reglas fisicas suficientes para tener credibilidad. Además, es importante que la simulación se mantenga estable y la tela mantenga su estructura a lo largo de la ejecución. La evaluación de este aspecto es más subjetiva, por lo que se le ha dado una puntuación del 1 al 10 a diferentes características basada en la observación. Estos aspectos serán los mismos que se tendrán en cuenta a la hora de pedir la opinión de los usuarios en el apartado x.
+    Las métricas que se calculan durante la simulación en Unity, el tiempo de inferencia y las FPS, se medirán en el mismo ordenador con las siguientes características: i7 13650HX, y una gráfica GTX 5060.
+  \item \textit{Resultado visual}: El movimiento inferido por el modelo ha de respetar las reglas fisicas suficientes para tener credibilidad. Además, es importante que la simulación se mantenga estable y la tela mantenga su estructura a lo largo de la ejecución. La evaluación de este aspecto es más subjetiva, por lo que se le ha dado una puntuación del 0 al 3 a diferentes características basada en la observación, estas quedan expuestas en la rubrica \ref{tab:rubrica}. Estos aspectos serán los mismos que se tendrán en cuenta a la hora de pedir la opinión de los usuarios en el apartado \ref{sec:PruebaTesters}.
   \begin{itemize}
     \item \textit{Reactividad al colisionador}: cuánta sensibilidad muestra la tela frente a colisiones, si tiende al reposo y a ser atravesada, o reacciona a tiempo.
-    \item \textit{Conservación de la estructura}: si consigue volver a la pose no deformada de la tela tras las colisiones, o los vértices pierden progresivamente su relaciones originales en el espacio. Se tiene en cuenta si los vértices forman picos en la tela, crean efectos de compresión en ella, o hacen que adpote poses antinaturales.
+    \item \textit{Conservación de la estructura}: si consigue volver a la pose no deformada de la tela tras las colisiones, o los vértices pierden progresivamente sus relaciones originales en el espacio. Se tiene en cuenta si los vértices forman picos en la tela, crean efectos de compresión en ella, o hacen que adpote poses antinaturales.
     \item \textit{Estabilidad a largo plazo}: se refiere a si la simulación se mantiene en el tiempo, ninguna colisión ocasiona movimientos erráticos o propulsiones hacia el infinito y continua reaccionando como en el inicio.
     \item \textit{Credibilidad del movimiento}: cómo de verosímiles son los movimientos e inercia generada en la tela. La tela puede reaccionar al colisionador correctamente, pero puede optar por evitarlo, encogerse, moverse en sentido contrario o adoptar otras deformaciones y velocidades poco naturales. 
   \end{itemize}
-\end{itemize}
 
-Las métricas que se calculan durante la simulación, el tiempo de inferencia y las FPS, se medirán en el mismo ordenador con las siguientes características: i7 13650HX, y una gráfica GTX 5060. Y de la misma forma (aplicación?, enchufado?) ORDENADOR DE EVA. Falta también explicar que significa cada puntuación \newline
+\end{itemize}
+  \begin{table}[H]
+    \begin{center}
+        \begin{tabular}{ | m{0.6cm} |  m{3cm} | m{3cm} | m{3cm} | m{3cm} |}
+        \hline \textbf{Pt.} & \textbf{Reactividad} & \textbf{Conservación} & \textbf{Estabilidad} & \textbf{Credibilidad} \\ \hline
+            0 
+            & No reacciona. 
+            & Se corrompe por completo.
+            & Los puntos estallan hacia el infinito.
+            & -
+            \\ \hline            
+            1 
+            & Reacciona a veces, generalmente no es fiel a los movimientos del colisionador. 
+            & Genera picos y se estira o comprime en exceso, no es capaz de recuperar la forma.
+            & Hay movimientos erraticos que afectan a su reactividad.
+            & -
+            \\ \hline
+            2 
+            & Suele reaccionar, puede no ser fiel a los movimientos. 
+            & Genera picos y se estira o comprime en exceso, pero es capaz de recuperar la forma.
+            & Mantiene su desempeño menos de un minuto. 
+            & -
+            \\ \hline
+            3 
+            & Suele reaccionar fielmente. 
+            & No se altera excesivamente y recupera prácticamente la forma inicial.
+            & Mantiene su desempeño durante más de un minuto. 
+            & -
+            \\ \hline
+        \end{tabular}
+    \end{center}
+    \caption{Resultados del entrenamiento en base a la percepción.}
+    \label{tab:rubrica}
+    \end{table}
+
+    
 A lo largo del proyecto se han llevado a cabo numerosas pruebas, a continuación se describen los experimentos con los resultados más interesantes. Pueden verse de forma interactiva en la aplicación del repositorio, explicada en el apartado \ref{sec:App}.
 
 \section{Recurrencia}
@@ -50,7 +85,7 @@ Las métricas obtenidas son las siguientes:
     \label{tab:rendResults}
 \end{table}
 
-Si ambos modelos emplean una ventana de frames histórica y llevan a cabo unrolling, podemos observar que ambos obtienen errores de vértice similares. En cuanto a tiempo de entrenamiento, el MLP tarda menos de la mitad (10 horas de diferencia), y obtiene un tiempo de inferencia ligeramente inferior (\~0,3 ms de diferencia).
+Si ambos modelos emplean una ventana de frames histórica y llevan a cabo unrolling, podemos observar que ambos obtienen errores de vértice similares. En cuanto a tiempo de entrenamiento, el MLP tarda menos de la mitad (10 horas de diferencia), y obtiene un tiempo de inferencia ligeramente inferior (\~0,3 ms de diferencia). \newline
 
 Donde realmente se aprecia una diferencia es a nivel visual, particularmente en cuanto la conservación de la tela. En este experimento el estado oculto propio de la RNN mantiene casi intacta la estructura de la tela, mientras que con el MLP se rompe la forma a medida que recibe colisiones. De la misma forma que el RNN, realiza los movimientos con mucha fluidez y es reactiva, pero no es capaz de mantenerse a través del tiempo.
 
@@ -73,7 +108,7 @@ Donde realmente se aprecia una diferencia es a nivel visual, particularmente en 
 Se concluyen las siguientes puntuaciones de calidad visual: 
 \begin{table}[H]
     \begin{center}
-        \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.8cm} | m{2.8cm} |}
+        \begin{tabular}{ | m{2cm} |  m{2.6cm} | m{2.8cm} | m{2.6cm} | m{2.7cm} |}
         \hline \textbf{Prueba} & \textbf{Reactividad} & \textbf{Conservación} & \textbf{Estabilidad} & \textbf{Credibilidad} \\ \hline
             MLP & 8/10 & 4/10 & 10/10 & 3/10 \\ \hline
             RNN & 8/10 & 8/10 & 10/10 & 4/10 \\ \hline
@@ -84,35 +119,37 @@ Se concluyen las siguientes puntuaciones de calidad visual:
 \end{table}
 
 Con esta metodología y técnicas concretas, compensa mantener la recurrencia para evitar la pérdida de estructura de la tela. No obstante, se planteará encontrar posteriormente una técnica más restrictiva en cuanto a estuctura que permita aprovechar los bajos tiempos de entrenamiento e inferencia del MLP.
+
 \section{Unrolling}
-La cadena de deltas generados sucesivamente permiten al modelo tener una noción sobre el cambio de velocidad y aceleración provocados. Esta técnica consiste en retropropagar el error a lo largo de la secuencia temporal y permite a la red aprender dependencias temporales. Realizamos el experimento modificando la secuencia de entrada del RNN entre 0, 16 y 32 frames futuras.
-Se mantienen los mismos parámetros entre las diferentes pruebas:
-\begin{table}[H]
-    \begin{center}
-        \begin{tabular}{ | m{2.2cm} | m{2cm} | m{1.2cm} | m{2.1cm} | m{2.4cm} | m{2.2cm} | }
-        \hline \textbf{Windows size} & \textbf{Rollout steps} & \textbf{Noise} & \textbf{Learning rate} & \textbf{Tamaño dataset} & \textbf{Batch size} \\ \hline
-            16 & 24 & 3\% & 0.001 & 25000 & 32 \\ \hline
-        \end{tabular}
-            \end{center}
-    \caption{Hiperparámetros y configuración del entrenamiento.}
-    \label{tab:randomTraining}
-\end{table}
-Los resultados son:
+Como se ha expuesto anteriormente, esta es una técnica que resulta ser muy útil en la autocorreción del modelo; en este experimento quieren observarse su repercusión en la práctica. Se realiza el experimento modificando la secuencia de entrada del RNN entre 1 y 24 frames futuras, de tal modo, pueden compararse los efectos del unrolling con un modelo análogo que solo infiere un frame, es decir, un modelo sin unrolling. El resto de parámetros se mantienen consisitentes con los de la prueba anterior. \newline
+
+En la siguiente tabla, \ref{tab:rendResultsUnroll}, pueden verse los resultados en cuanto al rendimiento:
 \begin{table}[H]
     \begin{center}
         \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.6cm} | m{1.2cm} |}
         \hline \textbf{Rolling steps} & \textbf{T entrenamiento} & \textbf{T inferencia} & \textbf{Error medio por vertice} & \textbf{FPS} \\ \hline
-            0 & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
-            16 & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
-            32 & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
+            1 & 1.5h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
+            24 & 0h(gpu) & 0.0ms & 0.0 & 0 \\ \hline
         \end{tabular}
     \end{center}
     \caption{Resultados del entrenamiento en base al rendimiento.}
-    \label{tab:rendResults}
+    \label{tab:rendResultsUnroll}
 \end{table}
+
+Contemplando ambas simulaciones en ejecución, es clara la diferencia en la conservación de la estructura de la geometría. Si bien, al contar con el resto de técnicas implementadas, la corrupción de la forma de la tela no es tan exagerada. Estos resultados visual pueden compararse en la figura \ref{fig:estrucUnfold}. 
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.7\textwidth]{Imagenes/estructuraUnfolding.png}
+    \caption{.}
+    \label{fig:estrucUnfold}
+\end{figure}
+
+Por otro lado, es interesante recalcar que el modelo sin unrolling permite más reactividad a la tela. Al contrario, utilizando la técnica, la inferencia tiene en cuenta el cambio de velocidad y aceleración provocados, por lo que las predicciones tienden a ser más cautelosas y se reduce el movimiento total.
+
 \begin{table}[H]
     \begin{center}
-        \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.8cm} | m{2.8cm} |}
+        \begin{tabular}{ | m{2cm} |  m{2.6cm} | m{2.8cm} | m{2.6cm} | m{2.7cm} |}
         \hline \textbf{Rolling steps} & \textbf{Reactividad} & \textbf{Conservación} & \textbf{Estabilidad} & \textbf{Credibilidad} \\ \hline
             0 & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
             16 & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
@@ -120,11 +157,9 @@ Los resultados son:
         \end{tabular}
     \end{center}
     \caption{Resultados del entrenamiento en base a la percepción.}
-    \label{tab:visResults}
+    \label{tab:visResultsUnfold}
 \end{table}
 
-
-\textit{FIGURAS, OBSERVACIONES ADICIONALES}
 \section{Velocidad}
 Al utilizar secuencias de frames para el entrenamiento, teniendo las posiciones de cada vértice, la velocidad puede ser inferida. Sin embargo, la secuencia de las velocidad aporta al modelo de una conciencia acerca de la aceleración y deceleración de los vértices, por lo que se considera importante medir el impacto en este experimento. En el momento de medir los parámetros mediante el random forest en el apartado \ref{sec:Dataset} se resalta la velodidad en el eje X como la información de la simulación más relevante, y podría resultar la información clave para aprender a gestionar la inercia.
 
