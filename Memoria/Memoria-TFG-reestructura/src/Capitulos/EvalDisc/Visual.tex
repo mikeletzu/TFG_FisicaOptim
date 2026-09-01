@@ -1,24 +1,15 @@
 \section{Resultados visuales de la inferencia}
 \label{sec:Visual}
-- el que mejores reesultados tiene es el finaltestPos, RNN con x datos. Realmente es una diferencia notablemente mejor que el mlp, la recurrencia ha supuesto la clave para gestionar y simular este tipo de simulacion. La simulacion elegida ha resultado ser... controversial. Ya al final del proceso, se llegó a la obvs de que este tipo de simulaciones con tanto movimiento e inercia se dejan siempre a mano de los solvers, usandose la IA más bien para reducir el coste de simular la ropa de personajes secundarios, arrugas en herramientas para artistas, vueltas al reposo... Se presenta la inercia academicamente como un caso de estudio, pero aun no se usa de forma profesional para resolver este problema. Los resultados visuales están ahí, pero observamos que el tamaño de los datasets no es lo suficientemente grande, esto hace que no responda ante todas las colisiones y situaciones que se encuenntre, pues el dataset grabado al fin y al cabo no abarca todas las posibilidades, al ser acotado pero muy aleatorio, que se eleva con la inercia de la tela. 
 
-El resultado alcanzado es natural, que se discutirá en pruebas de testers, en muchos casos, y aunque depende la variabilidad explicada, se ha conseguido que generalice más o menos para un movimiento que no es siempre el mismo. 
+Dada la combinatoria posible de las características contempladas en el estudio, los resultados visuales de las simulaciones generadas por los modelos han sido muy diversos. La aleatoriedad deseada supone la necesidad de datasets y entrenamientos mayores, por lo que si bien los modelos conseguidos no son capaces de reaccionar consistentemente frente a todos los movimentos del colisionador posibles, demuestran potencial en lo que respecta a la capacidad de generalización. \newline
 
-El pca no se que le ha pasado, el mlp se queda corto si le quitas el seqLen, para la inercia si es importante. El unrolling lo borda supongo, que aprenda a autocorregirse es lo que mantiene la estructura y lo hace creible. Aun asi, cabe recalcar que aunque mantiene la forma, la autocorrecion a veces puede tener efectos visuales un poco bizarros, suavizando por ejemplo un pico ocasionado por una colision de forma interpolada, como si tratara de un lerp. 
+Los mejores resultados visuales de la investigación se consiguen con el modelo RNN con la combinación de las técnicas de noise y unrolling. Presenta sobretodo una ventaja en la conservación de la estructura de la geometría de la tela, sin comprometer la naturalidad del movimiento. A pesar de que haya otros modelos más reactivos, la estabilidad de este ante el dinamismo de la simulación lo favorece a la hora de evaluar la credibilidad del resultado. Este modelo será el elegido para llevar acabo las pruebas a usuarios vistas en el siguiente apartado \ref{sec:PruebaTesters}. \newline
 
--mantiene estructura a traves de tiempo
-- se recupera de colisiones
-- a veces atraviesa (unity tambien peca de esto, datos que le inclinen a reproducirse)
-- arrugas
+Analizando el conjunto de experimentos realizados, se pueden observar distintos aspectos compartidos en los resultados visuales de los modelos:
 
-de forma general, como mencionabamos 
 \begin{itemize}
-    \item \textit{Reactividad al colisionador}
-    \item \textit{Conservación de la estructura}
-    \item \textit{Estabilidad a largo plazo}
-    \item \textit{Credibilidad del movimiento}
-  \end{itemize}
-
-  tiene sentido / no / interesante / cuanto mejor reactividad más pierde estructura de la tela 
-
-dos movimientos que se contrarestan. Loss. Creemos que la reactividad y la estabilidad se contradicen, interesante. Autocorregirse implica hacer el movimiento contrario al de la fuerza que recibes. ( no necesariamente pero en casos en que se ve el error si) (ej recupera antes de tiempo hacia el lado contrario del empuje del colisionador)
+  \item Como se ha observado, los modelos que tienen más capacidad de mantener un movimiento fluido y natural (y que a veces puede llegar a ser menos reactivo), son el RNN y MLP. Al contrario, la velocidad y reducción de entrada parecen romper la naturalidad de los desplazamientos. Ambos respetan menos la consistencia temporal, produciendo movimientos erráticos a velocidades incosistentes.
+  \item Por otra parte, los úncios modelos capaces de mantener la estructura de la tela son el RNN y el PCA, ambos con unfolding. El segundo consigue recuperar al completo la estructura de reposo tras interactuar con el colisionador, aunque en ambos casos esta recuperación puede tener un efecto visual interpolado. 
+  \item Los beneficios del unrolling suponen a veces un exceso en la prevención de los posibles errores. Llegando, en algunos casos de interacción, a producir el movimiento contrario al esperado con el fin de evitar movimientos de inercia desproporcionados.
+  \item Ocasionalmente, los impactos contra el colisionador atraviesan la tela. Si bien, su reactividad no es infalible, este problema ya se encuentra en la simulación de Cloth propia de Unity, por lo que el entrenamiento reproduce o incluso potencia estos errores de base.
+\end{itemize}
