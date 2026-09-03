@@ -9,7 +9,7 @@ Analizando el conjunto de experimentos realizados, se pueden observar distintos 
 
 \begin{itemize}
   \item Como se ha observado, los modelos que tienen más capacidad de mantener un movimiento fluido y natural (y que a veces puede llegar a ser menos reactivo), son el RNN y MLP. Al contrario, la velocidad y reducción de entrada parecen romper la naturalidad de los desplazamientos. Ambos respetan menos la consistencia temporal, produciendo movimientos erráticos a velocidades incosistentes.
-  \item Por otra parte, los úncios modelos capaces de mantener la estructura de la tela son el RNN y el PCA, ambos con unfolding. El segundo consigue recuperar al completo la estructura de reposo tras interactuar con el colisionador, aunque en ambos casos esta recuperación puede tener un efecto visual interpolado. 
+  \item Por otra parte, los únicos modelos capaces de mantener la estructura de la tela son el RNN y el PCA, ambos con unfolding. El segundo consigue recuperar al completo la estructura de reposo tras interactuar con el colisionador, aunque en ambos casos esta recuperación puede tener un efecto visual interpolado. 
   \item Los beneficios del unrolling suponen a veces un exceso en la prevención de los posibles errores. Llegando, en algunos casos de interacción, a producir el movimiento contrario al esperado con el fin de evitar movimientos de inercia desproporcionados.
   \item Ocasionalmente, los impactos contra el colisionador atraviesan la tela. Si bien, su reactividad no es infalible, este problema ya se encuentra en la simulación de Cloth propia de Unity, por lo que el entrenamiento reproduce o incluso potencia estos errores de base.
 \end{itemize}

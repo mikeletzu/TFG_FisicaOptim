@@ -12,7 +12,7 @@ A la hora de valorar la calidad de un sistema de inferencia en tiempo de ejecuci
     \item \textit{Error medio por vértice}: medido en metros (m), es el error medio de predicción de un batch, es decir la diferencia media que se encuentra entre las posiciones predichas y reales de los vértices. Se calcula en la fase de prueba del entrenamiento para cada primer frame de un batch \footnote{Para calcular el error de vértice del primer frame de un batch, se compara el último predicho de \textit{batch\_seq} con el primero de \textit{batch\_future}.}.
     \item \textit{Frames por segundo}: (FPS) la media calculada durante la simulación. 
   \end{itemize}
-    Las métricas que se calculan durante la simulación en Unity, el tiempo de inferencia y las FPS, se medirán en el mismo ordenador con las siguientes características: i7 13650HX, y una gráfica GTX 5060.
+    Las métricas que se calculan durante la simulación en Unity, el tiempo de inferencia y las FPS, se medirán en el mismo ordenador portátil con las siguientes características: i7 13650HX, y una gráfica GTX 5060.
   \item \textit{Resultado visual}: El movimiento inferido por el modelo ha de respetar las reglas fisicas suficientes para tener credibilidad. Además, es importante que la simulación se mantenga estable y la tela mantenga su estructura a lo largo de la ejecución. La evaluación de este aspecto es más subjetiva, por lo que se le ha dado una puntuación del 0 al 3 a diferentes características basada en la observación, estas quedan expuestas en la rubrica \ref{tab:rubrica}. Estos aspectos serán los mismos que se tendrán en cuenta a la hora de pedir la opinión de los usuarios en el apartado \ref{sec:PruebaTesters}.
   \begin{itemize}
     \item \textit{Reactividad al colisionador}: cuánta sensibilidad muestra la tela frente a colisiones, si tiende al reposo y a ser atravesada, o reacciona a tiempo.
@@ -121,7 +121,7 @@ Se concluyen las siguientes puntuaciones de calidad visual:
 Con esta metodología y técnicas concretas, compensa mantener la recurrencia para evitar la pérdida de estructura de la tela. No obstante, se planteará encontrar posteriormente una técnica más restrictiva en cuanto a estuctura que permita aprovechar los bajos tiempos de entrenamiento e inferencia del MLP.
 
 \section{Unrolling}
-Como se ha expuesto anteriormente, esta es una técnica que resulta ser muy útil en la autocorreción del modelo; en este experimento quieren observarse su repercusión en la práctica. Se realiza el experimento modificando la secuencia de entrada del RNN entre 1 y 24 frames futuras, de tal modo, pueden compararse los efectos del unrolling con un modelo análogo que solo infiere un frame, es decir, un modelo sin unrolling. El resto de parámetros se mantienen consisitentes con los de la prueba anterior. \newline
+Como se ha expuesto anteriormente, esta es una técnica que resulta ser muy útil en la autocorreción del modelo; este experimento pretende valorar su repercusión en la calidad visual de la simulación. Se realiza el experimento modificando la secuencia de entrada del RNN entre 1 y 24 frames futuras, de tal modo, pueden compararse los efectos del unrolling con un modelo análogo que solo infiere un frame, es decir, un modelo sin unrolling. El resto de parámetros se mantienen consisitentes con los de la prueba anterior. \newline
 
 En la siguiente tabla, \ref{tab:rendResultsUnroll}, pueden verse los resultados en cuanto al rendimiento:
 \begin{table}[H]
@@ -160,7 +160,7 @@ Por otro lado, es interesante recalcar que el modelo sin unrolling permite más 
 \end{table}
 
 \section{Velocidad}
-Al utilizar secuencias de frames para el entrenamiento, teniendo las posiciones de cada vértice, la velocidad puede ser inferida. Sin embargo, la secuencia de las velocidad aporta al modelo de una conciencia acerca de la aceleración y deceleración de los vértices, por lo que se considera importante medir el impacto en este experimento. En el momento2 de medir los parámetros mediante el random forest en el apartado \ref{sec:Dataset} se resalta la velodidad en el eje X como la información de la simulación más relevante, y podría resultar la información clave para aprender a gestionar la inercia.
+Al utilizar secuencias de frames para el entrenamiento, teniendo las posiciones de cada vértice, la velocidad puede ser inferida. Sin embargo, la secuencia de las velocidad aporta al modelo de una conciencia acerca de la aceleración y deceleración de los vértices, por lo que se considera importante medir el impacto en este experimento. En el momento de medir los parámetros mediante el random forest en el apartado \ref{sec:Dataset} se resalta la velodidad en el eje X como la información de la simulación más relevante, y podría resultar la información clave para aprender a gestionar la inercia.
 
 No obstante, de forma previa al experimento se pueden intuir dos implicaciones arriesgadas de emplear la velocidad como parámetro. En primer lugar, para generar el tensor de entrada es necesario calcular primero la velocidad de cada punto de la tela en cada frame, lo cual supone un aumento en el coste computacional en la simulación. Pero sobre todo, la velocidad otorga una mayor sensibilidad al error en el modelo, por lo que se puede intuir que sufrirá una mayor cantidad de desplazamientos erráticos.
 

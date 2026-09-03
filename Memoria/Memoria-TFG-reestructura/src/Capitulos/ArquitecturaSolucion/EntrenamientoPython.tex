@@ -65,7 +65,7 @@ Para crear un entorno de trabajo adaptable, y asegurar la consistencia entre los
             \begin{minipage}{0.48\textwidth}
                 \centering
                 \includegraphics[width=\textwidth]{Imagenes/ejemploVisualC.png}
-                \caption{Visualización de error de normalización}
+                \caption{Visualización del error medio a lo largo del entrenamiento}
                 \label{fig:visualC}
             \end{minipage}
         \end{figure}
@@ -222,7 +222,7 @@ Para conseguir alcanzar una mejora de rendimiento y complejidad en los modelos, 
 
 No obstante, cabe recalcar que la reducción conlleva un coste. Pese a aportar mejor rendimiento, un menor número de componentes compromete el nivel de detalle o la deformación en la simulacion, y supone una mayor restricción geométrica para la tela. Para encontrar el punto intermedio entre coste de la inferencia y un movimiento más detallado, menos restrictivo, se elige un número de componentes que explican un umbral de varianza. En este estudio se emplea una varianza del 95\%. \newline %aqui el optimal components tiene razones adicionales, ex overfittting
 
-El PCA empleado en el entrenamiento pertence a la librería de sklearn. El cálculo del número óptimo de componentes se obtiene mediante a través del proporcionado \textit{pca.explained\_variance\_ratio\_.cumsum()}. Una vez obtenido, se aplica y ajusta el PCA sobre el dataset.
+El PCA empleado en el entrenamiento pertence a la librería de sklearn. El cálculo del número óptimo de componentes se obtiene a través del proporcionado \textit{pca.explained\_variance\_ratio\_.cumsum()}. Una vez obtenido, se aplica y ajusta el PCA sobre el dataset.
 
 \begin{figure}[H]
     \centering
@@ -232,7 +232,7 @@ El PCA empleado en el entrenamiento pertence a la librería de sklearn. El cálc
 
 Podemos definir la reducción de la siguiente forma:
 
-\begin{algorithm}
+\begin{algorithm}[H]
 \caption{Reducción de dimensionalidad mediante PCA}
 \label{alg:pca}
 \begin{algorithmic}
@@ -258,11 +258,11 @@ Podemos definir la reducción de la siguiente forma:
 \end{algorithmic}
 \end{algorithm}
 
-Tanto en el entorno de entrenamiento como en la plataforma de simulación, Unity, se encuentran funciones que facilitan el cálculo de PCA sobre un conjunto de datos de vértices y su cálculo inverso, es decir, la obtención de la coordenada local xyz de los vértices. 
+Tanto en el entorno de entrenamiento como en la plataforma de simulación, Unity, se encuentran funciones que facilitan el cálculo del PCA sobre el conjunto de datos de entrada y su cálculo inverso sobre los datos de salida. Para mantener la consistencia de estas transformaciones, los parámetros necesarios se guardan junto con los datos de normalización en el archivo .JSON mencionado anteriormente. \newline
 
-Es importante resalta que el uso de PCA modifica en el modelo qué se entrena; la pérdida ya no consiste en el delta de posiciones, sino en el delta de PCA entre frames. Y quizá es la razón por la que es inestable...? Quién sabe. Pero va muy rápido.
+Es importante resaltar que el uso de PCA modifica la función de pérdida del modelo; la pérdida ya no consiste en el delta de posiciones, sino en el delta de PCA entre frames.
 
-\subsection{Bucle de entrenamiento}
+\subsection{Espacio de entrenamiento}
 La siguiente sección de pseudocódigo describe el bucle para llevar a cabo el entrenamiento completo del modelo. Inicialmente, se dividen los datos de entrenamiento en lotes, estos contienen una secuencia de entrada para el modelo y la secuencia de frames inmediatamente posterior. Con estos datos y la función descrita anteriormente, se obtiene la pérdida del modelo para la retropropagación y se actualizan sus pesos. La fase de evaluación también utiliza la función anterior para analizar la calidad del modelo ante situaciones nuevas, y calcula el primer frame de cada lote para obtener una aproximación de la media de error en la predicción de los deltas.
 
 
