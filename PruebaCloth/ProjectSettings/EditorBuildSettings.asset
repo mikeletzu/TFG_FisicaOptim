@@ -12,7 +12,7 @@ EditorBuildSettings:
     path: Assets/Scenes/Metricas.unity
     guid: 0d158d09501d5e148947921a7228fcee
   - enabled: 1
-    path: Assets/Scenes/MenuScene.unity
+    path: Assets/Scenes/AppExperimentos/MenuScene.unity
     guid: ea42a63c70eaf984f88941148a434268
   - enabled: 1
     path: Assets/Scenes/ShirtScene.unity
