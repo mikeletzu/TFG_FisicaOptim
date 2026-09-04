@@ -31,4 +31,12 @@ On the other hand, the research bears the burdens of any small scale software de
 Apropos the former subject, the limitations of the developed models, the bottom-line is the impossibility of these to generalise topology nor a wide range of movements. The model is certainly able to face the simulation of a cloth it has been trained with, but it can not function propperly on a different mesh. Likewise, it is sensible to new events like prominent changes on the colliders behaviour. Additionally, the simulation of garments was outside of the scope of the projects, partly because of the difficulty of generating viable datasets with the chosen platform (Unity).
 
 \section*{Future work}
-blabla
+The following points describe the various research paths henceforth. These could address the current challenges and complete the study:
+\begin{itemize}
+    \item In regard to the infrastructure, an \textbf{automatization} of the pipeline would be advised. Given the objectives, this was not part of the project, however creating a \textbf{tool for Unity} capable of collecting data, training a model and applying it on the base geometry would be interesting.
+    \item Working on the \textbf{scalability} of the model is also necessary. Improving the \textbf{reduction methods} and aligning them with the other techniques is essential to promote the next steps.
+    \item The previous proposal would allow for \textbf{bigger datasets}, having recorded more situations would provide the ability to try out more complex models. Interesting options such as CNNs, GNNs and encoder-decoder networks.
+    \item Moreover, according to the state of the art, \textbf{physical restrictions}, like physics-based loss funcions, would be an interesting addition. They would be added to the current models to archieve optimal visual results besides the topology of the geometry or the dataset size.
+    \item There is an option to \textbf{extract the daatasets from specialized softwares} as Maya or Houdini, even using external databases. By having better references models would improve and more complex geometries could be trained.
+    \item Having improved enough on the optimization of the model and with competent software and equipment, various \textbf{new simulation types} could be studied, other materials, tight-fitting clothing, and potentially \textbf{hybrid techniques}, combining ML, simulation and animation to lead the focus of the study to more specialised cases. An example would be to join ML with skinning, connecting the cloth to joints and letting AI handle inertia and smaller details like wrinkles.
+\end{itemize}
