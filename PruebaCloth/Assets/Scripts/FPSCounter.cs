@@ -39,11 +39,13 @@ public class FPSCounter : MonoBehaviour
 
     [SerializeField]
     GameObject stopButton;
+    BallMovement sphereMov;
 
     private void Awake()
     {
         fpsHistory = new List<float>();
         metricTimer = metricTime;
+        sphereMov = GameObject.Find("Sphere").GetComponent<BallMovement>();
     }
 
     private void Start()
@@ -119,14 +121,16 @@ public class FPSCounter : MonoBehaviour
         measuring = true;
         interactableToggles(false);
         timerTxt.text = "Measuring.\nWait " + Mathf.RoundToInt(metricTime) + "s.";
-        GameObject.Find("Sphere").GetComponent<BallMovement>().enabled = true;
+        sphereMov.enabled = true;
+        sphereMov.startMov();
     }
 
     public void stop()
     {
         measuring = false;
         interactableToggles(true);
-        GameObject.Find("Sphere").GetComponent<BallMovement>().enabled = false;
+        sphereMov.Reset();
+        sphereMov.enabled = false;
         stopButton.SetActive(false);
         reload(activeModel);
     }

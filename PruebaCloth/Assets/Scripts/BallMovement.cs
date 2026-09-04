@@ -13,11 +13,13 @@ public class BallMovement : MonoBehaviour
     [SerializeField]
     private bool isAuto = false;
     private int dir = -1;
+    public Vector3 initPos;
 
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        initPos = new Vector3(1.79999995f, -0.356999993f, 0);
         if (isAuto && !isLineal)
         {
             splineAnimate = GetComponent<SplineAnimate>();
@@ -85,6 +87,12 @@ public class BallMovement : MonoBehaviour
             SetPath(splineAnimate.Container.Spline.ToArray()[splineAnimate.Container.Spline.ToArray().Length - 1].Position);
         }
     }
+
+    public void startMov()
+    {
+        SetPath(transform.position);
+    }
+
     private void SetPath(Vector3 initPos)
     {
         SplineContainer sp = pathGen.GeneratePath(initPos);
@@ -96,5 +104,12 @@ public class BallMovement : MonoBehaviour
         }
         splineAnimate.ElapsedTime = 0;
         splineAnimate.Play();
+    }
+
+    public void Reset()
+    {
+        splineAnimate.StopAllCoroutines();
+        splineAnimate.Container = null;
+        transform.position = initPos;
     }
 }
