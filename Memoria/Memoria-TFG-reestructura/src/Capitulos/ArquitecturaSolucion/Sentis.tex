@@ -24,7 +24,7 @@ Habiendo descrito el funcionamiento interno de la herramienta, en este apartado 
 
 \textit{Start()} se ejecuta una sola vez al inicio del programa, por lo que se utiliza para crear el worker, el tensor de entrada e inicializar los parámetros necesarios. Los parámetros que el componente recibe son los siguientes:
 \begin{itemize}
-    \item \textbf{JSON:} Contiene los parámetros de normalización. Estos se utilizarán para normalizar los datos de entrada del tensor y desnormalizar los deltas resultantes.
+    \item \textbf{JSON:} Contiene los parámetros de normalización y en caso de ser necesarios los del PCA. Estos se utilizarán para normalizar los datos de entrada del tensor y desnormalizar los deltas resultantes o hacer las transformaciones al subespacio del PCA respectivamente.
     \item \textbf{ONNX:} El modelo entrenado en formato ONNX se utiliza para inicializar el modelo de Sentis.
     \item \textbf{Procesador:} Se elige si el modelo va a ser ejecutado en CPU o GPU. El worker de Sentis será creado con un \textit{BackendType} del tipo seleccionado. Se utiliza esta opción para hacer medidas de rendimiento.
     \item \textbf{\textit{MeshFilter:}} Se accede a la malla a través de este componente.
