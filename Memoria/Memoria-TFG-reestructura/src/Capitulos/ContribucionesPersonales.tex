@@ -117,8 +117,26 @@ memoria
 - traducción al ingles
 
 \section*{Eva}
-Muchas cosas.
+Eva -.-
+Eva fue un miembro activo y super cool durante todo el proceso.
+las distintas participantes, por lo que varias tareas se han llevado a cabo en colaboración, ya fuera de manera paralela o con intercambios consecutivos entre las colaboradoras del proyecto. Asímismo, la gestión logística del proyecto se ha desempeñado por todas las autoras: la comunicación con el tutor, la organización de los puntos a discutir en cada reunion, la redacción del acta de las mismas, la división de tareas y el seguimiento de estas en github, son algunos de los ejemplos. \newline
+Eva comenzó junto a sus compañeras con la investigación para acotar el tema de este proyecto, manteniendo un estudio sobre sobre distintas simulaciones físicas posibles. Una vez elegido el tema y contemplada la evolución general de las simulaciones, se centró en las simulaciones de telas basadas en grandes datasets, mass-spring systems, y reducciones de dimensionalidad. Por otro lado, junto a su compañera Paula, investigó las distintas soluciones existentes al problema de computación propio de las telas más allá de la IA, optimizaciones por CPU en herramientas o paralelización por GPU, centrándose en Unity como plaforma elegida. Comprobó que estas herramientas no eran accesibles sin dinero. 
 
+En relación con las simulaciones empleadas para los entrenamientos realizó iteraciones sobre distintos mallas en Blender necesarias para distintos momentos del desarrollo, como las reducciones o aumentos de dimensionalidad de la tela, y demás puestas en escena de elementos como la falda. 
+
+Creó la base del ClothDatasetRecoder junto a Paula, extrayendo los datos de la tela y guardándolos en formato csv, habilitando el grabado automático de una porción de la simulación y generando los consecuentes archivos. Investigó diferentes formas de tener en cuenta al colisionador en los datos como flags de contacto o campos voxelizados, y terminó creando un gran interés por los Signed Distance Fields, medidas de distancia a las superficies que permitian juntar varios colisionadores y tener en cuenta volúmenes para simulaciones más complejas. Implementó el estático SDFTUtils, que permite realizar los cálculos de distancias para un conjunto de colliders de los tipos que modifican a Cloth de Unity (sphere y capsule). Trabajó en traer el espacio de coordenadas al de la tela en todas estas funciones, después de las pruebas realizadas para elegir entre coordenadas globales y locales.
+
+Tras establecer Mikele la base de Pytorch con los modelos, estableció el primer modelo MLP funcional con con las capas y tamaño básicos para comenzar la investigación. También habilitó la posibilidad de realizar el entrenamiento sobre un conjunto de datasets, pero esta característica fue descartada debido a la necesidad de la secuencia temporal, basándose en simulaciones singulares. decidió el adam como el optimizador adecuado para las simulaciones físicas. Durante las primeras pruebas en el entornon de simulación, realizó un profunda investigación sobre que técncias eran necesarias para deformar la malla en Unity a tiempo real, restricciones y conseguir un resultado visual. Adicionalmente, incorporó eventualmente el early stopping de los entrenamientos. \dots
+
+Sobre el MLP llevó a cabo distintas pruebas de tamaños, funciones de activación (relu vs leakyrelu)así como una forma distinta de obtener los desplazamientos de los vértices. Esta última consiste en lo que se denomina "Anchored", es decir, realizar todas las transformaciones sobre la pose base (o en reposo) de la malla. Acumular error sea menos. Finalmente se descartó está linea de estudio al obtener resultados visualmente menos atractivos que el RNN con unfolding. Esta última técnica la aplicaría más adelante sobre el MLP también para comparar el efecto de la recurrencia en rendimiento y efecto visual.
+
+Medida de rendimiento del sdf, y células recurrentes diferentes: rnn, gru, lstm. Gru presentaba una mejoria menor pero no estaba supported by Unity. lstm mierdon.b. Por otra parte, trabajó en la habilitación del gpu del entrenamiento pero nunca llegó a saber si es verdad. Recogió tiempo de inferencia de la aplicación final. 
+
+Hizó prubas con la simulación de la falda, respecto a varias complejidades de vértices decididos por el grupo: 288, 72. El sdf funcionaba, se adhería a los colisionadores, pero la tela creaba picos y se descartó. 
+
+Creó la versión corregida del PCA, extrayendo las posiciones locales mediante la transformación inversa a la hecha en computeframe, tanto en Unity como en el entorno de entrenamiento. Llevó a cabo pruebas con distintos tamaños de dataset, así como implementando un clipping sobre los resultados a los obtenidos en el entrenamiento con objeto de reducir movimientos erráticos producidos por datos no esperados.
+
+Cabe recalcar, que como el resto de integrantes,se incorporó en distintas tareas, resolución de bugs y modificaciones para llegar al resultado final, así como todos los experimentos necesarios para obtener las métricas de los experimentos y pruebas intermedias para el desarrollo. De la misma forma, colaboró en la escritura de esta memoria, traducciones y sus posteriores revisiones.
 \section*{Pau}
 Muchas cosas.
 

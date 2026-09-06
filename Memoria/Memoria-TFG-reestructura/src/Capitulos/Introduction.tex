@@ -11,7 +11,15 @@ In the same context where other tecnhologies already used in games like NVDIA DL
 The main motivation for this study lies in achieving visually realistic simulations that focus on user perception. Therefore, fabric or cloth simulation was chosen. Cloth simulation presents itself as a case of complex physics, high dynamism, and application in both optimization within embedded games and tools for artists, offering a wide range of uses. It is beginning to be integrated into large companies and continues in the experimental phase. This use case was chosen because it represents a suitable balance between physical complexity and familiarity with the visual result, allowing for both technical and perceptual analysis.
 
 \section*{Objectives}
-blabla
+The main objetive of this project is building a infrastructure that enables identifying current limitations of AI cloth implmentation in a game engine with low latency. To reach this objective, the following development goals are put forward:
+\begin{enumerate}
+	%\renewcommand{\theenumi}{\alph{enumi}}
+	\item Create a cloth animation and a collider that generates movement in runtime.
+	\item Generate and process datasets with data relevant to the cloth concerning the collider and its environment.
+	\item Implement, train and evaluate different AI models, such as neural networks. 
+	\item Analyse and compare results obtained from the models, both performance and visualy wise.
+\end{enumerate}
+
 
 \section*{Work plan}
 The project will be developed during the 2025-2026 academic year.
@@ -37,5 +45,6 @@ El desarrollo de las tareas y su planificación se puede ver en la figura \ref{f
 	\label{fig:diagrama-gantt}
 \end{figure}
 
-\section*{Metodología}
+\section*{Work environment and methodology}
 In this research, accessible and free-to-use tools will be employed to facilitate the reproducibility of the results obtained. The main development environment will be Windows 11, as it is the operating system used by the research team and widespread among potential users. The cloth simulation, as well as the integration of the artificial intelligence model, will be carried out in Unity (version 6000.3.2f1, newest long-term support version at the starting date of this project). Regarding programming languages, C\# will be used for development within Unity, including simulation, generation and data collection, while Python with PyTorch will be used for training the machine learning models. The integration of the trained models into the runtime environment will be run using the Unity Sentis package. GitHub, based on the Git version control system, will be used for source code management and collaborative work. The GitHub Projects tool will also be used for planning, assigning, and tracking tasks. Additional tools include Google Drive for storing documentation, meeting notes, and occasional work materials. Lastly, Discord will serve for team coordination through online meetings and weekly in-person gatherings.
+
