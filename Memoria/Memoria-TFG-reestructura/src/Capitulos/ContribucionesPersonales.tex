@@ -18,7 +18,7 @@ lectura extensa d investigación:
 - PAU PBD
 - EVA CNN PCA
 - MIK SNUG HOOD
-- EVA PAU investigación sobre otras técnicas (obi cloth, accel gpu, uniti cosas...) y otros repos
+- EVA PAU investigación sobre otras técnicas (obi cloth, accel gpu, uniti cosas...) y otros repos PAU sentis
 
 
 Simulaciones 
@@ -116,6 +116,7 @@ memoria
 - correciones tutor
 - traducción al ingles
 
+\newpage
 \section*{Eva}
 Dada la complejidad teórica del proyecto era esencial la coordinación de las distintas participantes, por lo que varias tareas se han llevado a cabo en colaboración, ya fuera de manera paralela o con intercambios consecutivos entre las colaboradoras del proyecto. Asímismo, la gestión logística del proyecto se ha desempeñado por todas las autoras: la comunicación con el tutor, la organización de los puntos a discutir en cada reunion, la redacción del acta de las mismas, la división de tareas y el seguimiento de estas en github, son algunos de los ejemplos. \newline
 
@@ -135,8 +136,57 @@ Para poder observar el comportamiento de la tela en simulaciones de mayor coste,
 Eva creó la versión corregida del PCA, iniciado por Mikele, incorporando el PCA inverso: la extracción de posiciones locales mediante la transformación inversa en el subespacio, tanto en Unity como en el entorno de entrenamiento. Llevó a cabo pruebas con distintos tamaños de dataset, así como la adición de \textit{clipping} sobre los resultados a los obtenidos en el entrenamiento, con objeto de reducir movimientos erráticos producidos por datos no esperados. \newline
 
 Y finalmente, como se ha mencionado como dinámica del equipo, se unió a tareas externas, resolución de bugs y modificaciones para conseguir llegar al punto final descrito en este proyecto, así como todos los experimentos necesarios para obtener las métricas de los experimentos y pruebas intermedias para el desarrollo. De la misma forma, colaboró activamente en la escritura de esta memoria, traducciones y sus posteriores revisiones.
-\section*{Pau}
-Muchas cosas.
 
+\newpage
+\section*{Pau}
+Dada la complejidad teórica del proyecto era esencial la coordinación de las distintas participantes, por lo que varias tareas se han llevado a cabo en colaboración, ya fuera de manera paralela o con intercambios consecutivos entre las colaboradoras del proyecto. Asímismo, la gestión logística del proyecto se ha desempeñado por todas las autoras: la comunicación con el tutor, la organización de los puntos a discutir en cada reunion, la redacción del acta de las mismas, la división de tareas y el seguimiento de estas en github, son algunos de los ejemplos. \newline
+
+Para poder comenzar con la investigación del proyecto, Paula configuró una librería compartida en Zotero en la que se guardarían y organizarían todos los artículos leidos para asistir el desarrollo del proyecto. Con respecto al trabajo de investigación, es necesario recalcar que ha estado presente a lo largo de todo el desarrollo del proyecto, convirtiendolo en una tarea necesariamente compartida. En los primeros meses de desarrollo Paula, al igual que sus compañearas, investigó a cerca de las distintas investigaciones en curso relacionadas con el tema de estudio, hasta que se acabaron de concretar las necesidades específicas del proyecto. Posteriormente se indagó en mayor profundidad en las diversas investigaciones del estado del arte, en el que ella se especializó en las investigaciones dirigidas a PBD. \newline
+
+Además de la investigación en el ámbito académico, Paula se encargó de hacer una búsqueda tanto teórica como práctica a través de diversos repositorios para entender la herramienta Sentis. Posteriormente introduciría esta herramienta al desarrollo, creando la base del respectivo componente en Unity. \newline
+
+Antes de llegar a la fase de inferencia, la estudiante creó la base del movimiento del objeto colisionador en la escena de la simulación. Lo dotó de un movimiento lineal automático, para poder comprobar las primeras iteraciones del modelo con datasets sencillos con overfitting, y un movimiento generado por el input del usuario en los ejes X y Z. Las simulaciones seguirían siendo ajustadas indistintamente por todas las participantes del proyecto en los meses después de crear esta base; probando distintos parámetros para el componente de cloth de Unity, distintos tamaños o velocidades del colisionador, mallas con distintas topologías y demás adaptaciones.\newline
+
+Para poder pasar a la fase de entrenamiento, fue esencial extraer los datos de cada vértice de la geometría a lo largo de los frames. Para ello se creó un sistema de grabación y registro, \textit{ClothDatasetRecoder}, basado en archivos CSV. Este trabajo fue llevado a cabo en estrecha colaboración con la compañera Eva Feliu Aréjola, entre las dos pudieron crear un sistema completo capaz de producir los datasets con la información pertinente. Partieron por diseñar la herramienta y las características necesarias para la grabación (que conformarían 13 features). Trabajó en un sistema de grabado por pasos en el que poder fijar el tiempo entre las capturas de la tela, asímismo, se optimizó el  implementando un volcado en memoria por intervalos. 
+
+Uno de los aspectos sobre los que iteraron fue traer el espacio de coordenadas al de la tela en todas las funciones, después de las pruebas realizadas para elegir entre coordenadas globales y locales.
+cuanto a la organización en el directorio destino, crearon un sistema incremental para el nombrado automático de las distintas iteraciones \newline
+
+
+Se extrajeron los datos de interés de la tela y se convirtieron a formato CSV. 
+- EVA PAU base recorder, Autoselect de vertices
+- EVA investigación de incluir el collider (Signed Distance Fields, Contact Flags + impulso? (bool haColisionado), Campos voxelizados)
+- PAU guardado de csvs múltiples
+- PAU record automático
+- PAU snapshots
+- PAU volcado en memoria por intervalos
+- EVA debbug para recrear la simulación
+- EVA guardado del sdf y normales respecto a la bola
+- EVA distintos colliders combinación
+- PAU EVA global vs local soluciones investigación y pruebas
+- TODAS registro de las caracterísiticas de los datasets (.txt)
+
+como se ha mencionado, la incorporación de Sentis al flujo de trabajo 
+
+
+\newpage
 \section*{Mik}
-Muchas cosas.
+Dada la complejidad teórica del proyecto era esencial la coordinación de las distintas participantes, por lo que varias tareas se han llevado a cabo en colaboración, ya fuera de manera paralela o con intercambios consecutivos entre las colaboradoras del proyecto. Asímismo, la gestión logística del proyecto se ha desempeñado por todas las autoras: la comunicación con el tutor, la organización de los puntos a discutir en cada reunion, la redacción del acta de las mismas, la división de tareas y el seguimiento de estas en github, son algunos de los ejemplos. \newline
+
+Al inicio del proyecto se hizo un esfuerzo colectivo por investigar a cerca de las distintas investigaciones en curso relacionadas con el tema de estudio, hasta que se acabaron de concretar las necesidades específicas del proyecto. Posteriormente se indagó en mayor profundidad en las diversas investigaciones del estado del arte, en particular, Mikele se centró en las más recientes, como SNUG o HOOD, para intentar determinar de manera más informada el alcance de la investigación y las técnicas aplicables. \newline
+
+Implementó sus conocimientos en modelado procedural para conseguir rápida y flexiblemente algunos de los modelos necesarios para la generación de las simulaciones, estos modelos fueron creados utilizando el software de Houdini y posteriormente exportados a Unity. Otra de las tareas necesarias para la configuración de la escena de Unity fue aportar de aleatoriedad a la simulación. Para ello, ella implementó un sistema de generación de splines consecutivos que el objeto colisionador utilizaría como carril para sus movimientos. Las simulaciones seguirían siendo ajustadas indistintamente por todas las participantes del proyecto en los meses después de crear esta base; probando distintos parámetros para el componente de cloth de Unity, distintos tamaños o velocidades del colisionador, mallas con distintas topologías y demás adaptaciones.  \newline
+
+A la par que sus compañeras avanzaban con el desarrollo de la herramienta de grabación de las simulaciones, Mikele compenzó 
+Se creó una base de entrenamiento con Pytorch
+- MIK era una herramienta nueva así q investigación de recursos para aprender
+- MIK setup del environment de conda loooooooooooooooooooool
+- MIK carga del dataset
+- MIK limpieza de los datos
+- PAU normalización 
+- MIK PAU modelo básico setup d los archivos data/json/onnx
+- MIK métricas y gráficos
+- cn la base iteraciones TODAS distintos modelos y datasets
+- TODAS registro resultados
+- EVA setup patience
+- EVA onnx intermedios
