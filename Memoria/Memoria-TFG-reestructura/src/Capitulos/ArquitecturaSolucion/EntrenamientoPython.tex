@@ -1,7 +1,7 @@
 \section{La fase de entrenamiento}
 \label{sec:EntrenamientoPython}
 
-En este apartado se describen las fases de entrenamiento de los modelos, así como la evolución de los mismos y la serie de decisiones tomadas para conseguir esas adaptaciones. El código al que se hace referencia puede encontrarse en el directorio /Entrenamiento del repositorio de GitHub del proyecto \footnote{Enlace a la carpeta de entrenamiento: \url{https://github.com/mikeletzu/TFG_FisicaOptim/tree/23105b6733cacae9c708593f2d77a12faa2eb884/Entrenamiento}}. 
+En este apartado se describen las fases de entrenamiento de los modelos, así como la evolución de los mismos y la serie de decisiones tomadas para conseguir esas adaptaciones. El código al que se hace referencia puede encontrarse en el directorio /Entrenamiento del repositorio de GitHub del proyecto \footnote{Enlace a la carpeta de entrenamiento: \url{https://github.com/mikeletzu/TFG_FisicaOptim/tree/23105b6733cacae9c708593f2d77a12faa2eb884/Entrenamiento}}. No todas las implementaciones han sido favorables para el desarrollo del proyecto, por lo que algunas de ellas, que si bien no han resultado de gran utilidad han marcado el desarrollo del proyecto, se han desplazado al anexo \ref{appendix:otros}.
 
 \subsection{El entorno de trabajo}
 
@@ -101,7 +101,7 @@ Donde $\hat{\cdot}$ denota normalización, $n$ el número de vértices, $s_i$ el
 Partiendo de esta idea principal del entrenamiento, en los próximos apartados se explicarán las diferentes técnicas y tipos de redes implementadas para la optimización del mismo. Estas se eligen a partir de las dos nociones principales que guían el desarrollo de este proyecto: por un lado, combinar las técnicas óptimas y prometedoras de las investigaciones citadas en el estado del arte; y por otro, priorizar la simplicidad y accesibilidad de nuestro modelo en la plataforma elegida. Se han seleccionado redes específicas y características que permiten llegar a un movimiento de tela coherente, y sobre ellas se realizará posteriormente, en los capítulos \ref{cap:experimentos} y \ref{cap:evaluacionDiscusion}, una serie de experimentos y comparativas para medir su desempeño, así como una discusión y evaluación final respectivamente. Separamos las características que conforman los modelos en los siguientes campos:
 
 \subsubsection{Tipos de redes y recurrencia}
-Este estudio se ha enfocado en dos tipos de redes neuronales que se alienan con el objetivo de emplear modelos sencillos: los \textbf{perceptrones multicapa (MLP)} y las \textbf{redes neuronales recurrentes (RNN)}. Otras redes como las CNN o las GNNS han sido descartadas debido a la alta complejidad para representar y proporcionar los datos al modelo.
+Este estudio se ha enfocado en dos tipos de redes neuronales que se alienan con el objetivo de emplear modelos sencillos: los \textbf{perceptrones multicapa (MLP)} y las \textbf{redes neuronales recurrentes (RNN)}. Otras redes como las CNN o las GNNS han sido descartadas debido a la alta complejidad para representar y proporcionar los datos al modelo. 
 
 \begin{itemize}
     \item \cite{holden_subspace_2019} resalta el MLP como una red sencilla, computacionalmente más accesible que las CNNs empleadas en otros estudios, y que mantiene la capacidad de proporcionar resultados adecuados mediante técnicas adicionales, como hemos visto anteriormente, subespacios y correcciones en post-procesamiento. En este estudio se opta por incorporar una MLP con cuatro capas ocultas ReLU y una lineal para producir la salida (cinco capas densas). %REVISAR
