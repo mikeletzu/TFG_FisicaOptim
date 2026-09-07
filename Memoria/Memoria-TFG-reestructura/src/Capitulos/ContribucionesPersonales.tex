@@ -2,121 +2,6 @@
 \label{cap:contribucionesPersonales}
 \addcontentsline{toc}{chapter}{Contribuciones Personales}
 
-Logistica
-HORIZONTAL REPARTIDO MINI PARRAFO
-- comunicación con el tutor
-- anotar dudas/avances de cara a las reuniones
-- registro de las reuniones 
-- comunicación con externos marc
-- división de tareas y seguimiento en github
-
-
-Investigación previa
-- PAU setup zotero
-- PAU EVA MK lectura de papers inicial para encontrar el tema
-lectura extensa d investigación:
-- PAU PBD
-- EVA CNN PCA
-- MIK SNUG HOOD
-- EVA PAU investigación sobre otras técnicas (obi cloth, accel gpu, uniti cosas...) y otros repos PAU sentis
-
-
-Simulaciones 
-modelos 3d (blender y houdini) set maxdistance...
-- MIK init d unity (mientras ellas investigan)
-- EVA falda iteraciones
-- mov esático 
-- planos diff
-- camiseta
-- iterar sobre parametros del cloth
-- iterar sobre dinamismo interes d simula
-- PAU base mov bola
-- MIK splines mov bola (pathgen)
-- PAU manual mov bola
-- PAU lineal mov bola
-
-Se extrajeron los datos de interés de la tela y se convirtieron a formato CSV. 
-- EVA PAU base recorder, Autoselect de vertices
-- EVA investigación de incluir el collider (Signed Distance Fields, Contact Flags + impulso? (bool haColisionado), Campos voxelizados)
-- PAU guardado de csvs múltiples
-- PAU record automático
-- PAU snapshots
-- PAU volcado en memoria por intervalos
-- EVA debbug para recrear la simulación
-- EVA guardado del sdf y normales respecto a la bola
-- EVA distintos colliders combinación
-- PAU EVA global vs local soluciones investigación y pruebas
-- TODAS registro de las caracterísiticas de los datasets (.txt)
-
-Se creó una base de entrenamiento con Pytorch
-- MIK era una herramienta nueva así q investigación de recursos para aprender
-- MIK setup del environment de conda loooooooooooooooooooool
-- MIK carga del dataset
-- MIK limpieza de los datos
-- PAU normalización 
-- MIK PAU modelo básico setup d los archivos data/json/onnx
-- MIK métricas y gráficos
-- cn la base iteraciones TODAS distintos modelos y datasets
-- TODAS registro resultados
-- EVA setup patience
-- EVA onnx intermedios
-
-EVA MLP 
-- iteraciones...
-- EVA cambiar tipos de cell
-MIK RNN
-- EVA inv del optimizer mejor
-- MIK cnn
-
-error acumulado en tiempo de ejecución 
-- PAU inclusión de ruido en los datos de entrada
-- EVA anchored
-- MIK ... exito y TODAS ``unrolling''
-- TODAS función de pérdida
-
-Reducción de dimensionalidad:
-- EVA PCA
-- MIK ISMA random forest
-
-Sentis 
-- PAU crear base ClothML 
-gestión maxdistance
-framebuffer
-render d la tela / skinned / double ... al quitar cloth
-- MIK optimización input tensor solo en array
-- MIK Crear base para jerarquia (3 metod para child)
-- TODAS distintos clothML por cada tipo d modelo
-
-Se desarrolló una aplicación
-- MIK base d métricas 
-- MIK revamping d la UI
-- MIK menu y distintas escenas por experimento
-- EVA mejoró por q es perfekta
-
-experimentos
-- TODAS criterios d evaluación diseño
-reparto de los experimentos
-- TODAS setup escenas
-- TODAS elección a base de exp previos
-- TODAS tuning hiperparam
-- PAU pruebas de usuario diseño
-- PAU forms enviarlo tal
-- MIK sacar gráficos y métricas
-
-conclusiones
-- TODAS en consenso analisis d resultados, contrastar 
-
-memoria
-- setup latex
-- mucho escribir 
-- hacer figuras tal
-- capturas tal
-- corregir errores, revisión
-- ajuste normativa
-- correciones tutor
-- traducción al ingles
-
-\newpage
 \section*{Eva}
 Dada la complejidad teórica del proyecto era esencial la coordinación de las distintas participantes, por lo que varias tareas se han llevado a cabo en colaboración, ya fuera de manera paralela o con intercambios consecutivos entre las colaboradoras del proyecto. Asímismo, la gestión logística del proyecto se ha desempeñado por todas las autoras: la comunicación con el tutor, la organización de los puntos a discutir en cada reunion, la redacción del acta de las mismas, la división de tareas y el seguimiento de estas en github, son algunos de los ejemplos. \newline
 
@@ -147,27 +32,17 @@ Además de la investigación en el ámbito académico, Paula se encargó de hace
 
 Antes de llegar a la fase de inferencia, la estudiante creó la base del movimiento del objeto colisionador en la escena de la simulación. Lo dotó de un movimiento lineal automático, para poder comprobar las primeras iteraciones del modelo con datasets sencillos con overfitting, y un movimiento generado por el input del usuario en los ejes X y Z. Las simulaciones seguirían siendo ajustadas indistintamente por todas las participantes del proyecto en los meses después de crear esta base; probando distintos parámetros para el componente de cloth de Unity, distintos tamaños o velocidades del colisionador, mallas con distintas topologías y demás adaptaciones.\newline
 
-Para poder pasar a la fase de entrenamiento, fue esencial extraer los datos de cada vértice de la geometría a lo largo de los frames. Para ello se creó un sistema de grabación y registro, \textit{ClothDatasetRecoder}, basado en archivos CSV. Este trabajo fue llevado a cabo en estrecha colaboración con la compañera Eva Feliu Aréjola, entre las dos pudieron crear un sistema completo capaz de producir los datasets con la información pertinente. Partieron por diseñar la herramienta y las características necesarias para la grabación (que conformarían 13 features). Trabajó en un sistema de grabado por pasos en el que poder fijar el tiempo entre las capturas de la tela, asímismo, se optimizó el  implementando un volcado en memoria por intervalos. 
+Para poder pasar a la fase de entrenamiento, fue esencial extraer los datos de cada vértice de la geometría a lo largo de los frames. Para ello se creó un sistema de grabación y registro, \textit{ClothDatasetRecoder}, basado en archivos CSV. Este trabajo fue llevado a cabo en estrecha colaboración con la compañera Eva Feliu Aréjola, entre las dos pudieron crear un sistema completo capaz de producir los datasets con la información pertinente. Partieron por diseñar la herramienta y las características necesarias para la grabación (que conformarían 13 features). Trabajó en un sistema de grabado por pasos en el que poder fijar el tiempo entre las capturas de la tela, asímismo, se optimizó el mecanismo implementando un volcado en memoria por intervalos. Uno de los aspectos sobre los que iteraron fue traer el espacio de coordenadas al de la tela en todas las funciones, después de las pruebas realizadas para elegir entre coordenadas globales y locales. En cuanto a la organización en el directorio destino, crearon un sistema incremental para el nombrado automático de las distintas grabaciones. \newline
 
-Uno de los aspectos sobre los que iteraron fue traer el espacio de coordenadas al de la tela en todas las funciones, después de las pruebas realizadas para elegir entre coordenadas globales y locales.
-cuanto a la organización en el directorio destino, crearon un sistema incremental para el nombrado automático de las distintas iteraciones \newline
+Paula trabajó en la gestión de la normalización de los datos para su correcto entrenamiento. Para ello implementó la normalización tras la limpieza de los datasets, guardado las variables de normalización (la media y la desviación típica) en un archivo JSON para poder utilizar posteriormente en la fase de inferencia.  \newline 
 
+En referencia al desarrollo de los diferentes modelos, Paula trabajo de manera paralela a sus compañeras con las diversas iteraciones. Particularmente encontro la técnica de injección de ruido a los datos de entrada del modelo, que resultó ser muy beneficiosa para el control de los errores. \newline
 
-Se extrajeron los datos de interés de la tela y se convirtieron a formato CSV. 
-- EVA PAU base recorder, Autoselect de vertices
-- EVA investigación de incluir el collider (Signed Distance Fields, Contact Flags + impulso? (bool haColisionado), Campos voxelizados)
-- PAU guardado de csvs múltiples
-- PAU record automático
-- PAU snapshots
-- PAU volcado en memoria por intervalos
-- EVA debbug para recrear la simulación
-- EVA guardado del sdf y normales respecto a la bola
-- EVA distintos colliders combinación
-- PAU EVA global vs local soluciones investigación y pruebas
-- TODAS registro de las caracterísiticas de los datasets (.txt)
+A su vez, y para permitir la ejecución de los modelos en un entorno real de simulación, Paula comenzó con la integración del ML a Unity. Como se ha mencionado previamente, dio los primeros pasos de la incorporación de Sentis al flujo de trabajo. De tal manera que consiguió reemplazar el componente de cloth propio de Unity con un componente nuevo, \textit{ClothML}. El componente gestionaba los anclajes de la geometría, la extracción de datos de entrada, su gestión a través de un \textit{history buffer} para respetar la arquitectura \textit{many to one} la normalización de los mismos a través del JSON previamente mencionado, la conversión a un tensor adecuado para el modelo cargado, la ejecución del modelo de sentis, la extracción de los deltas de desplazamiento y la actualización de la tela a través de ellos. Considerando la naturaleza del proyecto, se iteró sobre esta base para crear las adaptaciones a distintos modelos y diversas optimizaciones y pruebas. \newline
 
-como se ha mencionado, la incorporación de Sentis al flujo de trabajo 
+Una vez el proyecto contaba con unos resultados sólidos, Paula diseñó las pruebas de usuario que permitirían a gente externa al proyecto evaluar la calidad de la inferencia de los modelos más óptimos. Para ello generó distintos videos de las simulaciones, preparó un formulario en Google Forms y redactó el mensaje para su posterior distribución. \newline
 
+En las últimas semanas de desarrollo colaboró con sus compañeras en llevar a cabo los experimentos diseñados y analizar los resultados. Así como la finalización de las escenas de los experimentos para la aplicación. Finalmente, como se ha mencionado como dinámica del equipo, se unió a tareas externas, resolución de bugs y modificaciones para conseguir llegar al punto final descrito en este proyecto, así como todos los experimentos necesarios para obtener las métricas de los experimentos y pruebas intermedias para el desarrollo. De la misma forma, colaboró activamente en la escritura de esta memoria, traducciones y sus posteriores revisiones.
 
 \newpage
 \section*{Mik}
@@ -177,16 +52,16 @@ Al inicio del proyecto se hizo un esfuerzo colectivo por investigar a cerca de l
 
 Implementó sus conocimientos en modelado procedural para conseguir rápida y flexiblemente algunos de los modelos necesarios para la generación de las simulaciones, estos modelos fueron creados utilizando el software de Houdini y posteriormente exportados a Unity. Otra de las tareas necesarias para la configuración de la escena de Unity fue aportar de aleatoriedad a la simulación. Para ello, ella implementó un sistema de generación de splines consecutivos que el objeto colisionador utilizaría como carril para sus movimientos. Las simulaciones seguirían siendo ajustadas indistintamente por todas las participantes del proyecto en los meses después de crear esta base; probando distintos parámetros para el componente de cloth de Unity, distintos tamaños o velocidades del colisionador, mallas con distintas topologías y demás adaptaciones.  \newline
 
-A la par que sus compañeras avanzaban con el desarrollo de la herramienta de grabación de las simulaciones, Mikele compenzó 
-Se creó una base de entrenamiento con Pytorch
-- MIK era una herramienta nueva así q investigación de recursos para aprender
-- MIK setup del environment de conda loooooooooooooooooooool
-- MIK carga del dataset
-- MIK limpieza de los datos
-- PAU normalización 
-- MIK PAU modelo básico setup d los archivos data/json/onnx
-- MIK métricas y gráficos
-- cn la base iteraciones TODAS distintos modelos y datasets
-- TODAS registro resultados
-- EVA setup patience
-- EVA onnx intermedios
+A la par que sus compañeras avanzaban con el desarrollo de la herramienta de grabación de las simulaciones, Mikele compenzó a indagar en la librería Pytorch. Al ser un entorno de trabajo nuevo para las integrantes, fue importante conseguir recursos de aprendizaje fiables para implementar la estructura base del entrenamiento. Uno de los aspectos más desafiantes a los tuvo que hacer frente fue la creación del environment de Conda, ya que tuvo que sincronizar las distintas librerías necesarias para el desarrollo de los modelos. Una vez conseguido un entorno de trabajo favorable, creó la primera iteración de los pasos del entrenamiento: una limpieza básica de los datos, un modelo simple que recibiera un dataset y lo entrenara y una serie de mátricas para evaluar estos modelos. Partiendo de esta base todas contribuyeron al desarrollo de estos scripts para implementar cada modelo experimental. \newline
+
+En cuanto a la evaluación de los modelos para hacer frente a los diversos errores encontrados en el proceso de desarrollo, Mikele empezó por implementar un modelo RNN. Este abrió un camino hacia las técnicas de sensibilización temporal. Llevó a cabo varias iteraciones para refinar la inferencia, sin embargo, el entrenamiento no conseguía aprender las dependencias temporales de manera óptima. Fue entonces que encontró la tecnica de unrolling, marcando un antes y después en el estudio. Esta técnica doto al modelo de la capacidad de autocorregirse. Similarmente, tuvieron que hacerse varias iteraciones para conseguir el modelo final, en lo que las compañeras participaron activamente. De la misma manera, en los pasos más avanzados del desarrollo, se hizo un esfuerzo congunto por valorar y elegir diferentes técnicas implementadas, las diferentes funciones de pérdida son un ejemplo de ello. En estos casos en los que más allá de la implementación hizo falta discutir los beneficios o perjuicios de distintos métodos, se participó en las pruebas y deliberación de manera colaborativa, llegando así a los modelos finales. \newline
+
+Mikele trabajó en varias de las técnicas fallidas implementadas, parte indispensable de un proyecto tan experimental como este. Probó distintas variables que podrían ayudar al entrenamiento, implemento un modelo CNN y adaptó la entrada de datos a este y llevó a cabo el flujo de trabajo completo (preparación de la simulación, grabación de datos, entrenamiento del modelo, incorporación en Unity y análisis) para una simulación estática controlada por 4 puntos con movimiento aleatorio.  \newline
+
+Por último en lo que se refiere al desarrollo inicial del entrenamiento también implementó las técnicas de elección de parámetros a través de modelos Random Forest. Posteriormente, se unió a sus compañeras en el ajuste de hiperparámetros y perfeccionamiento de los modelos. \newline
+
+En cuanto a la fase de indiferencia, Mikele adaptó la base proporcionada por su compañera Paula para adecuarla a la naturaleza del proyecto. Por un lado, dividió el componente en una base común a la inferencia de todos los modelos y distintos scripts para cada modelo con los métodos pertinentes. Por otro lado, optimizó la generación del tensor de input con una mejor gestión de la memoria dinámica del programa.  \newline
+
+En los últimos meses de desarrollo, Mikele empezó con la implementación de un sistema de recogida de métricas de rendimiento en una escena ideada para este tipo de pruebas. Posteriormente la convertiría en una aplicación completa con una interfaz para ejecutar los distintos experimentos del estudio. Eva colaboró con la implementación de la recogida del tiempo de inferencia de cada modelo. Consiguiendo así un apoyo visual e interactivo al resultado teórico del proyecto. \newline
+
+En las últimas semanas de desarrollo Mikele colaboró con sus compañeras en llevar a cabo los experimentos diseñados y analizar los resultados. También genero los gráficos para el análisis de las pruebas de usuario, y su posterior discusión. De la misma forma, colaboró activamente en la escritura de esta memoria, traducciones y sus posteriores revisiones.
