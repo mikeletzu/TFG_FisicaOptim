@@ -32,10 +32,10 @@ Para crear un entorno de trabajo adaptable, y asegurar la consistencia entre los
 \begin{enumerate}
 
     \item \textbf{Carga y procesamiento de datos}: 
-    Los datos se leen del archivo .csv utilizando la librería pandas, que permite llevar a cabo la limpieza fácilmente. Aunque es el dataset del modelo quien gestiona detalles como la coherencia de frames otorgados, intentar acceder al predecesor de un primer frame, se realiza una limpieza común previa del csv:
+    Los datos se leen del archivo .csv utilizando la librería pandas, que permite llevar a cabo la limpieza fácilmente. Pytorch proporciona dos primitivas de datos, \textit{DataSet} y \textit{DataLoader} para facilitar el manejo de detalles como la coherencia de frames otorgados, evitar los accesos fuera de rango, dividir los datos de entrenamiento y prueba y demás. Igualmente, se realiza una limpieza común previa del csv:
     \begin{itemize}
         \item Se elimina la columna "frame"\ de la tabla, ya que no aporta información pertinente para el aprendizaje. Su función es meramente auxiliar para depurar.
-        \item Asímismo, en los casos que se explicarán más adelante, muchos de los parámetros registrados no son necesarios, se filtran esas columnas para no sobrecargar innecesariamente el dataset.
+        \item Asímismo, como se ha mencionado en \ref{sec:ElecFin}, en varios casos muchos de los parámetros registrados no son necesarios, se filtran esas columnas para no sobrecargar innecesariamente el dataset.
     \end{itemize}
     Tras hacer la limpieza de los datos estos se transforman al formato de tensores de Pytorch. 
 
