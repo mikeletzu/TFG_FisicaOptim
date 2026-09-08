@@ -11,3 +11,11 @@ simulation**" in the Degree in Videogame Development at the Universidad Complute
 Este trabajo realiza una comparativa de distintos modelos y técnicas de IA que logran replicar simulaciones físicas costosas en proyectos 3D en motores de videojuegos.
 -
 This work compares different AI models and techniques to replicate physics simulations with high computational cost in 3D videogame engines.
+
+Las carpetas contienen:
+-
+- Build_ClothML: la aplicación auxiliar a los experimentos.
+- Entrenamiento: los archivos necesarios para entrenar los modelos
+- Memoria: el proyecto de latex de la memoria
+- PruebaCloth: el proyecto de Unity de la aplicación 
+- PruebasUsuarios: los resultados de las pruebas de usuario y vídeos auxiliares
