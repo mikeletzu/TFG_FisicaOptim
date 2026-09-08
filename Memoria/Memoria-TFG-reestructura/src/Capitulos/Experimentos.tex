@@ -68,7 +68,7 @@ Para analizar la importancia de la memoria recurrente de los modelos, en los cas
             16 & 24 & 3\% & 0.001 & 25000 & 32 \\ \hline
         \end{tabular}
             \end{center}
-    \caption{Hiperparámetros y configuración del entrenamiento.}
+    \caption{Hiperparámetros y configuración del entrenamiento (Recurrencia).}
     \label{tab:randomTraining}
 \end{table}
 Las métricas obtenidas son las siguientes:
@@ -77,11 +77,11 @@ Las métricas obtenidas son las siguientes:
     \begin{center}
         \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.6cm} | m{1.2cm} |}
         \hline \textbf{Prueba} & \textbf{T entrenamiento} & \textbf{T inferencia} & \textbf{Error medio por vertice} & \textbf{FPS} \\ \hline
-            MLP & 8h(gpu) & 2.25952ms & 0.001929 & 0 \\ \hline
-            RNN & 18h(gpu) & 2.58243ms & 0.002 & 0 \\ \hline
+            MLP & 8h(gpu) & 2.25952ms & 0.001929 & 423 \\ \hline
+            RNN & 18h(gpu) & 2.58243ms & 0.002 & 429 \\ \hline
         \end{tabular}
     \end{center}
-    \caption{Resultados del entrenamiento en base al rendimiento.}
+    \caption{Resultados del entrenamiento en base al rendimiento (Recurrencia).}
     \label{tab:rendResults}
 \end{table}
 
@@ -110,11 +110,11 @@ Se concluyen las siguientes puntuaciones de calidad visual:
     \begin{center}
         \begin{tabular}{ | m{2cm} |  m{2.6cm} | m{2.8cm} | m{2.6cm} | m{2.7cm} |}
         \hline \textbf{Prueba} & \textbf{Reactividad} & \textbf{Conservación} & \textbf{Estabilidad} & \textbf{Credibilidad} \\ \hline
-            MLP & 8/10 & 4/10 & 10/10 & 3/10 \\ \hline
-            RNN & 8/10 & 8/10 & 10/10 & 4/10 \\ \hline
+            MLP & 1/3 & 0/3 & 1/3 & 2/3  \\ \hline
+            RNN & 1/3 & 3/3 & 3/3 & 2/3 \\ \hline
         \end{tabular}
     \end{center}
-    \caption{Resultados del entrenamiento en base a la percepción.}
+    \caption{Resultados del entrenamiento en base a la percepción (Recurrencia).}
     \label{tab:visResults}
 \end{table}
 
@@ -123,16 +123,17 @@ Con esta metodología y técnicas concretas, compensa mantener la recurrencia pa
 \section{Unrolling}
 Como se ha expuesto anteriormente, esta es una técnica que resulta ser muy útil en la autocorreción del modelo; este experimento pretende valorar su repercusión en la calidad visual de la simulación. Se realiza el experimento modificando la secuencia de entrada del RNN entre 1 y 24 frames futuras, de tal modo, pueden compararse los efectos del unrolling con un modelo análogo que solo infiere un frame, es decir, un modelo sin unrolling. El resto de parámetros se mantienen consisitentes con los de la prueba anterior. \newline
 
-En la siguiente tabla, \ref{tab:rendResultsUnroll}, pueden verse los resultados en cuanto al rendimiento:
+En la siguiente tabla, \ref{tab:rendResultsUnroll}, pueden verse los resultados en cuanto al rendimiento. Es interesante subrayar la diferencia entre los errores medios por vértice, esto se debe a que dada la tendencia del modelo con unrolling a la autocorrección la inferencia de cada paso puede ser menos acertada, aunque a largo plazo eso le permite corromperse menos.
+
 \begin{table}[H]
     \begin{center}
         \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.6cm} | m{1.2cm} |}
         \hline \textbf{Rolling steps} & \textbf{T entrenamiento} & \textbf{T inferencia} & \textbf{Error medio por vertice} & \textbf{FPS} \\ \hline
-            1 & 1.5h(gpu) & 0.0ms & 0.0008 & 0 \\ \hline
-            24 & 18h(gpu) & 2.58243ms & 0.002 & 0 \\ \hline
+            1 & 1.5h(gpu) & 2.17ms & 0.0008 & 427 \\ \hline
+            24 & 18h(gpu) & 2.17ms & 0.0013 & 429 \\ \hline
         \end{tabular}
     \end{center}
-    \caption{Resultados de los entrenamientos en base al rendimiento.}
+    \caption{Resultados de los entrenamientos en base al rendimiento (Unrrolling).}
     \label{tab:rendResultsUnroll}
 \end{table}
 
@@ -151,11 +152,11 @@ Por otro lado, es interesante recalcar que el modelo sin unrolling permite más 
     \begin{center}
         \begin{tabular}{ | m{2cm} |  m{2.6cm} | m{2.8cm} | m{2.6cm} | m{2.7cm} |}
         \hline \textbf{Rolling steps} & \textbf{Reactividad} & \textbf{Conservación} & \textbf{Estabilidad} & \textbf{Credibilidad} \\ \hline
-            1 & 0/3 & 0/3 & 0/3 & 0/3 \\ \hline
-            24 & 0/3 & 0/3 & 0/3 & 0/3 \\ \hline
+            1 & 2/3 & 1/3 & 3/3 & 2/3 \\ \hline
+            24 & 1/3 & 3/3 & 3/3 & 2/3 \\ \hline
         \end{tabular}
     \end{center}
-    \caption{Resultados de los entrenamientos en base a la percepción.}
+    \caption{Resultados de los entrenamientos en base a la percepción (Unrrolling).}
     \label{tab:visResultsUnfold}
 \end{table}
 
@@ -173,7 +174,7 @@ Ambas pruebas siguen los parámetros:
             16 & 24 & 3\% & 0.001 & 25000 & 32 \\ \hline
         \end{tabular}
             \end{center}
-    \caption{Hiperparámetros y configuración del entrenamiento.}
+    \caption{Hiperparámetros y configuración del entrenamiento (Velocidad).}
     \label{tab:randomTraining}
 \end{table}
 
@@ -182,12 +183,12 @@ Los resultados son los siguientes:
 \begin{table}[H]
     \begin{center}
         \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.6cm} | m{1.2cm} |}
-        \hline \textbf{Prueba} & \textbf{T entrenamiento} & \textbf{T inferencia} & \textbf{Error medio por vertice} & \textbf{FPS} \\ \hline
-            Pos & 18h(gpu) & 2.25952ms & 0.001929m & 417 \\ \hline
-            Pos + Vel & 18h(gpu) & 0.0ms & 0.000942m & 407 \\ \hline
+        \hline \textbf{Prueba} & \textbf{T entrenamiento} & \textbf{T inferencia} & \textbf{Error medio por vértice} & \textbf{FPS} \\ \hline
+            Pos & 18h(gpu) & 2.25952ms & 0.0013m & 413 \\ \hline
+            Pos + Vel & 18h(gpu) & 0.0ms & 0.0009m & 411 \\ \hline
         \end{tabular}
     \end{center}
-    \caption{Resultados del entrenamiento en base al rendimiento.}
+    \caption{Resultados del entrenamiento en base al rendimiento (Velocidad).}
     \label{tab:rendResults}
 \end{table}
 
@@ -216,11 +217,11 @@ Visto esto, se concluyen las siguientes puntuaciones a nivel visual:
     \begin{center}
         \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.8cm} | m{2.8cm} |}
         \hline \textbf{Prueba} & \textbf{Reactividad} & \textbf{Conservación} & \textbf{Estabilidad} & \textbf{Credibilidad} \\ \hline
-            Pos & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
-            Pos + Vel & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
+            Pos         & 1/3 & 3/3 & 3/3 & 2/3 \\ \hline
+            Pos + Vel   & 2/3 & 0/3 & 1/3 & 1/3 \\ \hline
         \end{tabular}
     \end{center}
-    \caption{Resultados del entrenamiento en base a la percepción.}
+    \caption{Resultados del entrenamiento en base a la percepción (Velocidad).}
     \label{tab:visResults}
 \end{table}
 
@@ -238,7 +239,7 @@ Ambas pruebas comparten los parámetros:
             16 & 24 & 3\% & 0.001 & 25000 & 32 \\ \hline
         \end{tabular}
             \end{center}
-    \caption{Hiperparámetros y configuración del entrenamiento.}
+    \caption{Hiperparámetros y configuración del entrenamiento (PCA).}
     \label{tab:randomTraining}
 \end{table}
 
@@ -246,12 +247,12 @@ Los resultados son los siguientes:
 \begin{table}[H]
     \begin{center}
         \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.6cm} | m{1.2cm} |}
-        \hline \textbf{Prueba} & \textbf{T entrenamiento} & \textbf{T inferencia} & \textbf{Error medio por vertice} & \textbf{FPS} \\ \hline
-            RNN & 18h(gpu) & 0.0ms & 0.001929m & 444 \\ \hline
-            RNN + PCA & 19h(gpu) & 0.0ms & 0.005298m & 472 \\ \hline
+        \hline \textbf{Prueba} & \textbf{T entrenamiento} & \textbf{T inferencia} & \textbf{Error medio por vértice} & \textbf{FPS} \\ \hline
+            RNN & 18h(gpu) & 2.17ms & 0.0013 & 444 \\ \hline
+            RNN + PCA & 19h(gpu) & 1.89ms & 0.005298m & 472 \\ \hline
         \end{tabular}
     \end{center}
-    \caption{Resultados del entrenamiento en base al rendimiento.}
+    \caption{Resultados del entrenamiento en base al rendimiento (PCA).}
     \label{tab:rendResults}
 \end{table}
 
@@ -278,11 +279,11 @@ Adicionalmente a este experimento, se han realizado pequeñas pruebas que han co
     \begin{center}
         \begin{tabular}{ | m{2.2cm} |  m{2.8cm} | m{2.8cm} | m{2.8cm} | m{2.8cm} |}
         \hline \textbf{Prueba} & \textbf{Reactividad} & \textbf{Conservación} & \textbf{Estabilidad} & \textbf{Credibilidad} \\ \hline
-            Basic & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
-            PCA & 0/10 & 0/10 & 0/10 & 0/10 \\ \hline
+            RNN         & 1/3 & 3/3 & 3/3 & 2/3 \\ \hline
+            RNN + PCA & 1/3 & 2/3 & 3/3 & 1/3 \\ \hline
         \end{tabular}
     \end{center}
-    \caption{Resultados del entrenamiento en base a la percepción.}
+    \caption{Resultados del entrenamiento en base a la percepción (PCA).}
     \label{tab:visResults}
 \end{table}
 
