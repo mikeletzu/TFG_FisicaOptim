@@ -4227,7 +4227,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ClothMLpca
   ball: {fileID: 339546644}
   ballCollider: {fileID: 339546646}
-  modelAsset: {fileID: 5022602860645237092, guid: 7c5fde94bd11a2c4db6cd539e83d3dbe, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 713950b27ecc8514aa8194703d9d9ec0, type: 3}
   clothMeshFilter: {fileID: 1554518662}
   contador: 0
   vertexCount: 0
