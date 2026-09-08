@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using Newtonsoft.Json;
 using Unity.InferenceEngine;
 using UnityEngine;
-using Newtonsoft.Json;
+using Debug = UnityEngine.Debug;
 
 public class ClothMLpca : MonoBehaviour
 {
@@ -18,7 +21,7 @@ public class ClothMLpca : MonoBehaviour
     Tensor<float> inputTensor;
 
     public int contador = 0;
-    int vertexCount;
+    public int vertexCount;
 
     public int seqLen = 8; //8
     private int numFeatures = 4;
@@ -71,7 +74,15 @@ public class ClothMLpca : MonoBehaviour
     // num_vertices * 13 features: x,y,z,vx,vy,vz,sdf,nx,ny,nz,maxDist,u,v
     private int rawFeatureSize;
 
-    void Awake()
+	// Midiendo tiempos de tratado de datos y modelo 
+	protected Stopwatch stopwatch;
+
+	private List<double> inferenceArchive;
+	private double inferenceTime;
+
+	private int inferenceFrames = 0;
+
+	void Awake()
     {
         if (jsonFile != null)
             normData = JsonConvert.DeserializeObject<NormalizationData>(jsonFile.text);
@@ -153,7 +164,12 @@ public class ClothMLpca : MonoBehaviour
         for (int t = 0; t < seqLen; t++)
             for (int c = 0; c < optimalN; c++)
                 historyBuffer[t, c] = initialPCA[c];
-    }
+
+		stopwatch = new Stopwatch();
+
+		inferenceTime = 0; inferenceFrames = 0;
+		inferenceArchive = new List<double>();
+	}
 
     void FixedUpdate()
     {
@@ -178,12 +194,25 @@ public class ClothMLpca : MonoBehaviour
             for (int c = 0; c < optimalN; c++)
                 inputTensor[0, t, 0, c] = historyBuffer[t, c];
 
-        // 4. Ejecutar modelo
-        worker.Schedule(inputTensor);
+		// 4. Ejecutar modelo
+		// Medimos tiempo de inferencia
+		stopwatch.Restart();
+		worker.Schedule(inputTensor);
         using var output = worker.PeekOutput() as Tensor<float>;
         var result = output.ReadbackAndClone();
+		// Debug inference time
+		stopwatch.Stop();
+		UnityEngine.Debug.Log($"Elapsed: {stopwatch.Elapsed}");
+		inferenceTime += stopwatch.Elapsed.TotalMilliseconds; inferenceFrames++;
+		if (inferenceFrames >= 60)
+		{
+			UnityEngine.Debug.Log($"Media de frames: {stopwatch.Elapsed}");
+			inferenceArchive.Add(inferenceTime / inferenceFrames);
+			inferenceFrames = 0;
+			inferenceTime = 0;
+		}
 
-        // 5. Reconstruir pose deshaciendo PCA
+		// 5. Reconstruir pose deshaciendo PCA
 		Vector3[] newVertices = new Vector3[vertexCount];
 
         // Desnormalizacion delta e integración
@@ -329,8 +358,19 @@ public class ClothMLpca : MonoBehaviour
         return pca;
     }
 
-    void OnDestroy()
+	public void VolcarTiempos()
+	{
+		string filePath = Application.persistentDataPath + "/debugInferencePCA.txt";
+
+		foreach (double arc in inferenceArchive)
+		{
+			File.WriteAllText(filePath, arc + "\n");
+		}
+	}
+
+	void OnDestroy()
     {
-        worker?.Dispose();
+		VolcarTiempos();
+		worker?.Dispose();
     }
 }

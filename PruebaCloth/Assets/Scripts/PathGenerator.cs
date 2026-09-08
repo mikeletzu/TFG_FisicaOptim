@@ -55,15 +55,15 @@ public class PathGenerator : MonoBehaviour
 
         knots[0] = new BezierKnot(
                 pathPoints[0],
-                -1 * Vector3.right,
-                1 * Vector3.right);
+                -2 * Vector3.right,
+                2 * Vector3.right);
 
         for (int i = 1; i < pathPoints.Length; i++)
         {
 			knots[i] = new BezierKnot(
 	        (float3)BallPath.transform.InverseTransformPoint(pathPoints[i]),
-	        -1 * Vector3.right,
-	         1 * Vector3.right);
+	        -2 * Vector3.right,
+	         2 * Vector3.right);
 		}
 
         container.Spline.Knots = knots;
