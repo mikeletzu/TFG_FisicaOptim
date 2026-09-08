@@ -45,7 +45,7 @@ public class BallMovement : MonoBehaviour
     {
         // Movemos a la bola según el input en tres ejes
         // X
-        if (Input.GetKey(KeyCode.D)) // Establecer límites para el movimiento?
+        if (Input.GetKey(KeyCode.D))
         {
             transform.position += Vector3.right * Time.deltaTime * movementSpeed;
         }

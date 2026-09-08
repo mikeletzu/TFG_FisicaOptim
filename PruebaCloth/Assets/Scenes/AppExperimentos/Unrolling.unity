@@ -1943,7 +1943,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &512484658
 Transform:
   m_ObjectHideFlags: 0
@@ -4134,7 +4134,6 @@ GameObject:
   - component: {fileID: 1554518662}
   - component: {fileID: 1554518661}
   - component: {fileID: 1554518660}
-  - component: {fileID: 1554518664}
   m_Layer: 0
   m_Name: MLRotPlaneLow
   m_TagString: Untagged
@@ -4157,10 +4156,10 @@ MonoBehaviour:
   sphereColliders:
   - {fileID: 339546646}
   capsuleColliders: []
-  modelAsset: {fileID: 5022602860645237092, guid: 28ff8a1012058db449e24c2909ee7ce3, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 30e39674d45ad5044b169376e90847ec, type: 3}
   clothMeshFilter: {fileID: 1554518662}
   collidersUnionSmoothness: 0
-  jsonFile: {fileID: 4900000, guid: 13beecb2d44ac1f4986064bceb5dc259, type: 3}
+  jsonFile: {fileID: 4900000, guid: 10d7fc59b63a04442a3cbb0039484f3e, type: 3}
   normData:
     mean: []
     std: []
@@ -4240,18 +4239,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 512484658}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1554518664
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1554518656}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a5b507bfe94e534da933e56d3fafe33, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ClothMLPosCNNRecChild
 --- !u!1 &1554777247
 GameObject:
   m_ObjectHideFlags: 0
@@ -4840,10 +4827,10 @@ MonoBehaviour:
   sphereColliders:
   - {fileID: 339546646}
   capsuleColliders: []
-  modelAsset: {fileID: 5022602860645237092, guid: dcc6daa641c912d42b3f7a2717cf7983, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 2da7aa82cdc46ba4ba8b3d3c66b096ab, type: 3}
   clothMeshFilter: {fileID: 1872676682}
   collidersUnionSmoothness: 0
-  jsonFile: {fileID: 4900000, guid: 21cc01afa7663284f9526d503e1050cb, type: 3}
+  jsonFile: {fileID: 4900000, guid: a178b841337c25e4aade1c9c0e97a87d, type: 3}
   normData:
     mean: []
     std: []

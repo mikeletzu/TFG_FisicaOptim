@@ -29,11 +29,8 @@ public class ClothMLPosVelRec : MonoBehaviour
 
 	private int inferenceFrames = 0;
 
-	// --- NUEVO: Parámetros de la Secuencia ---
 	[SerializeField]
     public int seqLen = 5;
-    // Buffer para guardar el estado normalizado de los últimos 5 frames
-    // [tiempo, vertice, feature]
     private float[,,] historyBuffer;
 
     public TextAsset jsonFile;
@@ -74,32 +71,12 @@ public class ClothMLPosVelRec : MonoBehaviour
 
         maxDistance = new float[vertexCount];
         historyBuffer = new float[seqLen, vertexCount, numFeatures];
-        
-        // Definir puntos anclados (0 = se mueve)
-        int i = 0;
-        //MINI
-        //for (; i < 4; i++)
-        //{
-        //    maxDistance[i] = 1.0f;
-        //}
-        while (i < vertexCount)
-        {
-            maxDistance[i] = 0.2f;
-            i++;
-        }
-        ////MAX
-        maxDistance[11] = 0f;
-        maxDistance[12] = 0f;
-        maxDistance[18] = 0f;
-        maxDistance[22] = 0f;
-        maxDistance[24] = 0f;
 
-		// --- NUEVO: Llenar el buffer inicial ---
-		// Para que los primeros frames no sean nulos, llenamos la historia
-		// asumiendo que la tela está quieta en su posición inicial.
 
-		
-		for (int t = 0; t < seqLen; t++)
+        maxDistance = Utils.setMaxDistance(vertexCount);
+
+
+        for (int t = 0; t < seqLen; t++)
         {
             for (int v = 0; v < vertexCount; v++)
             {
@@ -148,7 +125,6 @@ public class ClothMLPosVelRec : MonoBehaviour
 		for (int i = 0; i < vertexCount; i++)
         {
             Vector3 pos = vertices[i];
-            //Vector3 vel = Vector3.zero;
             Vector3 vel = (pos - lastVertexPositions[i]) / Time.fixedDeltaTime;
 
             float sdf = Vector3.Distance(pos, transform.InverseTransformPoint(ball.transform.position)) - ballCollider.radius;
@@ -184,7 +160,6 @@ public class ClothMLPosVelRec : MonoBehaviour
             }
         }
 
-		// lastVertexPositions = vertices;
 
 		// 4. Ejecutar modelo
 		// Medimos tiempo de inferencia
@@ -208,12 +183,10 @@ public class ClothMLPosVelRec : MonoBehaviour
 
         for (int i = 0; i < vertexCount; i++)
         {
-            // --- NUEVO: Comprobamos si el vértice está anclado ---
-            // Si maxDistance es 0, el vértice no debe moverse bajo ninguna circunstancia
             if (maxDistance[i] == 0f)
             {
                 newVertices[i] = vertices[i];
-                continue; // Pasamos al siguiente vértice
+                continue; 
             }
 
             // Denormalizamos el desplazamiento predicho
@@ -226,8 +199,6 @@ public class ClothMLPosVelRec : MonoBehaviour
                 (normData.target_std[1] * dy) + normData.target_mean[1],
                 (normData.target_std[2] * dz) + normData.target_mean[2]
             );
-
-            //displacement = Vector3.ClampMagnitude(displacement, 0.05f);
 
             // Aplicamos el desplazamiento a la posición actual (en local)
             newVertices[i] = vertices[i] + displacement;

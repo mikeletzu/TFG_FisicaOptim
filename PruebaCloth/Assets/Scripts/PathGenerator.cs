@@ -37,8 +37,7 @@ public class PathGenerator : MonoBehaviour
 			    pathPoints[1] = new float3(limitMin.x, UnityEngine.Random.Range(limitMin.y, limitMax.y), UnityEngine.Random.Range(limitMin.z, limitMax.z));
 		}
         else{
-            // quitar for que solo sea uno 
-		    for (int i = 1; i < length; i++) // si estoy en caja limitmina si no b
+		    for (int i = 1; i < length; i++)
             {
                 pathPoints[i] = new float3(UnityEngine.Random.Range(limitMin.x, limitMax.x), UnityEngine.Random.Range(limitMin.y, limitMax.y), UnityEngine.Random.Range(limitMin.z, limitMax.z));
             }

@@ -23,14 +23,13 @@ public class ClothMLpca : MonoBehaviour
     public int contador = 0;
     public int vertexCount;
 
-    public int seqLen = 8; //8
+    public int seqLen = 8;
     private int numFeatures = 4;
     // Buffer en espacio PCA: [seqLen, optimal_n]
     private float[,] historyBuffer;
     private int optimalN;
 
-    // FIX: guardamos posiciones predichas (no reales del mesh externo)
-    // para calcular la velocidad de la misma forma que hizo el entrenamiento.
+    // se guardan las posiciones predichas
     private Vector3[] lastPredictedPositions;
 
     // Cache de matrices PCA en formato optimizado para evitar recalcular cada frame
@@ -45,10 +44,10 @@ public class ClothMLpca : MonoBehaviour
     [System.Serializable]
     public class NormalizationData
     {
-        public float[] input_scaler_mean;   // longitud = num_vertices * 13
-        public float[] input_scaler_std;    // longitud = num_vertices * 13
+        public float[] input_scaler_mean;   // longitud = num_vertices
+        public float[] input_scaler_std;    // longitud = num_vertices
         public float[] pca_components;      // aplanado: optimal_n × (num_vertices*13)
-        public float[] pca_mean;            // longitud = num_vertices*13
+        public float[] pca_mean;            // longitud = num_vertices
         public float[] target_pca_mean;
         public float[] target_pca_std;
         public int optimal_n;
@@ -56,22 +55,9 @@ public class ClothMLpca : MonoBehaviour
 		public float[] pca_min;
 		public float[] pca_max;
 	}
- //   [System.Serializable]
 
- //   public class NormalizationData
-	//{
-	//	public float[] input_scaler_mean;   // longitud = num_vertices * 13
-	//	public float[] input_scaler_std;    // longitud = num_vertices * 13
-	//	public float[] pca_components;      // aplanado: optimal_n × (num_vertices*13)
-	//	public float[] pca_mean;            // longitud = num_vertices*13
-	//	public float[] target_mean;
-	//	public float[] target_std;
-	//	public int optimal_n;
-	//	public int num_vertices;
-	//}
 	public NormalizationData normData;
 
-    // num_vertices * 13 features: x,y,z,vx,vy,vz,sdf,nx,ny,nz,maxDist,u,v
     private int rawFeatureSize;
 
 	// Midiendo tiempos de tratado de datos y modelo 
@@ -97,13 +83,11 @@ public class ClothMLpca : MonoBehaviour
         vertexCount = clothMeshFilter.mesh.vertexCount;
 
         optimalN = normData.optimal_n;
-        rawFeatureSize = normData.num_vertices * numFeatures; // x,y,z, sdf /o/ ,vx,vy,vz,sdf,nx,ny,nz,md,u,v
+        rawFeatureSize = normData.num_vertices * numFeatures;
 
         maxDistance = new float[vertexCount];
         historyBuffer = new float[seqLen, optimalN];
 
-        // FIX: inicializamos con las posiciones reales del mesh,
-        // igual que hace el entrenamiento en el primer frame.
         lastPredictedPositions = new Vector3[vertexCount];
         Vector3[] initialVerts = clothMeshFilter.mesh.vertices;
         for (int i = 0; i < vertexCount; i++)
@@ -122,36 +106,8 @@ public class ClothMLpca : MonoBehaviour
             for (int f = 0; f < rawFeatureSize; f++)
                 pcaComponents[c, f] = normData.pca_components[c * rawFeatureSize + f];
 
-        // Definir puntos anclados (maxDistance = 0 → no se mueven)
-        // Definir puntos anclados (0 = se mueve)
-        int j = 0;
-        //MINI
-        //for (; j < 4; j++)
-        //{
-        //    maxDistance[j] = 1.0f;
-        //}
-        while (j < vertexCount)
-        {
-            maxDistance[j] = 1.0f;
-            j++;
-        }
-        //MAX
-        maxDistance[11] = 0f;
-        maxDistance[12] = 0f;
-        maxDistance[18] = 0f;
-        maxDistance[22] = 0f;
-        maxDistance[24] = 0f;
 
-        /* // Falda 32 v
-        maxDistance[2] = 0f;
-        maxDistance[3] = 0f;
-        maxDistance[4] = 0f;
-        maxDistance[6] = 0f;
-        maxDistance[8] = 0f;
-        maxDistance[10] = 0f;
-        maxDistance[12] = 0f;
-        maxDistance[14] = 0f;
-        */
+        maxDistance = Utils.setMaxDistance(vertexCount);
 
         int expectedSize = optimalN * rawFeatureSize;
         int actualSize = normData.pca_components.Length;
@@ -182,8 +138,6 @@ public class ClothMLpca : MonoBehaviour
                 historyBuffer[t, c] = historyBuffer[t + 1, c];
 
         // 2. Calcular PCA del frame actual
-        //    FIX: pasamos lastPredictedPositions (no mesh.vertices del frame anterior)
-        //    para que la velocidad sea consistente con el entrenamiento.
         float[] currentPCA = ComputePCAFrame(vertices, lastPredictedPositions);
         for (int c = 0; c < optimalN; c++)
             historyBuffer[seqLen - 1, c] = currentPCA[c];
@@ -252,31 +206,10 @@ public class ClothMLpca : MonoBehaviour
             newVertices[v] = new Vector3(raw[b], raw[b + 1], raw[b + 2]);
         }
 
-        //// 5. Aplicar predicciones
-
-        //for (int i = 0; i < vertexCount; i++)
-        //{
-        //    if (maxDistance[i] == 0f)
-        //    {
-        //        newVertices[i] = vertices[i];
-        //        continue;
-        //    }
-
-
-        //    float dx = result[0, i, 0] * normData.target_pca_std[0] + normData.target_pca_mean[0];
-        //    float dy = result[0, i, 1] * normData.target_pca_std[1] + normData.target_pca_mean[1];
-        //    float dz = result[0, i, 2] * normData.target_pca_std[2] + normData.target_pca_mean[2];
-
-        //    newVertices[i] = vertices[i] + new Vector3(dx, dy, dz);
-        //}
-
         mesh.SetVertices(newVertices);
         mesh.RecalculateNormals();
         mesh.RecalculateBounds();
 
-        // FIX: guardamos las posiciones PREDICHAS (newVertices), no las originales del mesh.
-        // Así la velocidad del siguiente frame es (pred_t - pred_{t-1}) / dt,
-        // igual que ocurre en el training loop tras aplicar el rollout.
         for (int v = 0; v < vertexCount; v++)
             lastPredictedPositions[v] = newVertices[v];
 
@@ -300,52 +233,37 @@ public class ClothMLpca : MonoBehaviour
         var normals = clothMeshFilter.mesh.normals;
         var uvs = clothMeshFilter.mesh.uv;
 
-        // ── Paso 1: vector plano raw ──────────────────────────────────
+        // 1. vector plano raw
         float[] raw = new float[rawFeatureSize];
 
-        // FIX: el SDF se calcula en espacio local del transform de la tela.
-        // ball.transform.position está en world space → transformamos a local.
         Vector3 ballPosLocal = transform.InverseTransformPoint(ball.transform.position);
 
         for (int v = 0; v < normData.num_vertices; v++)
         {
             Vector3 pos = verts[v];  // ya en espacio local (mesh.vertices)
 
-            // FIX: velocidad desde posiciones predichas del frame anterior
             Vector3 vel = (pos - prevPositions[v]) / Time.fixedDeltaTime;
 
-            // FIX: SDF coherente — pos y ballPosLocal ambos en espacio local
             float sdf = Vector3.Distance(pos, ballPosLocal) - ballCollider.radius;
-
-            //Vector3 normal = (v < normals.Length) ? normals[v] : Vector3.up;
 
             int f = v * numFeatures;
             raw[f++] = pos.x;
             raw[f++] = pos.y;
             raw[f++] = pos.z;
-            //raw[f++] = vel.x;
-            //raw[f++] = vel.y;
-            //raw[f++] = vel.z;
             raw[f++] = sdf;
-            //raw[f++] = normal.x;
-            //raw[f++] = normal.y;
-            //raw[f++] = normal.z;
-            //raw[f++] = (v < maxDistance.Length) ? maxDistance[v] : 0f;
-            //raw[f++] = (v < uvs.Length) ? uvs[v].x : 0f;
-            //raw[f] = (v < uvs.Length) ? uvs[v].y : 0f;
         }
 
-        // ── Paso 2: StandardScaler ────────────────────────────────────
+        // 2. StandardScaler 
         float[] scaled = new float[rawFeatureSize];
         for (int f = 0; f < rawFeatureSize; f++)
             scaled[f] = (raw[f] - scalerMean[f]) / scalerStd[f];
 
-        // ── Paso 3: centrar con pca_mean ─────────────────────────────
+        // 3. centrar con pca_mean 
         float[] centered = new float[rawFeatureSize];
         for (int f = 0; f < rawFeatureSize; f++)
             centered[f] = scaled[f] - pcaMean[f];
 
-        // ── Paso 4: proyección PCA ────────────────────────────────────
+        // 4. proyección PCA 
         float[] pca = new float[optimalN];
         for (int c = 0; c < optimalN; c++)
         {

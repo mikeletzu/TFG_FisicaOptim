@@ -24,6 +24,7 @@ public class DataVerifier : MonoBehaviour
     void Start()
     {
         targetMesh = GetComponent<MeshFilter>().mesh;
+        
         // Optimizamos el mesh para actualizaciones frecuentes
         targetMesh.MarkDynamic();
 
@@ -49,7 +50,6 @@ public class DataVerifier : MonoBehaviour
         {
             string[] values = lines[i + 1].Split(',');
 
-            // Según tu CSV: col 0 es 'frame', luego cada vértice tiene 13 parámetros:
             // x, y, z, vx, vy, vz, sdf, nx, ny, nz, md, u, v
             int vertexCount = (values.Length - 1) / 13;
             animationFrames[i] = new Vector3[vertexCount];
