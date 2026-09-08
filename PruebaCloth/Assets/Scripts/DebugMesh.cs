@@ -4,10 +4,9 @@ using UnityEngine;
 
 public class DebugMesh : MonoBehaviour
 {
-	// Start is called once before the first execution of Update after the MonoBehaviour is created
 	[SerializeField]
 	public GameObject ball;
-	public SphereCollider ballCollider; // collider o mesh 
+	public SphereCollider ballCollider;
 	public ModelAsset modelAsset;
 	public MeshFilter clothMeshFilter;
 	public SkinnedMeshRenderer smr;
@@ -29,7 +28,6 @@ public class DebugMesh : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
 		// Capture the current poses
 		smr.BakeMesh(bakedMesh);
 

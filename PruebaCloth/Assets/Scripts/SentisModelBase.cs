@@ -25,7 +25,7 @@ public abstract class ClothML : MonoBehaviour
     protected abstract int SeqLen { get; }
     protected abstract int FeatureCount { get; }
 
-    // Buffer para guardar el estado normalizado de los �ltimos seqLen frames
+    // Buffer para guardar el estado normalizado de los ultimos seqLen frames
     // [tiempo x vertice x feature]
     protected float[] historyBuffer;
 
@@ -122,12 +122,10 @@ public abstract class ClothML : MonoBehaviour
 
 		for (int i = 0; i < VertexCount; i++)
         {
-            // --- NUEVO: Comprobamos si el v�rtice est� anclado ---
-            // Si maxDistance es 0, el v�rtice no debe moverse bajo ninguna circunstancia
             if (maxDistance[i] == 0f)
             {
                 newVertices[i] = vertices[i];
-                continue; // Pasamos al siguiente v�rtice
+                continue;
             }
 
             // Denormalizamos el desplazamiento predicho
