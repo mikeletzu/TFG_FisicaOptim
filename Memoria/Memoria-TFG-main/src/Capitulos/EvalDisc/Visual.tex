@@ -1,0 +1,15 @@
+\section{Resultados visuales de la inferencia}
+\label{sec:Visual}
+
+Dada la combinatoria posible de las características contempladas en el estudio, los resultados visuales de las simulaciones generadas por los modelos han sido muy diversos. La aleatoriedad deseada supone la necesidad de datasets y entrenamientos mayores, por lo que si bien los modelos conseguidos no son capaces de reaccionar consistentemente frente a todos los movimentos del colisionador posibles, demuestran potencial en lo que respecta a la capacidad de generalización. \newline
+
+Los mejores resultados visuales de la investigación se consiguen con el modelo RNN con la combinación de las técnicas de noise y unrolling. Presenta sobretodo una ventaja en la conservación de la estructura de la geometría de la tela, sin comprometer la naturalidad del movimiento. A pesar de que haya otros modelos más reactivos, la estabilidad de este ante el dinamismo de la simulación lo favorece a la hora de evaluar la credibilidad del resultado. Este modelo será el elegido para llevar acabo las pruebas a usuarios vistas en el siguiente apartado \ref{sec:PruebaTesters}. \newline
+
+Analizando el conjunto de experimentos realizados, se pueden observar distintos aspectos compartidos en los resultados visuales de los modelos:
+
+\begin{itemize}
+  \item Como se ha observado, los modelos que tienen más capacidad de mantener un movimiento fluido y natural (y que a veces puede llegar a ser menos reactivo), son el RNN y MLP. Al contrario, la velocidad y reducción de entrada parecen romper la naturalidad de los desplazamientos. Ambos respetan menos la consistencia temporal, produciendo movimientos erráticos a velocidades incosistentes.
+  \item Por otra parte, los únicos modelos capaces de mantener la estructura de la tela son el RNN y el PCA, ambos con unfolding. El segundo consigue recuperar al completo la estructura de reposo tras interactuar con el colisionador, aunque en ambos casos esta recuperación puede tener un efecto visual interpolado. 
+  \item Los beneficios del unrolling suponen a veces un exceso en la prevención de los posibles errores. Llegando, en algunos casos de interacción, a producir el movimiento contrario al esperado con el fin de evitar movimientos de inercia desproporcionados.
+  \item Ocasionalmente, los impactos contra el colisionador atraviesan la tela. Si bien, su reactividad no es infalible, este problema ya se encuentra en la simulación de Cloth propia de Unity, por lo que el entrenamiento reproduce o incluso potencia estos errores de base.
+\end{itemize}

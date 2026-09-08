@@ -1,0 +1,14 @@
+\chapter*{Abstract}
+
+\section*{\tituloPortadaEngVal}
+This work compares different AI models and techniques to replicate physics simulations with high computational cost in 3D videogame engines. \newline
+
+Cloth simulation is taken as a case study, due to its geometry and features, it represents a perfect example of a computationally expensive simulation to implement ML based optimization. The simulation is set up in Unity3D as an object with a cloth component along a collider inducing diverse movement and deformations. Datasets for this simulation are registered in run-time and then exported to a Pytorch environment to train different models: a MLP, a RRN, alongside error propagation and data dimensionality reduction techniques.
+
+The trained models are exported back to Unity to replace the physics solver of the Cloth component through the Sentis package. The ML component infers the displacement of each vertex in each frame, which are then applied to the geometry. Finally, various experiments are carried out to compare the performance and visual result of different implementations. The optimal result was achieved by a RNN model with a BPTT technique to handle the error, nevertheless optimizations in the performance are due for the results to be conclusive.\newline
+
+\textit{Access to the repository: \url{https://github.com/mikeletzu/TFG_FisicaOptim}}
+
+\section*{Keywords}
+
+\noindent Cloth, Artificial Inteligence, Physics simulation, ML, Sentis, Unity, PyTorch, Videogames, Optimization

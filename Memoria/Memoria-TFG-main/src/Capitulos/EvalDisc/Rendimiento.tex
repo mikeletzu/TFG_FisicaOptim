@@ -1,0 +1,17 @@
+\section{Análisis del Rendimiento}
+\label{sec:Rendimiento}
+Uno de los objetivos principales de este proyecto es replicar la simulación de un solver de telas con baja latencia, haciéndolo accesible para el desarollo indie en un motor como es Unity. Como se ha visto en el estado del arte, esa optimización se ha conseguido desde distintos enfoques a nivel académico y está en las primeras fases de implementación a nivel de industria, como herramienta para artistas o reducción de la carga de simulación de ropa (Chaos Cloth). Lamentablemente, el enfoque y la escala propias de esta investigación no han permitido reproducir resultados similares, es decir, un rendimiento notable respecto al propio de los solvers. \newline
+
+El modelo que mejor rendimiento obtiene es la RNN sobre la que se aplica un PCA. Esta supera ligeramente la tasa de frames alcanzada por el solver de Cloth de Unity, con una inferencia de xms. El resto de modelos, sin reducciones aplicadas, no han conseguido alcanzar inferencias adecuadas.
+
+La pérdida de enfoque en la optimización durante la investigación ha sido ocasionada por la simulación escogida como principal, que como se ha mencionado anteriormente, es altamente dinámica. La inercia presenta desafíos distintos que los tratados por estudios que se enfocan más en la creación de deformaciones y arrugas correctas a baja latencia. Debido a esto, ha tenido lugar la priorización de técnicas y características que permitían llegar a resultados con sentido visual y manejar la inercia, frente a las características de reducción necesarias para mantener la inferencia baja y completamente escalable. La RNN sin reducción de espacio consigue inferir la inercia pero no es óptima. El sistema de many to one resulta un impedimento frente a la cantidad de datos necesaria. Pese a que la optimización y los resultados visualmente atractivos son dos conceptos que siempre se encuentran en conflicto, ha de encontrarse un punto más cercano a la reducción.
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%Organización
+%- El modelo que mejor rendimiento es el PCA, que supera ligermente la tasa de frames alcanzada con el cloth de Unity, con una inferencia de tal. Hopefully esto con 2000 vertices es mas visible (escalable?). No.
+%- Los otros modelos se han quedado atrás. Es esto suficiente? No. Por ejemplo, la rnn para tratar estos datos aunque sea con el PCA, sirve para inferir la inercia pero no es óptimo. (mencionar todos los resultados de inferncia, comparacion con otro modelo de otro estudio...?)
+
+%- Se ha primado en parte del proceso el resultado coherente y visual, lo cual va directamente en conflicto con el rendimiento. Veremos ahora los resultados visuales. 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%\explicacionDobleCara
+
