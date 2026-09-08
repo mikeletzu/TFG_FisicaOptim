@@ -1599,7 +1599,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.7
+  m_Radius: 0.6
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &339546647
 MeshRenderer:
@@ -3326,8 +3326,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   pathPointMin: 2
-  pathPointMax: 4
-  simpleZmovement: 0
+  pathPointMax: 2
+  simpleZmovement: 1
 --- !u!65 &1132809794
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -4157,10 +4157,10 @@ MonoBehaviour:
   sphereColliders:
   - {fileID: 339546646}
   capsuleColliders: []
-  modelAsset: {fileID: 5022602860645237092, guid: c5e064c6892190042896593c3a5ee211, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: 28ff8a1012058db449e24c2909ee7ce3, type: 3}
   clothMeshFilter: {fileID: 1554518662}
   collidersUnionSmoothness: 0
-  jsonFile: {fileID: 4900000, guid: 10d7fc59b63a04442a3cbb0039484f3e, type: 3}
+  jsonFile: {fileID: 4900000, guid: 13beecb2d44ac1f4986064bceb5dc259, type: 3}
   normData:
     mean: []
     std: []
@@ -4840,10 +4840,10 @@ MonoBehaviour:
   sphereColliders:
   - {fileID: 339546646}
   capsuleColliders: []
-  modelAsset: {fileID: 5022602860645237092, guid: 971eca0becb23194781a55da9fdb73c3, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: dcc6daa641c912d42b3f7a2717cf7983, type: 3}
   clothMeshFilter: {fileID: 1872676682}
   collidersUnionSmoothness: 0
-  jsonFile: {fileID: 4900000, guid: 2286f3bbf41d13d4681b7c671f5c11ad, type: 3}
+  jsonFile: {fileID: 4900000, guid: 21cc01afa7663284f9526d503e1050cb, type: 3}
   normData:
     mean: []
     std: []
