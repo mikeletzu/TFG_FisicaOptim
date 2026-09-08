@@ -42,4 +42,9 @@ public class SceneLoader : MonoBehaviour
     {
         SceneManager.LoadScene("MenuScene");
     }
+
+    public void doExitGame()
+    {
+        Application.Quit();
+    }
 }

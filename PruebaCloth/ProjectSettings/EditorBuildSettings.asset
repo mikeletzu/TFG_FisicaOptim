@@ -6,17 +6,20 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/BallScene.unity
-    guid: 8534d19d499154249be5e15dc3784425
-  - enabled: 1
-    path: Assets/Scenes/Metricas.unity
-    guid: 0d158d09501d5e148947921a7228fcee
-  - enabled: 1
     path: Assets/Scenes/AppExperimentos/MenuScene.unity
     guid: ea42a63c70eaf984f88941148a434268
   - enabled: 1
-    path: Assets/Scenes/ShirtScene.unity
-    guid: 11ce45a3a1f292a44b07b1a7235792ec
+    path: Assets/Scenes/AppExperimentos/Unrolling.unity
+    guid: 10b939721500c5c47a48b1ff4ffe97b1
+  - enabled: 1
+    path: Assets/Scenes/AppExperimentos/PCA.unity
+    guid: 2ae9b3277d0dd754c97a18c892c6b24f
+  - enabled: 1
+    path: Assets/Scenes/AppExperimentos/Recurrencia.unity
+    guid: a3b4dde1f781a284e9b48331281d2996
+  - enabled: 1
+    path: Assets/Scenes/AppExperimentos/Velocidad.unity
+    guid: f565ec138ab87cf4e8c5063caa992ded
   m_configObjects:
     com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
   m_UseUCBPForAssetBundles: 0

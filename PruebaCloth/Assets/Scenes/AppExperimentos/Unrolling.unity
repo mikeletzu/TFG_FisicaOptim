@@ -1579,6 +1579,7 @@ MonoBehaviour:
   isLineal: 0
   movementSpeed: 0.35
   isAuto: 1
+  initPos: {x: 0, y: 0, z: 0}
 --- !u!135 &339546646
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -1598,7 +1599,7 @@ SphereCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 0.7
   m_Center: {x: 0, y: 0, z: 0}
 --- !u!23 &339546647
 MeshRenderer:
@@ -1942,7 +1943,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &512484658
 Transform:
   m_ObjectHideFlags: 0
@@ -3325,8 +3326,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: '::'
   pathPointMin: 2
-  pathPointMax: 2
-  simpleZmovement: 1
+  pathPointMax: 4
+  simpleZmovement: 0
 --- !u!65 &1132809794
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -3346,8 +3347,8 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 1.4928968, y: 0.7661903, z: 1.9486967}
-  m_Center: {x: -0.07111347, y: -0.1545457, z: 0.14855844}
+  m_Size: {x: 1.23, y: 0.65146637, z: 1.5048006}
+  m_Center: {x: -0.07111347, y: -0.15321316, z: 0.10965758}
 --- !u!23 &1132809795
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -4156,10 +4157,10 @@ MonoBehaviour:
   sphereColliders:
   - {fileID: 339546646}
   capsuleColliders: []
-  modelAsset: {fileID: 5022602860645237092, guid: 9305e631a07edac408d69f142e13ae5a, type: 3}
+  modelAsset: {fileID: 5022602860645237092, guid: c5e064c6892190042896593c3a5ee211, type: 3}
   clothMeshFilter: {fileID: 1554518662}
   collidersUnionSmoothness: 0
-  jsonFile: {fileID: 4900000, guid: cfa02cc15ed64184b90896d80f90d19d, type: 3}
+  jsonFile: {fileID: 4900000, guid: 10d7fc59b63a04442a3cbb0039484f3e, type: 3}
   normData:
     mean: []
     std: []
